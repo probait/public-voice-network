@@ -1,63 +1,113 @@
 
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import SubmissionForm from "@/components/SubmissionForm";
-import CommunityFeed from "@/components/CommunityFeed";
-import { Link } from "react-router-dom";
+import NewSubmissionForm from "@/components/NewSubmissionForm";
+import CampaignFeed from "@/components/CampaignFeed";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const Index = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      // User is authenticated, stay on homepage
+    }
+  }, [user, loading, navigate]);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-primary/5 to-background py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-6 civic-text-gradient">
-            Your Voice Matters
+      <section className="bg-gradient-to-r from-red-600 to-orange-600 text-white py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl sm:text-6xl font-bold mb-6">
+            The world's platform for change
           </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Share the issues and concerns affecting your daily life. Together, we can drive understanding and change.
+          <p className="text-xl sm:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
+            Start a campaign. Mobilize supporters. Create change.
           </p>
+          {!user && (
+            <Link to="/auth">
+              <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3">
+                Start a campaign
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
 
-      {/* Submission Form Section */}
-      <section className="py-16">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
-            <h2 className="text-2xl font-bold mb-6 text-center">Share Your Concern</h2>
-            <SubmissionForm />
+      {/* Campaign Form Section - Only show if user is logged in */}
+      {user && (
+        <section className="py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <NewSubmissionForm />
+          </div>
+        </section>
+      )}
+
+      {/* Stats Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold text-red-600 mb-2">500M+</div>
+              <div className="text-gray-600">People taking action</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-red-600 mb-2">195</div>
+              <div className="text-gray-600">Countries</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold text-red-600 mb-2">100K+</div>
+              <div className="text-gray-600">Victories every month</div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Mission Statement */}
-      <section className="py-16 bg-muted/30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
-          <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-            Community Voices is a public platform where anyone can share the issues and concerns affecting their daily life. 
-            By collecting and sharing these voices, we aim to give policymakers, nonprofits, and commercial AI firms better 
-            insight into the real challenges faced by communities across the globe.
-          </p>
-          <Link to="/about">
-            <Button variant="outline">Learn More About Us</Button>
-          </Link>
-        </div>
-      </section>
-
-      {/* Recent Community Feed Preview */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Recent Campaigns Feed */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Recent Community Voices</h2>
+            <h2 className="text-3xl font-bold text-gray-900">Recent campaigns</h2>
             <Link to="/feed">
-              <Button>View All</Button>
+              <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
+                View all campaigns
+              </Button>
             </Link>
           </div>
-          <CommunityFeed limit={5} />
+          <CampaignFeed limit={5} />
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-20 bg-red-600 text-white text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            Ready to start your campaign?
+          </h2>
+          <p className="text-xl mb-8 opacity-90">
+            Join millions of people creating positive change in their communities and beyond.
+          </p>
+          {!user ? (
+            <Link to="/auth">
+              <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3">
+                Get started
+              </Button>
+            </Link>
+          ) : (
+            <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3" onClick={() => {
+              document.querySelector('form')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
+              Start your campaign
+            </Button>
+          )}
         </div>
       </section>
 
