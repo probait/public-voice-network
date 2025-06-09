@@ -1,9 +1,9 @@
-// This component has been replaced by NewSubmissionForm.tsx
+// This component has been replaced by NewMeetupForm.tsx
 // Keeping this file to avoid breaking imports, but it's deprecated
-import NewSubmissionForm from './NewSubmissionForm';
+import NewMeetupForm from './NewMeetupForm';
 
-const SubmissionForm = ({ onSubmit }: { onSubmit?: (data: any) => void }) => {
-  return <NewSubmissionForm onSubmit={onSubmit} />;
+const SubmissionForm = ({ onSubmit }: { onSubmit?: () => void }) => {
+  return <NewMeetupForm onSubmit={onSubmit} />;
 };
 
 export default SubmissionForm;

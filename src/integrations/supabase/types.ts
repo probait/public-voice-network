@@ -9,6 +9,80 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      attendees: {
+        Row: {
+          created_at: string
+          id: string
+          meetup_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meetup_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meetup_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendees_meetup_id_fkey"
+            columns: ["meetup_id"]
+            isOneToOne: false
+            referencedRelation: "meetups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetups: {
+        Row: {
+          category: string | null
+          created_at: string
+          date_time: string
+          description: string
+          id: string
+          is_virtual: boolean | null
+          location: string
+          max_attendees: number | null
+          meeting_link: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          date_time: string
+          description: string
+          id?: string
+          is_virtual?: boolean | null
+          location: string
+          max_attendees?: number | null
+          meeting_link?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          date_time?: string
+          description?: string
+          id?: string
+          is_virtual?: boolean | null
+          location?: string
+          max_attendees?: number | null
+          meeting_link?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -36,42 +110,6 @@ export type Database = {
           id?: string
           location?: string | null
           updated_at?: string
-        }
-        Relationships: []
-      }
-      submissions: {
-        Row: {
-          category: string | null
-          content: string
-          created_at: string
-          id: string
-          is_anonymous: boolean | null
-          location: string | null
-          title: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          category?: string | null
-          content: string
-          created_at?: string
-          id?: string
-          is_anonymous?: boolean | null
-          location?: string | null
-          title?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          category?: string | null
-          content?: string
-          created_at?: string
-          id?: string
-          is_anonymous?: boolean | null
-          location?: string | null
-          title?: string | null
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }

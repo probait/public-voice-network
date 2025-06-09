@@ -1,9 +1,9 @@
 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import CampaignFeed from "@/components/CampaignFeed";
+import MeetupFeed from "@/components/MeetupFeed";
 
-const Feed = () => {
+const Meetups = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -11,12 +11,12 @@ const Feed = () => {
       <main className="py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">All Campaigns</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">AI Meetups</h1>
             <p className="text-gray-600">
-              Discover campaigns from people around the world who are fighting for change.
+              Discover AI meetups from enthusiasts around the world who are exploring the future of artificial intelligence.
             </p>
           </div>
-          <CampaignFeed />
+          <MeetupFeed />
         </div>
       </main>
 
@@ -25,4 +25,4 @@ const Feed = () => {
   );
 };
 
-export default Feed;
+export default Meetups;

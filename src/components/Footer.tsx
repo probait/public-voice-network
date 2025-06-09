@@ -9,7 +9,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">PolicyNow</h3>
             <p className="text-muted-foreground">
-              The world's platform for policy change. Start campaigns, mobilize supporters, and create meaningful change.
+              Connecting AI enthusiasts and concerned citizens to discuss the challenges and opportunities ahead.
             </p>
           </div>
           
@@ -17,10 +17,10 @@ const Footer = () => {
             <h4 className="text-md font-semibold mb-4">Quick Links</h4>
             <div className="space-y-2">
               <Link to="/" className="block text-muted-foreground hover:text-primary transition-colors">
-                Start a Campaign
+                Organize a Meetup
               </Link>
-              <Link to="/feed" className="block text-muted-foreground hover:text-primary transition-colors">
-                Browse Campaigns
+              <Link to="/meetups" className="block text-muted-foreground hover:text-primary transition-colors">
+                Browse Meetups
               </Link>
               <Link to="/about" className="block text-muted-foreground hover:text-primary transition-colors">
                 About

@@ -13,7 +13,7 @@ const About = () => {
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-6">About PolicyNow</h1>
             <p className="text-xl text-muted-foreground">
-              The world's platform for policy change
+              Connecting AI enthusiasts to shape the future together
             </p>
           </div>
 
@@ -22,26 +22,27 @@ const About = () => {
               <CardContent className="p-8">
                 <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  PolicyNow is the world's platform for policy change. We empower people everywhere to start campaigns, 
-                  mobilize supporters, and work with decision makers to drive solutions. By collecting and amplifying voices, 
-                  we help policymakers, nonprofits, and organizations better understand the real challenges faced by communities. 
-                  Your voice matters. Together, we can drive understanding and change.
+                  PolicyNow is a platform that brings together AI enthusiasts, researchers, policymakers, and concerned 
+                  citizens to discuss the challenges and opportunities that artificial intelligence presents. We believe 
+                  that the future of AI should be shaped by diverse voices coming together in meaningful conversations. 
+                  Through local meetups and community discussions, we're building a network of people who care about 
+                  creating a beneficial AI future for everyone.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-4">How Your Data Is Used</h2>
+                <h2 className="text-2xl font-bold mb-4">Why AI Meetups Matter</h2>
                 <div className="space-y-4 text-muted-foreground">
-                  <p>We believe in transparency about how your contributions are used:</p>
+                  <p>AI is rapidly transforming our world, and these changes affect everyone:</p>
                   <ul className="list-disc list-inside space-y-2">
-                    <li><strong>Policymakers:</strong> Aggregated data helps inform policy decisions and resource allocation</li>
-                    <li><strong>Nonprofits:</strong> Organizations use insights to better understand community needs and direct their efforts</li>
-                    <li><strong>Commercial AI Firms:</strong> Data helps train AI systems to better understand real-world problems and concerns</li>
-                    <li><strong>Researchers:</strong> Academic institutions may access anonymized data for social research</li>
+                    <li><strong>Policy Implications:</strong> Understanding how AI governance and regulation will shape our future</li>
+                    <li><strong>Ethical Considerations:</strong> Discussing bias, fairness, and responsible AI development</li>
+                    <li><strong>Economic Impact:</strong> Exploring how AI will change jobs, industries, and economic structures</li>
+                    <li><strong>Safety Concerns:</strong> Addressing risks and ensuring AI systems remain beneficial and controllable</li>
+                    <li><strong>Public Awareness:</strong> Educating communities about AI capabilities and limitations</li>
                   </ul>
-                  <p>All data sharing follows strict privacy guidelines and user consent protocols.</p>
                 </div>
               </CardContent>
             </Card>
@@ -54,22 +55,22 @@ const About = () => {
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-primary font-bold">1</span>
                     </div>
-                    <h3 className="font-semibold mb-2">Start Your Campaign</h3>
-                    <p className="text-sm text-muted-foreground">Create a campaign for any policy issue that matters to you</p>
+                    <h3 className="font-semibold mb-2">Organize a Meetup</h3>
+                    <p className="text-sm text-muted-foreground">Create a meetup on any AI-related topic that interests you</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-primary font-bold">2</span>
                     </div>
-                    <h3 className="font-semibold mb-2">Mobilize Support</h3>
-                    <p className="text-sm text-muted-foreground">Share your campaign and gather supporters from around the world</p>
+                    <h3 className="font-semibold mb-2">Gather Participants</h3>
+                    <p className="text-sm text-muted-foreground">Connect with like-minded people in your area or join virtual discussions</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-primary font-bold">3</span>
                     </div>
-                    <h3 className="font-semibold mb-2">Drive Change</h3>
-                    <p className="text-sm text-muted-foreground">Work with decision makers to implement real policy solutions</p>
+                    <h3 className="font-semibold mb-2">Shape the Future</h3>
+                    <p className="text-sm text-muted-foreground">Engage in meaningful conversations that can influence AI development and policy</p>
                   </div>
                 </div>
               </CardContent>
@@ -83,7 +84,7 @@ const About = () => {
                 </p>
                 <div className="space-y-2 text-muted-foreground">
                   <p><strong>Email:</strong> <a href="mailto:contact@policynow.org" className="text-primary hover:underline">contact@policynow.org</a></p>
-                  <p><strong>For data requests:</strong> <a href="mailto:data@policynow.org" className="text-primary hover:underline">data@policynow.org</a></p>
+                  <p><strong>For partnerships:</strong> <a href="mailto:partnerships@policynow.org" className="text-primary hover:underline">partnerships@policynow.org</a></p>
                   <p><strong>Privacy concerns:</strong> <a href="mailto:privacy@policynow.org" className="text-primary hover:underline">privacy@policynow.org</a></p>
                 </div>
               </CardContent>
