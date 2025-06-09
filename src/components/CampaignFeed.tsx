@@ -1,11 +1,10 @@
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
-import { formatDistanceToNow } from 'date-fns';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatDistanceToNow } from "date-fns";
 
 interface Campaign {
   id: string;
@@ -22,9 +21,9 @@ interface Campaign {
 }
 
 const CampaignFeed = ({ limit }: { limit?: number }) => {
-  const { data: campaigns = [], isLoading } = useQuery({
+  const { data: campaigns = [], isLoading, error } = useQuery({
     queryKey: ['campaigns', limit],
-    queryFn: async () => {
+    queryFn: async (): Promise<Campaign[]> => {
       let query = supabase
         .from('submissions')
         .select(`
@@ -47,48 +46,29 @@ const CampaignFeed = ({ limit }: { limit?: number }) => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
-      return data as Campaign[];
-    }
+      
+      if (error) {
+        console.error('Error fetching campaigns:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
   });
-
-  const getDisplayName = (campaign: Campaign) => {
-    if (campaign.is_anonymous) return "Anonymous";
-    return campaign.profiles?.full_name || "Unknown User";
-  };
-
-  const getInitials = (name: string) => {
-    if (name === "Anonymous") return "A";
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
-
-  const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
-      environment: "bg-green-100 text-green-800",
-      education: "bg-blue-100 text-blue-800",
-      healthcare: "bg-red-100 text-red-800",
-      "social-justice": "bg-purple-100 text-purple-800",
-      politics: "bg-gray-100 text-gray-800",
-      economy: "bg-yellow-100 text-yellow-800",
-      other: "bg-gray-100 text-gray-800"
-    };
-    return colors[category] || colors.other;
-  };
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, i) => (
           <Card key={i} className="animate-pulse">
-            <CardContent className="p-6">
-              <div className="flex items-start space-x-4">
-                <div className="h-12 w-12 rounded-full bg-gray-200"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-16 bg-gray-200 rounded"></div>
-                </div>
-              </div>
+            <CardHeader>
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-2/3"></div>
             </CardContent>
           </Card>
         ))}
@@ -96,62 +76,66 @@ const CampaignFeed = ({ limit }: { limit?: number }) => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">Error loading campaigns. Please try again later.</p>
+      </div>
+    );
+  }
+
   if (campaigns.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <p className="text-muted-foreground">No campaigns yet. Be the first to start a campaign!</p>
-        </CardContent>
-      </Card>
+      <div className="text-center py-8">
+        <p className="text-gray-500">No campaigns yet. Be the first to start one!</p>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {campaigns.map((campaign) => (
-        <Card key={campaign.id} className="hover:shadow-lg transition-shadow border-l-4 border-l-red-500">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-4">
-              <Avatar className="h-12 w-12">
-                <AvatarImage src={!campaign.is_anonymous ? campaign.profiles?.avatar_url : undefined} />
-                <AvatarFallback className="bg-red-100 text-red-600">
-                  {getInitials(getDisplayName(campaign))}
-                </AvatarFallback>
-              </Avatar>
-              
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <h3 className="font-semibold text-gray-900">{getDisplayName(campaign)}</h3>
-                    {campaign.location && (
-                      <span className="text-sm text-gray-500">• {campaign.location}</span>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {campaign.category && (
-                      <Badge variant="secondary" className={getCategoryColor(campaign.category)}>
-                        {campaign.category.replace('-', ' ')}
-                      </Badge>
-                    )}
-                    <span className="text-sm text-gray-500">
-                      {formatDistanceToNow(new Date(campaign.created_at), { addSuffix: true })}
-                    </span>
-                  </div>
+        <Card key={campaign.id} className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                  {campaign.title || 'Untitled Campaign'}
+                </CardTitle>
+                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                  {!campaign.is_anonymous && campaign.profiles ? (
+                    <div className="flex items-center space-x-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={campaign.profiles.avatar_url} />
+                        <AvatarFallback className="text-xs">
+                          {campaign.profiles.full_name?.split(' ').map(n => n[0]).join('') || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>{campaign.profiles.full_name}</span>
+                    </div>
+                  ) : (
+                    <span>Anonymous</span>
+                  )}
+                  <span>•</span>
+                  <span>{formatDistanceToNow(new Date(campaign.created_at), { addSuffix: true })}</span>
                 </div>
-                
-                <h2 className="text-xl font-bold text-gray-900 mb-3">{campaign.title}</h2>
-                <p className="text-gray-700 leading-relaxed">{campaign.content}</p>
-                
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                  <div className="flex space-x-4 text-sm text-gray-500">
-                    <button className="hover:text-red-600 transition-colors">Support</button>
-                    <button className="hover:text-red-600 transition-colors">Share</button>
-                    <button className="hover:text-red-600 transition-colors">Comment</button>
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    0 supporters
-                  </div>
-                </div>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 mb-4 line-clamp-3">
+              {campaign.content}
+            </p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                {campaign.category && (
+                  <Badge variant="secondary" className="text-xs">
+                    {campaign.category}
+                  </Badge>
+                )}
+                {campaign.location && (
+                  <span className="text-xs text-gray-500">📍 {campaign.location}</span>
+                )}
               </div>
             </div>
           </CardContent>

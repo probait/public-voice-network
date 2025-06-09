@@ -11,9 +11,9 @@ const About = () => {
       <main className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-6">About Community Voices</h1>
+            <h1 className="text-4xl font-bold mb-6">About PolicyNow</h1>
             <p className="text-xl text-muted-foreground">
-              Amplifying community concerns to drive meaningful change
+              The world's platform for policy change
             </p>
           </div>
 
@@ -22,9 +22,10 @@ const About = () => {
               <CardContent className="p-8">
                 <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  Community Voices is a public platform where anyone can share the issues and concerns affecting their daily life. 
-                  By collecting and sharing these voices, we aim to give policymakers, nonprofits, and commercial AI firms better 
-                  insight into the real challenges faced by communities across the globe. Your voice matters. Together, we can drive understanding and change.
+                  PolicyNow is the world's platform for policy change. We empower people everywhere to start campaigns, 
+                  mobilize supporters, and work with decision makers to drive solutions. By collecting and amplifying voices, 
+                  we help policymakers, nonprofits, and organizations better understand the real challenges faced by communities. 
+                  Your voice matters. Together, we can drive understanding and change.
                 </p>
               </CardContent>
             </Card>
@@ -53,22 +54,22 @@ const About = () => {
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-primary font-bold">1</span>
                     </div>
-                    <h3 className="font-semibold mb-2">Share Your Concern</h3>
-                    <p className="text-sm text-muted-foreground">Submit any issue or concern affecting your community</p>
+                    <h3 className="font-semibold mb-2">Start Your Campaign</h3>
+                    <p className="text-sm text-muted-foreground">Create a campaign for any policy issue that matters to you</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-primary font-bold">2</span>
                     </div>
-                    <h3 className="font-semibold mb-2">Join the Feed</h3>
-                    <p className="text-sm text-muted-foreground">Your voice appears in our public community feed</p>
+                    <h3 className="font-semibold mb-2">Mobilize Support</h3>
+                    <p className="text-sm text-muted-foreground">Share your campaign and gather supporters from around the world</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-primary font-bold">3</span>
                     </div>
                     <h3 className="font-semibold mb-2">Drive Change</h3>
-                    <p className="text-sm text-muted-foreground">Decision makers use insights to address community needs</p>
+                    <p className="text-sm text-muted-foreground">Work with decision makers to implement real policy solutions</p>
                   </div>
                 </div>
               </CardContent>
@@ -81,9 +82,9 @@ const About = () => {
                   Have questions, suggestions, or want to partner with us? We'd love to hear from you.
                 </p>
                 <div className="space-y-2 text-muted-foreground">
-                  <p><strong>Email:</strong> <a href="mailto:contact@communityvoices.org" className="text-primary hover:underline">contact@communityvoices.org</a></p>
-                  <p><strong>For data requests:</strong> <a href="mailto:data@communityvoices.org" className="text-primary hover:underline">data@communityvoices.org</a></p>
-                  <p><strong>Privacy concerns:</strong> <a href="mailto:privacy@communityvoices.org" className="text-primary hover:underline">privacy@communityvoices.org</a></p>
+                  <p><strong>Email:</strong> <a href="mailto:contact@policynow.org" className="text-primary hover:underline">contact@policynow.org</a></p>
+                  <p><strong>For data requests:</strong> <a href="mailto:data@policynow.org" className="text-primary hover:underline">data@policynow.org</a></p>
+                  <p><strong>Privacy concerns:</strong> <a href="mailto:privacy@policynow.org" className="text-primary hover:underline">privacy@policynow.org</a></p>
                 </div>
               </CardContent>
             </Card>
