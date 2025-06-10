@@ -1,7 +1,8 @@
-import CampaignFeed from './CampaignFeed';
+
+import MeetupFeed from './MeetupFeed';
 
 const CommunityFeed = ({ limit }: { limit?: number }) => {
-  return <CampaignFeed limit={limit} />;
+  return <MeetupFeed limit={limit} />;
 };
 
 export default CommunityFeed;

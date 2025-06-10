@@ -51,10 +51,7 @@ const MeetupFeed = ({ limit }: { limit?: number }) => {
           is_virtual,
           meeting_link,
           created_at,
-          profiles!inner(
-            full_name,
-            avatar_url
-          ),
+          user_id,
           attendees(count),
           attendees!inner(user_id)
         `)
@@ -64,15 +61,31 @@ const MeetupFeed = ({ limit }: { limit?: number }) => {
         query = query.limit(limit);
       }
 
-      const { data, error } = await query;
+      const { data: meetupsData, error } = await query;
       
       if (error) {
         console.error('Error fetching meetups:', error);
         throw error;
       }
 
-      return (data || []).map(meetup => ({
+      // Now get the profiles for the meetup organizers
+      const userIds = meetupsData?.map(meetup => meetup.user_id).filter(Boolean) || [];
+      
+      let profilesData: any[] = [];
+      if (userIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url')
+          .in('id', userIds);
+        
+        if (!profilesError) {
+          profilesData = profiles || [];
+        }
+      }
+
+      return (meetupsData || []).map(meetup => ({
         ...meetup,
+        profiles: profilesData.find(profile => profile.id === meetup.user_id) || null,
         attendee_count: meetup.attendees?.length || 0,
         user_attending: user ? meetup.attendees?.some((a: any) => a.user_id === user.id) || false : false
       }));
