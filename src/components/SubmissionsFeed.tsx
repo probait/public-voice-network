@@ -81,8 +81,8 @@ const SubmissionsFeed = () => {
 
   return (
     <div className="w-full">
-      <ScrollArea className="h-96 w-full rounded-md">
-        <div className="p-2">
+      <ScrollArea className="h-80 w-full rounded-md">
+        <div className="p-1">
           {mockSubmissions.map((submission) => (
             <SubmissionCard
               key={submission.id}

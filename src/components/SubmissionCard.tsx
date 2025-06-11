@@ -30,26 +30,26 @@ const SubmissionCard = ({ name, province, category, subject, message, timeAgo }:
   };
 
   return (
-    <Card className="w-full bg-white shadow-sm hover:shadow-md transition-shadow mb-3">
-      <CardContent className="p-4">
-        <div className="flex items-start space-x-3">
-          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
+    <Card className="w-full bg-white shadow-sm hover:shadow-md transition-shadow mb-2">
+      <CardContent className="p-3">
+        <div className="flex items-start space-x-2">
+          <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0">
             {getInitials(name)}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-1 mb-1">
-              <p className="font-semibold text-gray-900 text-sm truncate">{name}</p>
+              <p className="font-semibold text-gray-900 text-xs truncate">{name}</p>
               <span className="text-gray-400 text-xs">•</span>
               <span className="text-gray-500 text-xs">{province}</span>
               <span className="text-gray-400 text-xs">•</span>
               <span className="text-gray-500 text-xs">{timeAgo}</span>
             </div>
-            <div className="mb-2">
-              <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(category)}`}>
+            <div className="mb-1">
+              <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-medium ${getCategoryColor(category)}`}>
                 {category.charAt(0).toUpperCase() + category.slice(1)}
               </span>
             </div>
-            <h4 className="font-medium text-gray-900 mb-1 text-sm line-clamp-1">{subject}</h4>
+            <h4 className="font-medium text-gray-900 mb-1 text-xs line-clamp-1">{subject}</h4>
             <p className="text-gray-600 text-xs line-clamp-2">{message}</p>
           </div>
         </div>
