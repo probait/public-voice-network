@@ -18,19 +18,19 @@ interface EventbriteEvent {
   image_url: string;
 }
 
-// Hand-selected events - in a real app, these would come from Eventbrite API
+// Hand-selected events - in a real app, these would come from various event platforms
 const featuredEvents: EventbriteEvent[] = [
   {
     id: "1",
-    title: "AI Ethics Symposium Toronto",
-    description: "Join leading experts to discuss the ethical implications of AI development and deployment in Canadian society.",
+    title: "AI & Future of Work Panel Discussion",
+    description: "Join industry leaders and experts as they discuss how artificial intelligence is reshaping the workplace and what it means for Canadian workers and businesses.",
     location: "Toronto, ON",
-    date_time: "2025-07-15T14:00:00",
-    url: "https://eventbrite.ca/example1",
-    organizer: "University of Toronto AI Institute",
-    category: "Ethics",
+    date_time: "2025-07-10T18:30:00",
+    url: "https://lu.ma/j449jzh1",
+    organizer: "AI Future Forum",
+    category: "Panel Discussion",
     price: "Free",
-    image_url: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=200&fit=crop"
+    image_url: "/lovable-uploads/47b1e719-4a13-487a-b7a0-a918ee25dce0.png"
   },
   {
     id: "2",
@@ -114,7 +114,7 @@ const EventbriteFeed = () => {
             >
               <a href={event.url} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="h-4 w-4 mr-2" />
-                View on Eventbrite
+                View event details
               </a>
             </Button>
           </CardContent>
