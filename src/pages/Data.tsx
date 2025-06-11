@@ -1,687 +1,352 @@
 
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { BarChart3, Users, MapPin, Calendar, AlertTriangle, CheckCircle } from "lucide-react";
+import { BarChart3, Users, MapPin, Calendar, AlertTriangle, CheckCircle, Leaf, Heart } from "lucide-react";
 
 const Data = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50">
       <Navigation />
       
       <main className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Key Policy Recommendations - At the top */}
-          <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg p-8 mb-12 shadow-sm">
-            <div className="flex items-center mb-6">
-              <AlertTriangle className="h-8 w-8 text-red-600 mr-3" />
-              <h2 className="text-3xl font-bold text-red-800">Key Policy Recommendations</h2>
+          {/* Header with Canadian flair */}
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center mb-6">
+              <Leaf className="h-8 w-8 text-red-600 mr-3" />
+              <h1 className="text-5xl font-bold text-gray-900">Community Voices</h1>
+              <Leaf className="h-8 w-8 text-red-600 ml-3" />
+            </div>
+            <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+              Real concerns from real Canadians about AI across our great nation. 
+              From coast to coast, these voices represent the heart of our democratic dialogue.
+            </p>
+            <div className="mt-6 flex items-center justify-center text-sm text-red-700">
+              <Heart className="h-4 w-4 mr-2" />
+              <span>Powered by community participation • Updated daily</span>
+            </div>
+          </div>
+
+          {/* Key Policy Recommendations - Redesigned with Canadian styling */}
+          <div className="bg-white border-l-8 border-red-600 rounded-r-lg shadow-lg p-8 mb-16">
+            <div className="flex items-center mb-8">
+              <div className="bg-red-100 p-3 rounded-full mr-4">
+                <AlertTriangle className="h-8 w-8 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-red-800">Priority Actions for Canada</h2>
+                <p className="text-red-600 mt-2">Based on community input from across the country</p>
+              </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-red-50 rounded-lg p-6 border border-red-200">
                 <div className="flex items-center mb-4">
-                  <AlertTriangle className="h-6 w-6 text-red-600 mr-2" />
-                  <h3 className="text-xl font-semibold text-red-700">Immediate Actions Needed</h3>
+                  <AlertTriangle className="h-6 w-6 text-red-600 mr-3" />
+                  <h3 className="text-xl font-semibold text-red-800">Immediate Community Needs</h3>
                 </div>
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-red-700">Implement AI bias testing requirements for hiring systems</span>
+                    <span className="text-red-800">Fair AI hiring practices for all Canadians</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-red-700">Establish worker retraining programs for AI-displaced jobs</span>
+                    <span className="text-red-800">Worker retraining programs in every province</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-red-700">Create Indigenous data sovereignty frameworks</span>
+                    <span className="text-red-800">Protect Indigenous data sovereignty</span>
                   </li>
                   <li className="flex items-start">
                     <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-red-700">Mandate transparent AI decision-making in healthcare</span>
+                    <span className="text-red-800">Transparent healthcare AI for all</span>
                   </li>
                 </ul>
               </div>
-              <div className="bg-white rounded-lg p-6 shadow-sm">
+              <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
                 <div className="flex items-center mb-4">
-                  <BarChart3 className="h-6 w-6 text-red-600 mr-2" />
-                  <h3 className="text-xl font-semibold text-red-700">Long-term Strategic Goals</h3>
+                  <BarChart3 className="h-6 w-6 text-blue-600 mr-3" />
+                  <h3 className="text-xl font-semibold text-blue-800">Building Canada's Future</h3>
                 </div>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-red-700">Develop comprehensive AI education curricula</span>
+                    <CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-blue-800">AI education in schools from K-12</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-red-700">Build rural broadband infrastructure for AI access</span>
+                    <CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-blue-800">Rural broadband for digital equity</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-red-700">Establish national AI ethics review board</span>
+                    <CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-blue-800">National AI ethics council</span>
                   </li>
                   <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-red-700">Create cross-provincial AI governance standards</span>
+                    <CheckCircle className="h-5 w-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-blue-800">Cross-provincial AI standards</span>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
 
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">AI Policy Research Data</h1>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              Comprehensive analysis of Canadian concerns about AI across sectors and regions. 
-              This data aggregates submissions from our platform and transcribed insights from public events.
-            </p>
-          </div>
-
-          {/* Overview Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-              <Users className="h-8 w-8 text-red-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">2,347</div>
-              <div className="text-sm text-gray-600">Total Submissions</div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-              <MapPin className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">13</div>
-              <div className="text-sm text-gray-600">Provinces & Territories</div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-              <BarChart3 className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">8</div>
-              <div className="text-sm text-gray-600">Key Sectors</div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm p-6 text-center">
-              <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">47</div>
-              <div className="text-sm text-gray-600">Events Transcribed</div>
-            </div>
-          </div>
-
-          {/* Sector Analysis */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Concerns by Sector</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Employment</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Concerns:</span>
-                    <span className="font-semibold">487</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Percentage:</span>
-                    <span className="font-semibold">21%</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Top Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Job displacement from automation</p>
-                  </div>
-                </div>
+          {/* Community Stats - Redesigned */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Growing Movement</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-white rounded-xl shadow-md p-6 text-center border-t-4 border-red-500 hover:shadow-lg transition-shadow">
+                <Users className="h-10 w-10 text-red-600 mx-auto mb-3" />
+                <div className="text-3xl font-bold text-gray-900 mb-1">2,347</div>
+                <div className="text-sm text-gray-600 font-medium">Voices Heard</div>
               </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Healthcare</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Concerns:</span>
-                    <span className="font-semibold">412</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Percentage:</span>
-                    <span className="font-semibold">18%</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Top Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">AI bias in diagnostics</p>
-                  </div>
-                </div>
+              <div className="bg-white rounded-xl shadow-md p-6 text-center border-t-4 border-blue-500 hover:shadow-lg transition-shadow">
+                <MapPin className="h-10 w-10 text-blue-600 mx-auto mb-3" />
+                <div className="text-3xl font-bold text-gray-900 mb-1">13</div>
+                <div className="text-sm text-gray-600 font-medium">Provinces & Territories</div>
               </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Privacy</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Concerns:</span>
-                    <span className="font-semibold">356</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Percentage:</span>
-                    <span className="font-semibold">15%</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Top Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Data collection without consent</p>
-                  </div>
-                </div>
+              <div className="bg-white rounded-xl shadow-md p-6 text-center border-t-4 border-green-500 hover:shadow-lg transition-shadow">
+                <BarChart3 className="h-10 w-10 text-green-600 mx-auto mb-3" />
+                <div className="text-3xl font-bold text-gray-900 mb-1">8</div>
+                <div className="text-sm text-gray-600 font-medium">Key Sectors</div>
               </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Education</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Concerns:</span>
-                    <span className="font-semibold">298</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Percentage:</span>
-                    <span className="font-semibold">13%</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Top Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">AI replacing teachers</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Ethics</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Concerns:</span>
-                    <span className="font-semibold">267</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Percentage:</span>
-                    <span className="font-semibold">11%</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Top Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Algorithmic discrimination</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Economy</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Concerns:</span>
-                    <span className="font-semibold">234</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Percentage:</span>
-                    <span className="font-semibold">10%</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Top Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Small business adaptation costs</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Regulation</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Concerns:</span>
-                    <span className="font-semibold">189</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Percentage:</span>
-                    <span className="font-semibold">8%</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Top Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Lack of oversight frameworks</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Other</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Total Concerns:</span>
-                    <span className="font-semibold">104</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Percentage:</span>
-                    <span className="font-semibold">4%</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Top Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Environmental impact of AI</p>
-                  </div>
-                </div>
+              <div className="bg-white rounded-xl shadow-md p-6 text-center border-t-4 border-purple-500 hover:shadow-lg transition-shadow">
+                <Calendar className="h-10 w-10 text-purple-600 mx-auto mb-3" />
+                <div className="text-3xl font-bold text-gray-900 mb-1">47</div>
+                <div className="text-sm text-gray-600 font-medium">Community Events</div>
               </div>
             </div>
           </div>
 
-          {/* Regional Analysis */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Regional Analysis</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Ontario</span>
-                  <span className="text-sm font-normal text-gray-500">(ON)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">687</span>
+          {/* What Canadians Are Saying */}
+          <div className="mb-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">What Canadians Are Saying</h2>
+              <p className="text-lg text-gray-600">Breaking down concerns by the issues that matter most</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { sector: "Employment", concerns: 487, topConcern: "Job displacement from automation", percentage: 21, color: "red" },
+                { sector: "Healthcare", concerns: 412, topConcern: "AI bias in diagnostics", percentage: 18, color: "blue" },
+                { sector: "Privacy", concerns: 356, topConcern: "Data collection without consent", percentage: 15, color: "green" },
+                { sector: "Education", concerns: 298, topConcern: "AI replacing teachers", percentage: 13, color: "yellow" },
+                { sector: "Ethics", concerns: 267, topConcern: "Algorithmic discrimination", percentage: 11, color: "purple" },
+                { sector: "Economy", concerns: 234, topConcern: "Small business adaptation costs", percentage: 10, color: "indigo" },
+                { sector: "Regulation", concerns: 189, topConcern: "Lack of oversight frameworks", percentage: 8, color: "pink" },
+                { sector: "Other", concerns: 104, topConcern: "Environmental impact of AI", percentage: 4, color: "gray" }
+              ].map((sector) => (
+                <div key={sector.sector} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all hover:-translate-y-1 border border-gray-100">
+                  <div className={`w-12 h-12 bg-${sector.color}-100 rounded-lg flex items-center justify-center mb-4`}>
+                    <div className={`w-6 h-6 bg-${sector.color}-500 rounded`}></div>
                   </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Employment automation</p>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{sector.sector}</h3>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Concerns:</span>
+                      <span className="font-bold text-gray-900">{sector.concerns}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Share:</span>
+                      <span className="font-bold text-gray-900">{sector.percentage}%</span>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Quebec</span>
-                  <span className="text-sm font-normal text-gray-500">(QC)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">523</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Language preservation in AI</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>British Columbia</span>
-                  <span className="text-sm font-normal text-gray-500">(BC)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">445</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Tech sector worker rights</p>
+                  <div className="border-t pt-3">
+                    <p className="text-xs text-gray-500 mb-1 font-medium">Top Concern:</p>
+                    <p className="text-sm text-gray-800 leading-tight">{sector.topConcern}</p>
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Alberta</span>
-                  <span className="text-sm font-normal text-gray-500">(AB)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">298</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Energy sector AI transition</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Manitoba</span>
-                  <span className="text-sm font-normal text-gray-500">(MB)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">134</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Rural healthcare AI access</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Saskatchewan</span>
-                  <span className="text-sm font-normal text-gray-500">(SK)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">89</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Agricultural data ownership</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Nova Scotia</span>
-                  <span className="text-sm font-normal text-gray-500">(NS)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">76</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Maritime industry changes</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>New Brunswick</span>
-                  <span className="text-sm font-normal text-gray-500">(NB)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">45</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Bilingual AI services</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Newfoundland</span>
-                  <span className="text-sm font-normal text-gray-500">(NL)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">32</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Resource sector automation</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Prince Edward Island</span>
-                  <span className="text-sm font-normal text-gray-500">(PE)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">12</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Tourism industry AI</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Yukon</span>
-                  <span className="text-sm font-normal text-gray-500">(YT)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">4</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Northern connectivity</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2 flex justify-between">
-                  <span>Northwest Territories</span>
-                  <span className="text-sm font-normal text-gray-500">(NT)</span>
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Submissions:</span>
-                    <span className="font-semibold">2</span>
-                  </div>
-                  <div className="mt-3">
-                    <p className="text-xs text-gray-500 mb-1">Primary Concern:</p>
-                    <p className="text-sm font-medium text-gray-800">Indigenous data rights</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Event Insights */}
-          <div className="mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">Event Insights</h2>
+          {/* Coast to Coast - Regional Analysis */}
+          <div className="mb-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">From Coast to Coast</h2>
+              <p className="text-lg text-gray-600">Every province and territory has a voice in Canada's AI future</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { province: "ON", name: "Ontario", submissions: 687, topConcern: "Employment automation", flag: "🇨🇦" },
+                { province: "QC", name: "Quebec", submissions: 523, topConcern: "Language preservation in AI", flag: "⚜️" },
+                { province: "BC", name: "British Columbia", submissions: 445, topConcern: "Tech sector worker rights", flag: "🏔️" },
+                { province: "AB", name: "Alberta", submissions: 298, topConcern: "Energy sector AI transition", flag: "🛢️" },
+                { province: "MB", name: "Manitoba", submissions: 134, topConcern: "Rural healthcare AI access", flag: "🌾" },
+                { province: "SK", name: "Saskatchewan", submissions: 89, topConcern: "Agricultural data ownership", flag: "🌾" },
+                { province: "NS", name: "Nova Scotia", submissions: 76, topConcern: "Maritime industry changes", flag: "⚓" },
+                { province: "NB", name: "New Brunswick", submissions: 45, topConcern: "Bilingual AI services", flag: "🦞" },
+                { province: "NL", name: "Newfoundland", submissions: 32, topConcern: "Resource sector automation", flag: "🐟" },
+                { province: "PE", name: "Prince Edward Island", submissions: 12, topConcern: "Tourism industry AI", flag: "🥔" },
+                { province: "YT", name: "Yukon", submissions: 4, topConcern: "Northern connectivity", flag: "❄️" },
+                { province: "NT", name: "Northwest Territories", submissions: 2, topConcern: "Indigenous data rights", flag: "🏔️" }
+              ].map((region) => (
+                <div key={region.province} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all hover:-translate-y-1 border-l-4 border-red-500">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-bold text-gray-900">{region.name}</h3>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-2xl">{region.flag}</span>
+                      <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {region.province}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Community voices:</span>
+                      <span className="font-bold text-red-600 text-lg">{region.submissions}</span>
+                    </div>
+                  </div>
+                  <div className="border-t pt-3">
+                    <p className="text-xs text-gray-500 mb-1 font-medium">Primary concern:</p>
+                    <p className="text-sm text-gray-800 leading-tight font-medium">{region.topConcern}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Community Events Section */}
+          <div className="mb-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Community Conversations</h2>
+              <p className="text-lg text-gray-600">Real discussions happening in communities across Canada</p>
+            </div>
             
             {/* Summary Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white rounded-lg shadow-sm p-4 text-center">
-                <Calendar className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-4 text-center">
+                <Calendar className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-xl font-bold">6</div>
-                <div className="text-sm text-gray-600">Events Held</div>
+                <div className="text-sm opacity-90">Community Events</div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm p-4 text-center">
-                <Users className="h-6 w-6 text-green-600 mx-auto mb-2" />
+              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg p-4 text-center">
+                <Users className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-xl font-bold">1,109</div>
-                <div className="text-sm text-gray-600">Total Attendees</div>
+                <div className="text-sm opacity-90">Participants</div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm p-4 text-center">
-                <BarChart3 className="h-6 w-6 text-purple-600 mx-auto mb-2" />
+              <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg p-4 text-center">
+                <BarChart3 className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-xl font-bold">22.3h</div>
-                <div className="text-sm text-gray-600">Transcribed Content</div>
+                <div className="text-sm opacity-90">Recorded Discussions</div>
               </div>
-              <div className="bg-white rounded-lg shadow-sm p-4 text-center">
-                <MapPin className="h-6 w-6 text-red-600 mx-auto mb-2" />
+              <div className="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg p-4 text-center">
+                <MapPin className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-xl font-bold">6</div>
-                <div className="text-sm text-gray-600">Cities Visited</div>
+                <div className="text-sm opacity-90">Cities Visited</div>
               </div>
             </div>
 
             {/* Event Details */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">AI and the Future of Work - Toronto</h3>
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    December 8, 2024
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    Toronto, ON
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Attendees: <strong>245</strong></span>
-                    <span>Transcribed: <strong>4.5h</strong></span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Key Themes:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Job displacement</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Retraining programs</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Union perspectives</span>
+              {[
+                {
+                  title: "AI and the Future of Work",
+                  location: "Toronto, ON",
+                  date: "December 8, 2024",
+                  attendees: 245,
+                  duration: "4.5h",
+                  themes: ["Job displacement", "Retraining programs", "Union perspectives"],
+                  quote: "We need policies that protect workers while embracing technological advancement.",
+                  emoji: "🏭"
+                },
+                {
+                  title: "Healthcare AI Ethics Forum",
+                  location: "Vancouver, BC",
+                  date: "December 5, 2024",
+                  attendees: 189,
+                  duration: "3.2h",
+                  themes: ["Diagnostic bias", "Patient privacy", "Rural access"],
+                  quote: "AI should augment human judgment in healthcare, never replace it entirely.",
+                  emoji: "🏥"
+                },
+                {
+                  title: "Indigenous Data Sovereignty Summit",
+                  location: "Winnipeg, MB",
+                  date: "December 1, 2024",
+                  attendees: 156,
+                  duration: "6.0h",
+                  themes: ["Traditional knowledge", "Data ownership", "Cultural preservation"],
+                  quote: "Our communities must control how AI systems use data about our lands and peoples.",
+                  emoji: "🪶"
+                },
+                {
+                  title: "AI in Education Roundtable",
+                  location: "Montreal, QC",
+                  date: "November 28, 2024",
+                  attendees: 134,
+                  duration: "2.8h",
+                  themes: ["Student privacy", "Teacher training", "Multilingual support"],
+                  quote: "Quebec's education system must ensure AI serves our linguistic and cultural values.",
+                  emoji: "🎓"
+                },
+                {
+                  title: "Rural Innovation & AI",
+                  location: "Calgary, AB",
+                  date: "November 25, 2024",
+                  attendees: 98,
+                  duration: "3.5h",
+                  themes: ["Agricultural automation", "Connectivity gaps", "Energy transition"],
+                  quote: "AI promises are empty without reliable rural internet infrastructure.",
+                  emoji: "🚜"
+                },
+                {
+                  title: "Maritime AI Opportunities",
+                  location: "Halifax, NS",
+                  date: "November 22, 2024",
+                  attendees: 87,
+                  duration: "2.3h",
+                  themes: ["Fishing industry", "Coastal monitoring", "Tourism tech"],
+                  quote: "Technology should enhance Maritime traditions, not replace them.",
+                  emoji: "⚓"
+                }
+              ].map((event, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-all border border-gray-100">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center mb-2">
+                        <span className="text-2xl mr-3">{event.emoji}</span>
+                        <h3 className="text-lg font-bold text-gray-900">{event.title}</h3>
+                      </div>
+                      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          {event.date}
+                        </div>
+                        <div className="flex items-center">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          {event.location}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <p className="text-xs text-gray-500 mb-1">Representative Quote:</p>
-                    <p className="text-sm italic text-gray-700">"We need policies that protect workers while embracing technological advancement."</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Healthcare AI Ethics Forum - Vancouver</h3>
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    December 5, 2024
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    Vancouver, BC
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Attendees: <strong>189</strong></span>
-                    <span>Transcribed: <strong>3.2h</strong></span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Key Themes:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Diagnostic bias</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Patient privacy</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Rural access</span>
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                    <div className="bg-gray-50 p-3 rounded">
+                      <span className="text-gray-600">Attendees:</span>
+                      <span className="font-bold text-gray-900 ml-2">{event.attendees}</span>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded">
+                      <span className="text-gray-600">Duration:</span>
+                      <span className="font-bold text-gray-900 ml-2">{event.duration}</span>
                     </div>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <p className="text-xs text-gray-500 mb-1">Representative Quote:</p>
-                    <p className="text-sm italic text-gray-700">"AI should augment human judgment in healthcare, never replace it entirely."</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Indigenous Data Sovereignty Summit - Winnipeg</h3>
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    December 1, 2024
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    Winnipeg, MB
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Attendees: <strong>156</strong></span>
-                    <span>Transcribed: <strong>6.0h</strong></span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Key Themes:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Traditional knowledge</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Data ownership</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Cultural preservation</span>
+                  
+                  <div className="mb-4">
+                    <p className="text-sm font-medium mb-2 text-gray-700">Key Discussion Points:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {event.themes.map((theme, i) => (
+                        <span key={i} className="inline-block bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-medium">
+                          {theme}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <p className="text-xs text-gray-500 mb-1">Representative Quote:</p>
-                    <p className="text-sm italic text-gray-700">"Our communities must control how AI systems use data about our lands and peoples."</p>
+                  
+                  <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                    <p className="text-xs text-red-600 mb-1 font-medium uppercase tracking-wide">Community Voice:</p>
+                    <p className="text-sm italic text-red-800 font-medium">"{event.quote}"</p>
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">AI in Education Roundtable - Montreal</h3>
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    November 28, 2024
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    Montreal, QC
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Attendees: <strong>134</strong></span>
-                    <span>Transcribed: <strong>2.8h</strong></span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Key Themes:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Student privacy</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Teacher training</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Multilingual support</span>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <p className="text-xs text-gray-500 mb-1">Representative Quote:</p>
-                    <p className="text-sm italic text-gray-700">"Quebec's education system must ensure AI serves our linguistic and cultural values."</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Rural Innovation & AI - Calgary</h3>
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    November 25, 2024
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    Calgary, AB
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Attendees: <strong>98</strong></span>
-                    <span>Transcribed: <strong>3.5h</strong></span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Key Themes:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Agricultural automation</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Connectivity gaps</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Energy transition</span>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <p className="text-xs text-gray-500 mb-1">Representative Quote:</p>
-                    <p className="text-sm italic text-gray-700">"AI promises are empty without reliable rural internet infrastructure."</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <h3 className="text-lg font-semibold mb-2">Maritime AI Opportunities - Halifax</h3>
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    November 22, 2024
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    Halifax, NS
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Attendees: <strong>87</strong></span>
-                    <span>Transcribed: <strong>2.3h</strong></span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Key Themes:</p>
-                    <div className="flex flex-wrap gap-1">
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Fishing industry</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Coastal monitoring</span>
-                      <span className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">Tourism tech</span>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <p className="text-xs text-gray-500 mb-1">Representative Quote:</p>
-                    <p className="text-sm italic text-gray-700">"Technology should enhance Maritime traditions, not replace them."</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
