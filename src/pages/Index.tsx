@@ -27,13 +27,12 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative text-white py-20 overflow-hidden">
-        {/* Optimized background image with overlay */}
+        {/* House of Commons background image with overlay */}
         <div className="absolute inset-0">
           <img 
-            src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=1920&h=1080&fit=crop&auto=format&q=75" 
-            alt="Canadian Parliament Buildings"
+            src="/lovable-uploads/d2c84baf-534d-4715-9e32-2deda000aca7.png" 
+            alt="Canada House of Commons"
             className="w-full h-full object-cover"
-            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-red-600/85 to-orange-600/85"></div>
         </div>
