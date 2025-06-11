@@ -87,6 +87,36 @@ const Index = () => {
               we're witnessing both the incredible potential and concerning challenges that AI brings to our nation.
             </p>
           </div>
+          
+          {/* Intro Video Section */}
+          <div className="mt-12 max-w-4xl mx-auto">
+            <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg">
+              <div className="aspect-video bg-gray-200 flex items-center justify-center">
+                <video 
+                  controls 
+                  className="w-full h-full object-cover"
+                  poster="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=450&fit=crop"
+                >
+                  <source src="/intro-video.mp4" type="video/mp4" />
+                  <p className="text-gray-600">
+                    Your browser does not support the video tag. 
+                    <a href="/intro-video.mp4" className="text-red-600 hover:underline">
+                      Download the video instead
+                    </a>
+                  </p>
+                </video>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Understanding AI's Impact on Canada
+                </h3>
+                <p className="text-gray-600">
+                  Watch this introduction to learn about the key challenges and opportunities 
+                  that artificial intelligence presents for Canadian communities.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
