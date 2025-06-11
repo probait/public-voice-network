@@ -1,8 +1,11 @@
 
+import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SubmissionCard from "./SubmissionCard";
 
 const SubmissionsFeed = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   // Mock data for now - this will be replaced with real data from Supabase later
   const mockSubmissions = [
     {
@@ -79,23 +82,53 @@ const SubmissionsFeed = () => {
     }
   ];
 
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    const scroll = () => {
+      if (scrollContainer.scrollTop >= scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+        scrollContainer.scrollTop = 0;
+      } else {
+        scrollContainer.scrollTop += 1;
+      }
+    };
+
+    const interval = setInterval(scroll, 50);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="w-full">
-      <ScrollArea className="h-80 w-full rounded-md">
-        <div className="p-1">
-          {mockSubmissions.map((submission) => (
-            <SubmissionCard
-              key={submission.id}
-              name={submission.name}
-              province={submission.province}
-              category={submission.category}
-              subject={submission.subject}
-              message={submission.message}
-              timeAgo={submission.timeAgo}
-            />
-          ))}
+      <div className="h-80 w-full rounded-md overflow-hidden relative">
+        <div 
+          ref={scrollRef}
+          className="h-full overflow-y-scroll scrollbar-hide"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          <div className="p-1">
+            {mockSubmissions.map((submission) => (
+              <SubmissionCard
+                key={submission.id}
+                name={submission.name}
+                province={submission.province}
+                category={submission.category}
+                subject={submission.subject}
+                message={submission.message}
+                timeAgo={submission.timeAgo}
+              />
+            ))}
+          </div>
         </div>
-      </ScrollArea>
+      </div>
+      
+      {/* Voices Count Metric */}
+      <div className="mt-3 text-center">
+        <div className="text-white/90 text-sm">
+          <span className="font-semibold text-lg">{mockSubmissions.length.toLocaleString()}</span>
+          <span className="ml-1">Canadians have shared their thoughts</span>
+        </div>
+      </div>
     </div>
   );
 };
