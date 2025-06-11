@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -7,6 +6,7 @@ import EventbriteFeed from "@/components/EventbriteFeed";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
+import SubmissionsFeed from "@/components/SubmissionsFeed";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -47,6 +47,21 @@ const Index = () => {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Voices from Canadians Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Voices from Across Canada
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Real Canadians sharing their thoughts, concerns, and hopes about AI's impact on their communities
+            </p>
+          </div>
+          <SubmissionsFeed />
         </div>
       </section>
 
