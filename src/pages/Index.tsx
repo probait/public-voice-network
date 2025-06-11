@@ -24,8 +24,19 @@ const Index = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-red-600 to-orange-600 text-white py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="relative text-white py-20 overflow-hidden">
+        {/* Canadian flag background image with overlay */}
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1466442929976-97f336a657be?w=1920&h=1080&fit=crop" 
+            alt="Canadian flag"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-red-600/85 to-orange-600/85"></div>
+        </div>
+        
+        {/* Content */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
               <h1 className="text-4xl sm:text-6xl font-bold mb-6">
