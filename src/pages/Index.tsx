@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -25,11 +24,11 @@ const Index = () => {
       
       {/* Hero Section */}
       <section className="relative text-white py-20 overflow-hidden">
-        {/* Canadian flag background image with overlay */}
+        {/* House of Commons background image with overlay */}
         <div className="absolute inset-0">
           <img 
-            src="https://images.unsplash.com/photo-1466442929976-97f336a657be?w=1920&h=1080&fit=crop" 
-            alt="Canadian flag"
+            src="https://images.unsplash.com/photo-1519567241046-7f570eee3ce6?w=1920&h=1080&fit=crop" 
+            alt="Canada House of Commons"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-red-600/85 to-orange-600/85"></div>
