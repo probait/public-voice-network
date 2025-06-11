@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -7,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import SubmissionsFeed from "@/components/SubmissionsFeed";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
 
 const Index = () => {
   const { user, loading } = useAuth();
@@ -135,33 +138,80 @@ const Index = () => {
             Key Issues Facing Canada
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-sm">
-              <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=64&h=64&fit=crop" alt="Job displacement" className="w-8 h-8 rounded" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Job Displacement</h3>
-              <p className="text-gray-600">
-                How will AI automation affect Canadian workers across industries from manufacturing to professional services?
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-lg shadow-sm">
-              <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=64&h=64&fit=crop" alt="Privacy and security" className="w-8 h-8 rounded" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Privacy & Rights</h3>
-              <p className="text-gray-600">
-                What safeguards do we need to protect Canadian privacy and civil liberties in an AI-driven world?
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-lg shadow-sm">
-              <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=64&h=64&fit=crop" alt="Healthcare innovation" className="w-8 h-8 rounded" />
-              </div>
-              <h3 className="text-xl font-semibold mb-4">Healthcare Innovation</h3>
-              <p className="text-gray-600">
-                How can AI improve Canadian healthcare while ensuring equitable access across all provinces and territories?
-              </p>
-            </div>
+            <Link to="/articles/job-displacement" className="group">
+              <Card className="h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-0 shadow-md">
+                <CardContent className="p-0">
+                  <div className="aspect-video overflow-hidden rounded-t-lg">
+                    <img 
+                      src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=225&fit=crop" 
+                      alt="Job displacement and automation" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold mb-3 group-hover:text-red-600 transition-colors">
+                      Job Displacement & Automation
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      How will AI automation affect Canadian workers across industries from manufacturing to professional services?
+                    </p>
+                    <div className="flex items-center text-red-600 font-medium">
+                      Read more <ArrowRight className="ml-2 w-4 h-4" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to="/articles/privacy-rights" className="group">
+              <Card className="h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-0 shadow-md">
+                <CardContent className="p-0">
+                  <div className="aspect-video overflow-hidden rounded-t-lg">
+                    <img 
+                      src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=225&fit=crop" 
+                      alt="Privacy and digital rights" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold mb-3 group-hover:text-red-600 transition-colors">
+                      Privacy & Digital Rights
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      What safeguards do we need to protect Canadian privacy and civil liberties in an AI-driven world?
+                    </p>
+                    <div className="flex items-center text-red-600 font-medium">
+                      Read more <ArrowRight className="ml-2 w-4 h-4" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link to="/articles/healthcare-innovation" className="group">
+              <Card className="h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-0 shadow-md">
+                <CardContent className="p-0">
+                  <div className="aspect-video overflow-hidden rounded-t-lg">
+                    <img 
+                      src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=225&fit=crop" 
+                      alt="Healthcare innovation and AI" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold mb-3 group-hover:text-red-600 transition-colors">
+                      Healthcare Innovation
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      How can AI improve Canadian healthcare while ensuring equitable access across all provinces and territories?
+                    </p>
+                    <div className="flex items-center text-red-600 font-medium">
+                      Read more <ArrowRight className="ml-2 w-4 h-4" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
       </section>

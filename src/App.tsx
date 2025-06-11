@@ -11,6 +11,9 @@ import GetInvolved from "./pages/GetInvolved";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Data from "./pages/Data";
+import JobDisplacement from "./pages/articles/JobDisplacement";
+import PrivacyRights from "./pages/articles/PrivacyRights";
+import HealthcareInnovation from "./pages/articles/HealthcareInnovation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +32,9 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/data" element={<Data />} />
+            <Route path="/articles/job-displacement" element={<JobDisplacement />} />
+            <Route path="/articles/privacy-rights" element={<PrivacyRights />} />
+            <Route path="/articles/healthcare-innovation" element={<HealthcareInnovation />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
