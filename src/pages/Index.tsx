@@ -41,8 +41,8 @@ const Index = () => {
             </div>
             <div className="hidden lg:block">
               <img 
-                src="/placeholder.svg" 
-                alt="AI and Canada illustration" 
+                src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800&h=600&fit=crop"
+                alt="AI and technology in Canada" 
                 className="w-full h-auto rounded-lg shadow-2xl"
               />
             </div>
@@ -75,7 +75,7 @@ const Index = () => {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-lg shadow-sm">
               <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <img src="/placeholder.svg" alt="Job displacement icon" className="w-8 h-8" />
+                <img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=64&h=64&fit=crop" alt="Job displacement" className="w-8 h-8 rounded" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Job Displacement</h3>
               <p className="text-gray-600">
@@ -84,7 +84,7 @@ const Index = () => {
             </div>
             <div className="bg-white p-8 rounded-lg shadow-sm">
               <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <img src="/placeholder.svg" alt="Privacy icon" className="w-8 h-8" />
+                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=64&h=64&fit=crop" alt="Privacy and security" className="w-8 h-8 rounded" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Privacy & Rights</h3>
               <p className="text-gray-600">
@@ -93,7 +93,7 @@ const Index = () => {
             </div>
             <div className="bg-white p-8 rounded-lg shadow-sm">
               <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center mb-6">
-                <img src="/placeholder.svg" alt="Healthcare icon" className="w-8 h-8" />
+                <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=64&h=64&fit=crop" alt="Healthcare innovation" className="w-8 h-8 rounded" />
               </div>
               <h3 className="text-xl font-semibold mb-4">Healthcare Innovation</h3>
               <p className="text-gray-600">

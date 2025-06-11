@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import {
   Form,
   FormControl,
@@ -49,19 +48,11 @@ const ThoughtsSubmissionForm = () => {
     setIsSubmitting(true);
     
     try {
-      const { error } = await supabase
-        .from('submissions')
-        .insert({
-          title: data.subject,
-          content: data.message,
-          category: data.category,
-          location: data.province,
-          contact_email: data.email,
-          contact_name: data.name,
-          status: 'pending'
-        });
-
-      if (error) throw error;
+      // For now, just simulate submission - will implement database later
+      console.log('Submission data:', data);
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       toast({
         title: "Thank you for your submission!",
