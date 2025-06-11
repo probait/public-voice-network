@@ -11,6 +11,7 @@ import GetInvolved from "./pages/GetInvolved";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Auth from "./pages/Auth";
+import Data from "./pages/Data";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/data" element={<Data />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
