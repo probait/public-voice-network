@@ -27,7 +27,7 @@ const Index = () => {
         {/* House of Commons background image with overlay */}
         <div className="absolute inset-0">
           <img 
-            src="https://images.unsplash.com/photo-1519567241046-7f570eee3ce6?w=1920&h=1080&fit=crop" 
+            src="/lovable-uploads/d2c84baf-534d-4715-9e32-2deda000aca7.png" 
             alt="Canada House of Commons"
             className="w-full h-full object-cover"
           />
