@@ -1,11 +1,11 @@
 
-import { Maple } from "lucide-react";
+import { Map } from "lucide-react";
 
 const PolicyNowLogo = () => {
   return (
     <div className="flex items-center space-x-2">
       <div className="relative">
-        <Maple 
+        <Map 
           className="w-8 h-8 text-red-600" 
           fill="currentColor"
         />
