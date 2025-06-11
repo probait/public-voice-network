@@ -15,6 +15,7 @@ interface EventbriteEvent {
   organizer: string;
   category: string;
   price: string;
+  image_url: string;
 }
 
 // Hand-selected events - in a real app, these would come from Eventbrite API
@@ -28,7 +29,8 @@ const featuredEvents: EventbriteEvent[] = [
     url: "https://eventbrite.ca/example1",
     organizer: "University of Toronto AI Institute",
     category: "Ethics",
-    price: "Free"
+    price: "Free",
+    image_url: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=200&fit=crop"
   },
   {
     id: "2",
@@ -39,7 +41,8 @@ const featuredEvents: EventbriteEvent[] = [
     url: "https://eventbrite.ca/example2",
     organizer: "BC Tech Association",
     category: "Employment",
-    price: "$25"
+    price: "$25",
+    image_url: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=200&fit=crop"
   },
   {
     id: "3",
@@ -50,7 +53,8 @@ const featuredEvents: EventbriteEvent[] = [
     url: "https://eventbrite.ca/example3",
     organizer: "McGill Health Innovation",
     category: "Healthcare",
-    price: "Free"
+    price: "Free",
+    image_url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=200&fit=crop"
   }
 ];
 
@@ -58,7 +62,14 @@ const EventbriteFeed = () => {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {featuredEvents.map((event) => (
-        <Card key={event.id} className="hover:shadow-lg transition-shadow">
+        <Card key={event.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+          <div className="relative">
+            <img 
+              src={event.image_url} 
+              alt={event.title}
+              className="w-full h-48 object-cover"
+            />
+          </div>
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex-1">
