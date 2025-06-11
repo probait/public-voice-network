@@ -98,23 +98,21 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Intro Video Section */}
+          {/* YouTube Video Section */}
           <div className="mt-12 max-w-4xl mx-auto">
             <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg">
-              <div className="aspect-video bg-gray-200 flex items-center justify-center">
-                <video 
-                  controls 
-                  className="w-full h-full object-cover"
-                  poster="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=450&fit=crop"
-                >
-                  <source src="/intro-video.mp4" type="video/mp4" />
-                  <p className="text-gray-600">
-                    Your browser does not support the video tag. 
-                    <a href="/intro-video.mp4" className="text-red-600 hover:underline">
-                      Download the video instead
-                    </a>
-                  </p>
-                </video>
+              <div className="aspect-video">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/di25i8z0Tn4?si=M0VqjFfNU7HPoKza"
+                  title="Understanding AI's Impact on Canada"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  className="w-full h-full"
+                ></iframe>
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
