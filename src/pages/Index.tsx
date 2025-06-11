@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -25,7 +26,7 @@ const Index = () => {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-red-600 to-orange-600 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
               <h1 className="text-4xl sm:text-6xl font-bold mb-6">
                 AI's Impact on Canada
@@ -40,28 +41,36 @@ const Index = () => {
               </Link>
             </div>
             <div className="hidden lg:block">
-              <img 
-                src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800&h=600&fit=crop"
-                alt="AI and technology in Canada" 
-                className="w-full h-auto rounded-lg shadow-2xl"
-              />
+              <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+                <h3 className="text-xl font-semibold mb-4 text-white">Voices from Across Canada</h3>
+                <div className="max-h-96 overflow-hidden">
+                  <SubmissionsFeed />
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Voices from Canadians Section */}
+      {/* Upcoming Events Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Voices from Across Canada
+              Upcoming AI Events & AMAs
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Real Canadians sharing their thoughts, concerns, and hopes about AI's impact on their communities
+              Join conversations, ask questions, and connect with experts discussing AI's impact on Canada
             </p>
           </div>
-          <SubmissionsFeed />
+          <EventbriteFeed />
+          <div className="text-center mt-8">
+            <Link to="/events">
+              <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
+                View all events
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -116,21 +125,6 @@ const Index = () => {
               </p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Upcoming Events */}
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Upcoming AI Events in Canada</h2>
-            <Link to="/events">
-              <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
-                View all events
-              </Button>
-            </Link>
-          </div>
-          <EventbriteFeed />
         </div>
       </section>
 
