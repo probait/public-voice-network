@@ -28,7 +28,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link to="/" className="text-2xl font-bold text-red-600">
-              PolicyNow
+              AI Canada Voice
             </Link>
           </div>
           
@@ -37,8 +37,11 @@ const Navigation = () => {
               <Link to="/" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                 Home
               </Link>
-              <Link to="/meetups" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                Browse Meetups
+              <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                Events
+              </Link>
+              <Link to="/get-involved" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                Get Involved
               </Link>
               <Link to="/about" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                 About
