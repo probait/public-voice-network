@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import SectorAnalytics from "@/components/SectorAnalytics";
 import RegionalAnalytics from "@/components/RegionalAnalytics";
 import EventInsights from "@/components/EventInsights";
-import { BarChart3, Users, MapPin, Calendar } from "lucide-react";
+import { BarChart3, Users, MapPin, Calendar, AlertTriangle, CheckCircle } from "lucide-react";
 
 const Data = () => {
   return (
@@ -20,6 +20,64 @@ const Data = () => {
               Comprehensive analysis of Canadian concerns about AI across sectors and regions. 
               This data aggregates submissions from our platform and transcribed insights from public events.
             </p>
+          </div>
+
+          {/* Key Policy Recommendations - Moved to top */}
+          <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 rounded-lg p-8 mb-12 shadow-sm">
+            <div className="flex items-center mb-6">
+              <AlertTriangle className="h-8 w-8 text-red-600 mr-3" />
+              <h2 className="text-3xl font-bold text-red-800">Key Policy Recommendations</h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <AlertTriangle className="h-6 w-6 text-red-600 mr-2" />
+                  <h3 className="text-xl font-semibold text-red-700">Immediate Actions Needed</h3>
+                </div>
+                <ul className="space-y-3">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700">Implement AI bias testing requirements for hiring systems</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700">Establish worker retraining programs for AI-displaced jobs</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700">Create Indigenous data sovereignty frameworks</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700">Mandate transparent AI decision-making in healthcare</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <BarChart3 className="h-6 w-6 text-red-600 mr-2" />
+                  <h3 className="text-xl font-semibold text-red-700">Long-term Strategic Goals</h3>
+                </div>
+                <ul className="space-y-3">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700">Develop comprehensive AI education curricula</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700">Build rural broadband infrastructure for AI access</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700">Establish national AI ethics review board</span>
+                  </li>
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <span className="text-red-700">Create cross-provincial AI governance standards</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           {/* Overview Stats */}
@@ -62,31 +120,6 @@ const Data = () => {
           <div className="mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Event Insights</h2>
             <EventInsights />
-          </div>
-
-          {/* Policy Recommendations */}
-          <div className="bg-red-50 border border-red-200 rounded-lg p-8">
-            <h3 className="text-2xl font-semibold text-red-800 mb-4">Key Policy Recommendations</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-medium text-red-700 mb-2">Immediate Actions Needed</h4>
-                <ul className="text-red-600 space-y-1 text-sm">
-                  <li>• Implement AI bias testing requirements for hiring systems</li>
-                  <li>• Establish worker retraining programs for AI-displaced jobs</li>
-                  <li>• Create Indigenous data sovereignty frameworks</li>
-                  <li>• Mandate transparent AI decision-making in healthcare</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-medium text-red-700 mb-2">Long-term Strategic Goals</h4>
-                <ul className="text-red-600 space-y-1 text-sm">
-                  <li>• Develop comprehensive AI education curricula</li>
-                  <li>• Build rural broadband infrastructure for AI access</li>
-                  <li>• Establish national AI ethics review board</li>
-                  <li>• Create cross-provincial AI governance standards</li>
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
       </main>
