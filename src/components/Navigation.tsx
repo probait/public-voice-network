@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AuthModal from "@/components/AuthModal";
+import PolicyNowLogo from "@/components/PolicyNowLogo";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
@@ -31,8 +32,8 @@ const Navigation = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-red-600">
-                AI Canada Voice
+              <Link to="/" className="hover:opacity-80 transition-opacity">
+                <PolicyNowLogo />
               </Link>
             </div>
             
