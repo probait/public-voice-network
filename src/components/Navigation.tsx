@@ -46,7 +46,7 @@ const Navigation = () => {
             </div>
             
             <div className="hidden md:block">
-              <NavigationMenu className="mx-auto">
+              <NavigationMenu>
                 <NavigationMenuList className="space-x-2">
                   <NavigationMenuItem>
                     <Link to="/" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
@@ -58,8 +58,8 @@ const Navigation = () => {
                     <NavigationMenuTrigger className="text-gray-700 hover:text-red-600 text-sm font-medium">
                       Community
                     </NavigationMenuTrigger>
-                    <NavigationMenuContent className="min-w-[400px]">
-                      <div className="grid w-[400px] gap-3 p-4">
+                    <NavigationMenuContent className="w-[400px]">
+                      <div className="grid gap-3 p-4">
                         <NavigationMenuLink asChild>
                           <Link to="/contributors" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                             <div className="text-sm font-medium leading-none">Contributors</div>
@@ -96,8 +96,8 @@ const Navigation = () => {
                     <NavigationMenuTrigger className="text-gray-700 hover:text-red-600 text-sm font-medium">
                       Thought Leadership
                     </NavigationMenuTrigger>
-                    <NavigationMenuContent className="min-w-[400px]">
-                      <div className="grid w-[400px] gap-3 p-4">
+                    <NavigationMenuContent className="w-[400px]">
+                      <div className="grid gap-3 p-4">
                         <NavigationMenuLink asChild>
                           <Link to="/prompts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
                             <div className="text-sm font-medium leading-none">Curated Prompts</div>
