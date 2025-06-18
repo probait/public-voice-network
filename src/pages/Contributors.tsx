@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Globe, Linkedin, Twitter, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
+import { mockContributors } from "@/data/mockContributors";
 
 const Contributors = () => {
   const { data: contributors, isLoading } = useQuery({
@@ -22,6 +23,9 @@ const Contributors = () => {
       return data;
     },
   });
+
+  // Use mock data if no real contributors are available
+  const displayContributors = contributors && contributors.length > 0 ? contributors : mockContributors;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -57,7 +61,7 @@ const Contributors = () => {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {contributors?.map((contributor) => (
+              {displayContributors?.map((contributor) => (
                 <Card key={contributor.id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
