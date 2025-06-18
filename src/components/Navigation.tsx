@@ -11,20 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 import AuthModal from "@/components/AuthModal";
 import PolicyNowLogo from "@/components/PolicyNowLogo";
+import { ChevronDown } from "lucide-react";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const handleSignOut = async () => {
     await signOut();
@@ -32,6 +26,10 @@ const Navigation = () => {
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const toggleDropdown = (dropdown: string) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
 
   return (
@@ -46,91 +44,91 @@ const Navigation = () => {
             </div>
             
             <div className="hidden md:block">
-              <NavigationMenu>
-                <NavigationMenuList className="space-x-2">
-                  <NavigationMenuItem>
-                    <Link to="/" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                      Home
-                    </Link>
-                  </NavigationMenuItem>
-                  
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className="text-gray-700 hover:text-red-600 text-sm font-medium">
-                      Community
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="w-[400px]">
-                      <div className="grid gap-3 p-4">
-                        <NavigationMenuLink asChild>
-                          <Link to="/contributors" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            <div className="text-sm font-medium leading-none">Contributors</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Meet our expert contributors and policy researchers
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/fellows" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            <div className="text-sm font-medium leading-none">PolicyNow Fellows</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Current and past fellows in our research program
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
+              <div className="flex items-center space-x-1">
+                <Link to="/" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Home
+                </Link>
+                
+                <div className="relative">
+                  <button
+                    onClick={() => toggleDropdown('community')}
+                    className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
+                  >
+                    Community
+                    <ChevronDown className={`ml-1 h-3 w-3 transition-transform duration-200 ${openDropdown === 'community' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {openDropdown === 'community' && (
+                    <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                      <div className="p-4 space-y-3">
+                        <Link 
+                          to="/contributors" 
+                          className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          <div className="font-medium text-sm text-gray-900">Contributors</div>
+                          <p className="text-sm text-gray-600 mt-1">Meet our expert contributors and policy researchers</p>
+                        </Link>
+                        <Link 
+                          to="/fellows" 
+                          className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          <div className="font-medium text-sm text-gray-900">PolicyNow Fellows</div>
+                          <p className="text-sm text-gray-600 mt-1">Current and past fellows in our research program</p>
+                        </Link>
                       </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
+                    </div>
+                  )}
+                </div>
 
-                  <NavigationMenuItem>
-                    <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                      Events
-                    </Link>
-                  </NavigationMenuItem>
+                <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Events
+                </Link>
 
-                  <NavigationMenuItem>
-                    <Link to="/data" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                      Data Commons
-                    </Link>
-                  </NavigationMenuItem>
+                <Link to="/data" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Data Commons
+                </Link>
 
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className="text-gray-700 hover:text-red-600 text-sm font-medium">
-                      Thought Leadership
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent className="w-[400px]">
-                      <div className="grid gap-3 p-4">
-                        <NavigationMenuLink asChild>
-                          <Link to="/prompts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            <div className="text-sm font-medium leading-none">Curated Prompts</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Current prompts seeking policy contributions
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/roundtables" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                            <div className="text-sm font-medium leading-none">Roundtables</div>
-                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                              Upcoming and past contributor roundtables
-                            </p>
-                          </Link>
-                        </NavigationMenuLink>
+                <div className="relative">
+                  <button
+                    onClick={() => toggleDropdown('thought-leadership')}
+                    className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
+                  >
+                    Thought Leadership
+                    <ChevronDown className={`ml-1 h-3 w-3 transition-transform duration-200 ${openDropdown === 'thought-leadership' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {openDropdown === 'thought-leadership' && (
+                    <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                      <div className="p-4 space-y-3">
+                        <Link 
+                          to="/prompts" 
+                          className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          <div className="font-medium text-sm text-gray-900">Curated Prompts</div>
+                          <p className="text-sm text-gray-600 mt-1">Current prompts seeking policy contributions</p>
+                        </Link>
+                        <Link 
+                          to="/roundtables" 
+                          className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
+                          onClick={() => setOpenDropdown(null)}
+                        >
+                          <div className="font-medium text-sm text-gray-900">Roundtables</div>
+                          <p className="text-sm text-gray-600 mt-1">Upcoming and past contributor roundtables</p>
+                        </Link>
                       </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
+                    </div>
+                  )}
+                </div>
 
-                  <NavigationMenuItem>
-                    <Link to="/get-involved" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                      Get Involved
-                    </Link>
-                  </NavigationMenuItem>
+                <Link to="/get-involved" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Get Involved
+                </Link>
 
-                  <NavigationMenuItem>
-                    <Link to="/about" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                      About
-                    </Link>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
+                <Link to="/about" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  About
+                </Link>
+              </div>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -174,6 +172,14 @@ const Navigation = () => {
             </div>
           </div>
         </div>
+
+        {/* Close dropdown when clicking outside */}
+        {openDropdown && (
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setOpenDropdown(null)}
+          />
+        )}
       </nav>
 
       <AuthModal 
