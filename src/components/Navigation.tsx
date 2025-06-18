@@ -28,8 +28,12 @@ const Navigation = () => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
-  const toggleDropdown = (dropdown: string) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  const handleMouseEnter = (dropdown: string) => {
+    setOpenDropdown(dropdown);
+  };
+
+  const handleMouseLeave = () => {
+    setOpenDropdown(null);
   };
 
   return (
@@ -49,11 +53,12 @@ const Navigation = () => {
                   Home
                 </Link>
                 
-                <div className="relative">
-                  <button
-                    onClick={() => toggleDropdown('community')}
-                    className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
-                  >
+                <div 
+                  className="relative"
+                  onMouseEnter={() => handleMouseEnter('community')}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <button className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
                     Community
                     <ChevronDown className={`ml-1 h-3 w-3 transition-transform duration-200 ${openDropdown === 'community' ? 'rotate-180' : ''}`} />
                   </button>
@@ -63,7 +68,6 @@ const Navigation = () => {
                         <Link 
                           to="/contributors" 
                           className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
-                          onClick={() => setOpenDropdown(null)}
                         >
                           <div className="font-medium text-sm text-gray-900">Contributors</div>
                           <p className="text-sm text-gray-600 mt-1">Meet our expert contributors and policy researchers</p>
@@ -71,7 +75,6 @@ const Navigation = () => {
                         <Link 
                           to="/fellows" 
                           className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
-                          onClick={() => setOpenDropdown(null)}
                         >
                           <div className="font-medium text-sm text-gray-900">PolicyNow Fellows</div>
                           <p className="text-sm text-gray-600 mt-1">Current and past fellows in our research program</p>
@@ -89,11 +92,12 @@ const Navigation = () => {
                   Data Commons
                 </Link>
 
-                <div className="relative">
-                  <button
-                    onClick={() => toggleDropdown('thought-leadership')}
-                    className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
-                  >
+                <div 
+                  className="relative"
+                  onMouseEnter={() => handleMouseEnter('thought-leadership')}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <button className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
                     Thought Leadership
                     <ChevronDown className={`ml-1 h-3 w-3 transition-transform duration-200 ${openDropdown === 'thought-leadership' ? 'rotate-180' : ''}`} />
                   </button>
@@ -103,7 +107,6 @@ const Navigation = () => {
                         <Link 
                           to="/prompts" 
                           className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
-                          onClick={() => setOpenDropdown(null)}
                         >
                           <div className="font-medium text-sm text-gray-900">Curated Prompts</div>
                           <p className="text-sm text-gray-600 mt-1">Current prompts seeking policy contributions</p>
@@ -111,7 +114,6 @@ const Navigation = () => {
                         <Link 
                           to="/roundtables" 
                           className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
-                          onClick={() => setOpenDropdown(null)}
                         >
                           <div className="font-medium text-sm text-gray-900">Roundtables</div>
                           <p className="text-sm text-gray-600 mt-1">Upcoming and past contributor roundtables</p>
@@ -172,14 +174,6 @@ const Navigation = () => {
             </div>
           </div>
         </div>
-
-        {/* Close dropdown when clicking outside */}
-        {openDropdown && (
-          <div 
-            className="fixed inset-0 z-40" 
-            onClick={() => setOpenDropdown(null)}
-          />
-        )}
       </nav>
 
       <AuthModal 
