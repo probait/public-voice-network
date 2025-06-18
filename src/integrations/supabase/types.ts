@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      articles: {
+        Row: {
+          author_id: string | null
+          content: string | null
+          created_at: string
+          id: string
+          is_published: boolean | null
+          partnership_id: string | null
+          published_at: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          partnership_id?: string | null
+          published_at?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          partnership_id?: string | null
+          published_at?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "contributors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_partnership_id_fkey"
+            columns: ["partnership_id"]
+            isOneToOne: false
+            referencedRelation: "partnerships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       attendees: {
         Row: {
           created_at: string
@@ -34,6 +88,137 @@ export type Database = {
             columns: ["meetup_id"]
             isOneToOne: false
             referencedRelation: "meetups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contributors: {
+        Row: {
+          bio: string | null
+          created_at: string
+          email: string | null
+          featured_until: string | null
+          headshot_url: string | null
+          id: string
+          institution: string | null
+          is_featured: boolean | null
+          linkedin_url: string | null
+          name: string
+          organization: string | null
+          twitter_url: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          featured_until?: string | null
+          headshot_url?: string | null
+          id?: string
+          institution?: string | null
+          is_featured?: boolean | null
+          linkedin_url?: string | null
+          name: string
+          organization?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          featured_until?: string | null
+          headshot_url?: string | null
+          id?: string
+          institution?: string | null
+          is_featured?: boolean | null
+          linkedin_url?: string | null
+          name?: string
+          organization?: string | null
+          twitter_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      datasets: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          external_url: string | null
+          file_url: string | null
+          format: string | null
+          id: string
+          is_public: boolean | null
+          source_organization: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          external_url?: string | null
+          file_url?: string | null
+          format?: string | null
+          id?: string
+          is_public?: boolean | null
+          source_organization?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          external_url?: string | null
+          file_url?: string | null
+          format?: string | null
+          id?: string
+          is_public?: boolean | null
+          source_organization?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      fellows: {
+        Row: {
+          contributor_id: string | null
+          created_at: string
+          end_date: string | null
+          id: string
+          is_current: boolean | null
+          program_description: string | null
+          start_date: string | null
+        }
+        Insert: {
+          contributor_id?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          program_description?: string | null
+          start_date?: string | null
+        }
+        Update: {
+          contributor_id?: string | null
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          is_current?: boolean | null
+          program_description?: string | null
+          start_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fellows_contributor_id_fkey"
+            columns: ["contributor_id"]
+            isOneToOne: false
+            referencedRelation: "contributors"
             referencedColumns: ["id"]
           },
         ]
@@ -83,6 +268,36 @@ export type Database = {
         }
         Relationships: []
       }
+      partnerships: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          logo_url: string | null
+          organization_name: string
+          organization_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          organization_name: string
+          organization_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          logo_url?: string | null
+          organization_name?: string
+          organization_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -110,6 +325,113 @@ export type Database = {
           id?: string
           location?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      prompts: {
+        Row: {
+          category: string | null
+          created_at: string
+          deadline: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          title: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          title?: string
+        }
+        Relationships: []
+      }
+      roundtable_rsvps: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          organization: string | null
+          roundtable_id: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          organization?: string | null
+          roundtable_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          organization?: string | null
+          roundtable_id?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roundtable_rsvps_roundtable_id_fkey"
+            columns: ["roundtable_id"]
+            isOneToOne: false
+            referencedRelation: "roundtables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roundtables: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          is_upcoming: boolean | null
+          max_attendees: number | null
+          summary: string | null
+          title: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          is_upcoming?: boolean | null
+          max_attendees?: number | null
+          summary?: string | null
+          title: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          is_upcoming?: boolean | null
+          max_attendees?: number | null
+          summary?: string | null
+          title?: string
+          video_url?: string | null
         }
         Relationships: []
       }

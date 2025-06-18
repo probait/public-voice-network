@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import EventbriteFeed from "@/components/EventbriteFeed";
+import FeaturedContributor from "@/components/FeaturedContributor";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
@@ -62,6 +63,13 @@ const Index = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Featured Contributor Section */}
+      <section className="py-8 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FeaturedContributor />
         </div>
       </section>
 

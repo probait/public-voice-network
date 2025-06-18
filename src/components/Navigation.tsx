@@ -11,6 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 import AuthModal from "@/components/AuthModal";
 import PolicyNowLogo from "@/components/PolicyNowLogo";
 
@@ -38,26 +46,91 @@ const Navigation = () => {
             </div>
             
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-4">
-                <Link to="/" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Home
-                </Link>
-                <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Events
-                </Link>
-                <Link to="/get-involved" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Get Involved
-                </Link>
-                <Link to="/data" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Data
-                </Link>
-                <Link to="/about" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  About
-                </Link>
-                <Link to="/privacy" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Privacy & Terms
-                </Link>
-              </div>
+              <NavigationMenu>
+                <NavigationMenuList className="space-x-2">
+                  <NavigationMenuItem>
+                    <Link to="/" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                      Home
+                    </Link>
+                  </NavigationMenuItem>
+                  
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-700 hover:text-red-600 text-sm font-medium">
+                      Community
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="grid w-[400px] gap-3 p-4">
+                        <NavigationMenuLink asChild>
+                          <Link to="/contributors" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            <div className="text-sm font-medium leading-none">Contributors</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Meet our expert contributors and policy researchers
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/fellows" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            <div className="text-sm font-medium leading-none">PolicyNow Fellows</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Current and past fellows in our research program
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+
+                  <NavigationMenuItem>
+                    <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                      Events
+                    </Link>
+                  </NavigationMenuItem>
+
+                  <NavigationMenuItem>
+                    <Link to="/data" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                      Data Commons
+                    </Link>
+                  </NavigationMenuItem>
+
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className="text-gray-700 hover:text-red-600 text-sm font-medium">
+                      Thought Leadership
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="grid w-[400px] gap-3 p-4">
+                        <NavigationMenuLink asChild>
+                          <Link to="/prompts" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            <div className="text-sm font-medium leading-none">Curated Prompts</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Current prompts seeking policy contributions
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                        <NavigationMenuLink asChild>
+                          <Link to="/roundtables" className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
+                            <div className="text-sm font-medium leading-none">Roundtables</div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              Upcoming and past contributor roundtables
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+
+                  <NavigationMenuItem>
+                    <Link to="/get-involved" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                      Get Involved
+                    </Link>
+                  </NavigationMenuItem>
+
+                  <NavigationMenuItem>
+                    <Link to="/about" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                      About
+                    </Link>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
             </div>
 
             <div className="flex items-center space-x-4">

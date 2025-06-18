@@ -12,6 +12,12 @@ import GetInvolved from "./pages/GetInvolved";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Data from "./pages/Data";
+import DataCommons from "./pages/DataCommons";
+import Contributors from "./pages/Contributors";
+import ContributorProfile from "./pages/ContributorProfile";
+import Fellows from "./pages/Fellows";
+import Prompts from "./pages/Prompts";
+import Roundtables from "./pages/Roundtables";
 import JobDisplacement from "./pages/articles/JobDisplacement";
 import PrivacyRights from "./pages/articles/PrivacyRights";
 import HealthcareInnovation from "./pages/articles/HealthcareInnovation";
@@ -33,7 +39,12 @@ const App = () => (
             <Route path="/get-involved" element={<GetInvolved />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
-            <Route path="/data" element={<Data />} />
+            <Route path="/data" element={<DataCommons />} />
+            <Route path="/contributors" element={<Contributors />} />
+            <Route path="/contributors/:id" element={<ContributorProfile />} />
+            <Route path="/fellows" element={<Fellows />} />
+            <Route path="/prompts" element={<Prompts />} />
+            <Route path="/roundtables" element={<Roundtables />} />
             <Route path="/articles/job-displacement" element={<JobDisplacement />} />
             <Route path="/articles/privacy-rights" element={<PrivacyRights />} />
             <Route path="/articles/healthcare-innovation" element={<HealthcareInnovation />} />
