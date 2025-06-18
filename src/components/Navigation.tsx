@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,6 +19,7 @@ const Navigation = () => {
   const { user, signOut } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSignOut = async () => {
     await signOut();
@@ -29,11 +30,16 @@ const Navigation = () => {
   };
 
   const handleMouseEnter = (dropdown: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
     setOpenDropdown(dropdown);
   };
 
   const handleMouseLeave = () => {
-    setOpenDropdown(null);
+    timeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 150); // Small delay to allow moving to submenu
   };
 
   return (
@@ -63,7 +69,7 @@ const Navigation = () => {
                     <ChevronDown className={`ml-1 h-3 w-3 transition-transform duration-200 ${openDropdown === 'community' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'community' && (
-                    <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                    <div className="absolute top-full left-0 mt-0 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                       <div className="p-4 space-y-3">
                         <Link 
                           to="/contributors" 
@@ -102,7 +108,7 @@ const Navigation = () => {
                     <ChevronDown className={`ml-1 h-3 w-3 transition-transform duration-200 ${openDropdown === 'thought-leadership' ? 'rotate-180' : ''}`} />
                   </button>
                   {openDropdown === 'thought-leadership' && (
-                    <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                    <div className="absolute top-full left-0 mt-0 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                       <div className="p-4 space-y-3">
                         <Link 
                           to="/prompts" 
