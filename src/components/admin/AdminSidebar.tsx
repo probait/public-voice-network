@@ -12,7 +12,7 @@ import {
   Database,
   Settings,
   UserCheck,
-  PresentationChart
+  Presentation
 } from 'lucide-react';
 import PolicyNowLogo from '@/components/PolicyNowLogo';
 
@@ -47,7 +47,7 @@ const AdminSidebar = () => {
     },
     {
       title: 'Roundtables',
-      icon: PresentationChart,
+      icon: Presentation,
       path: '/admin/roundtables',
       roles: ['content_manager']
     },

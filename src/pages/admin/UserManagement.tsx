@@ -12,6 +12,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Search, UserPlus } from 'lucide-react';
 
+interface UserRole {
+  role: string;
+}
+
+interface UserWithRole {
+  id: string;
+  full_name: string | null;
+  email: string;
+  created_at: string;
+  user_roles: UserRole[];
+}
+
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('');
@@ -38,7 +50,7 @@ const UserManagement = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+      return (data || []) as UserWithRole[];
     },
   });
 
