@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,10 +14,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import AuthModal from "@/components/AuthModal";
 import PolicyNowLogo from "@/components/PolicyNowLogo";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Settings } from "lucide-react";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
+  const { isContentManager } = useUserRole();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -158,6 +160,17 @@ const Navigation = () => {
                       <div className="text-sm text-muted-foreground">{user.email}</div>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    {isContentManager() && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="flex items-center">
+                            <Settings className="mr-2 h-4 w-4" />
+                            Admin Portal
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
                     <DropdownMenuItem onClick={handleSignOut}>
                       Sign out
                     </DropdownMenuItem>

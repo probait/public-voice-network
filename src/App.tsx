@@ -21,6 +21,8 @@ import Roundtables from "./pages/Roundtables";
 import JobDisplacement from "./pages/articles/JobDisplacement";
 import PrivacyRights from "./pages/articles/PrivacyRights";
 import HealthcareInnovation from "./pages/articles/HealthcareInnovation";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserManagement from "./pages/admin/UserManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +50,11 @@ const App = () => (
             <Route path="/articles/job-displacement" element={<JobDisplacement />} />
             <Route path="/articles/privacy-rights" element={<PrivacyRights />} />
             <Route path="/articles/healthcare-innovation" element={<HealthcareInnovation />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
