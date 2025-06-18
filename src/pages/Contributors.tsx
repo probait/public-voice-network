@@ -32,7 +32,7 @@ const Contributors = () => {
       <Navigation />
       
       <main className="py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-6">Our Contributors</h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -42,12 +42,12 @@ const Contributors = () => {
           </div>
 
           {isLoading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
                 <Card key={i} className="animate-pulse">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
+                      <div className="w-16 h-16 bg-gray-300 rounded-full flex-shrink-0"></div>
                       <div className="flex-1">
                         <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
                         <div className="h-3 bg-gray-300 rounded w-1/2 mb-3"></div>
@@ -60,19 +60,19 @@ const Contributors = () => {
               ))}
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {displayContributors?.map((contributor) => (
-                <Card key={contributor.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <Avatar className="w-16 h-16">
+                <Card key={contributor.id} className="hover:shadow-lg transition-shadow h-full">
+                  <CardContent className="p-6 h-full flex flex-col">
+                    <div className="flex items-start gap-4 mb-4">
+                      <Avatar className="w-16 h-16 flex-shrink-0">
                         <AvatarImage src={contributor.headshot_url || ''} alt={contributor.name} />
                         <AvatarFallback className="bg-red-100 text-red-600 text-lg font-semibold">
                           {contributor.name.split(' ').map(n => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
                       
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-gray-900 mb-1">{contributor.name}</h3>
                         {(contributor.organization || contributor.institution) && (
                           <p className="text-sm text-gray-600 mb-2">
@@ -81,49 +81,49 @@ const Contributors = () => {
                               : contributor.organization || contributor.institution}
                           </p>
                         )}
-                        
-                        {contributor.bio && (
-                          <p className="text-gray-700 text-sm mb-3 line-clamp-3">{contributor.bio}</p>
+                      </div>
+                    </div>
+                    
+                    {contributor.bio && (
+                      <p className="text-gray-700 text-sm mb-4 flex-1 line-clamp-4">{contributor.bio}</p>
+                    )}
+                    
+                    <div className="flex items-center justify-between mt-auto">
+                      <Link to={`/contributors/${contributor.id}`}>
+                        <Button size="sm" variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
+                          View Profile
+                        </Button>
+                      </Link>
+                      
+                      <div className="flex gap-2">
+                        {contributor.website_url && (
+                          <Button size="sm" variant="ghost" asChild>
+                            <a href={contributor.website_url} target="_blank" rel="noopener noreferrer">
+                              <Globe className="w-4 h-4" />
+                            </a>
+                          </Button>
                         )}
-                        
-                        <div className="flex items-center justify-between">
-                          <Link to={`/contributors/${contributor.id}`}>
-                            <Button size="sm" variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
-                              View Profile
-                            </Button>
-                          </Link>
-                          
-                          <div className="flex gap-1">
-                            {contributor.website_url && (
-                              <Button size="sm" variant="ghost" asChild>
-                                <a href={contributor.website_url} target="_blank" rel="noopener noreferrer">
-                                  <Globe className="w-4 h-4" />
-                                </a>
-                              </Button>
-                            )}
-                            {contributor.linkedin_url && (
-                              <Button size="sm" variant="ghost" asChild>
-                                <a href={contributor.linkedin_url} target="_blank" rel="noopener noreferrer">
-                                  <Linkedin className="w-4 h-4" />
-                                </a>
-                              </Button>
-                            )}
-                            {contributor.twitter_url && (
-                              <Button size="sm" variant="ghost" asChild>
-                                <a href={contributor.twitter_url} target="_blank" rel="noopener noreferrer">
-                                  <Twitter className="w-4 h-4" />
-                                </a>
-                              </Button>
-                            )}
-                            {contributor.email && (
-                              <Button size="sm" variant="ghost" asChild>
-                                <a href={`mailto:${contributor.email}`}>
-                                  <Mail className="w-4 h-4" />
-                                </a>
-                              </Button>
-                            )}
-                          </div>
-                        </div>
+                        {contributor.linkedin_url && (
+                          <Button size="sm" variant="ghost" asChild>
+                            <a href={contributor.linkedin_url} target="_blank" rel="noopener noreferrer">
+                              <Linkedin className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        )}
+                        {contributor.twitter_url && (
+                          <Button size="sm" variant="ghost" asChild>
+                            <a href={contributor.twitter_url} target="_blank" rel="noopener noreferrer">
+                              <Twitter className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        )}
+                        {contributor.email && (
+                          <Button size="sm" variant="ghost" asChild>
+                            <a href={`mailto:${contributor.email}`}>
+                              <Mail className="w-4 h-4" />
+                            </a>
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </CardContent>
