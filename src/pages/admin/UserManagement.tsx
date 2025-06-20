@@ -33,24 +33,43 @@ const UserManagement = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users', searchTerm],
     queryFn: async () => {
-      let query = supabase
+      // First get all profiles
+      let profilesQuery = supabase
         .from('profiles')
-        .select(`
-          id,
-          full_name,
-          email,
-          created_at,
-          user_roles!inner(role)
-        `)
+        .select('id, full_name, email, created_at')
         .order('created_at', { ascending: false });
 
       if (searchTerm) {
-        query = query.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`);
+        profilesQuery = profilesQuery.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`);
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return (data || []) as UserWithRole[];
+      const { data: profiles, error: profilesError } = await profilesQuery;
+      if (profilesError) throw profilesError;
+
+      // Then get user roles for each profile
+      const usersWithRoles = await Promise.all(
+        (profiles || []).map(async (profile) => {
+          const { data: roles, error: rolesError } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', profile.id);
+
+          if (rolesError) {
+            console.error('Error fetching roles for user:', profile.id, rolesError);
+            return {
+              ...profile,
+              user_roles: []
+            };
+          }
+
+          return {
+            ...profile,
+            user_roles: roles || []
+          };
+        })
+      );
+
+      return usersWithRoles as UserWithRole[];
     },
   });
 
