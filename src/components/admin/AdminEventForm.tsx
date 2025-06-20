@@ -82,10 +82,15 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
   const createMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
       const eventData = {
-        ...data,
+        title: data.title,
+        description: data.description,
+        location: data.location,
         date_time: new Date(data.date_time).toISOString(),
-        user_id: user?.id,
-        meeting_link: data.is_virtual ? data.meeting_link : null,
+        max_attendees: data.max_attendees,
+        category: data.category,
+        is_virtual: data.is_virtual,
+        meeting_link: data.is_virtual ? data.meeting_link || null : null,
+        user_id: user?.id || '',
       };
 
       if (event) {

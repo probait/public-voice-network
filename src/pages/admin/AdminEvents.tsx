@@ -44,14 +44,14 @@ interface Meetup {
   description: string;
   location: string;
   date_time: string;
-  max_attendees: number;
-  category: string;
-  is_virtual: boolean;
+  max_attendees: number | null;
+  category: string | null;
+  is_virtual: boolean | null;
   meeting_link: string | null;
   created_at: string;
   attendee_count: number;
   profiles: {
-    full_name: string;
+    full_name: string | null;
   } | null;
 }
 
@@ -81,7 +81,7 @@ const AdminEvents = () => {
 
       return (data || []).map(event => ({
         ...event,
-        attendee_count: event.attendees?.length || 0
+        attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0
       }));
     },
   });
@@ -132,7 +132,7 @@ const AdminEvents = () => {
   const filteredEvents = events.filter(event =>
     event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    event.category.toLowerCase().includes(searchTerm.toLowerCase())
+    (event.category && event.category.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleSelectEvent = (eventId: string) => {
@@ -366,12 +366,12 @@ const AdminEvents = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary">{event.category}</Badge>
+                          <Badge variant="secondary">{event.category || 'General'}</Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center space-x-1">
                             <Users className="h-4 w-4 text-gray-400" />
-                            <span>{event.attendee_count}/{event.max_attendees}</span>
+                            <span>{event.attendee_count}/{event.max_attendees || 'Unlimited'}</span>
                           </div>
                         </TableCell>
                         <TableCell>
