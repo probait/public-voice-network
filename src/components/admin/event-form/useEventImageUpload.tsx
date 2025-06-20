@@ -10,12 +10,14 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setValue: (name: string, value: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log('Image file selected:', file.name, file.size);
       setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
         setImagePreview(result);
-        setValue('image_url', result);
+        // Don't set the form value to the preview - we'll set it to the actual URL after upload
+        console.log('Image preview set');
       };
       reader.readAsDataURL(file);
     }
@@ -28,6 +30,7 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
   };
 
   const uploadImage = async (file: File): Promise<string> => {
+    console.log('Starting image upload for file:', file.name);
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `event-images/${fileName}`;
@@ -37,6 +40,7 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
       .upload(filePath, file);
 
     if (uploadError) {
+      console.error('Upload error:', uploadError);
       throw uploadError;
     }
 
@@ -44,6 +48,7 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
       .from('event-images')
       .getPublicUrl(filePath);
 
+    console.log('Image uploaded successfully. Public URL:', data.publicUrl);
     return data.publicUrl;
   };
 

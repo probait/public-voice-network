@@ -61,6 +61,8 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
         throw error;
       }
 
+      console.log('Fetched meetups with images:', meetupsData?.map(m => ({ id: m.id, title: m.title, image_url: m.image_url })));
+
       // Get attendees count for each meetup
       if (!meetupsData || meetupsData.length === 0) {
         return [];
@@ -150,6 +152,24 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
     );
   }
 
+  const getImageUrl = (imageUrl: string | undefined) => {
+    if (!imageUrl) {
+      return "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
+    }
+    
+    // If it's already a full URL (starts with http), return as is
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    
+    // If it's a data URL (base64), return as is
+    if (imageUrl.startsWith('data:')) {
+      return imageUrl;
+    }
+    
+    return imageUrl;
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {meetups.map((meetup) => (
@@ -157,9 +177,13 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
           <div className="relative">
             <div className="w-full h-48 overflow-hidden">
               <img 
-                src={meetup.image_url || "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop"} 
+                src={getImageUrl(meetup.image_url)}
                 alt={meetup.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.log('Image failed to load for meetup:', meetup.id, 'URL:', meetup.image_url);
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
+                }}
               />
             </div>
           </div>

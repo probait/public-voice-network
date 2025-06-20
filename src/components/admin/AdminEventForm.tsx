@@ -1,4 +1,3 @@
-
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -56,16 +55,21 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
     mutationFn: async (data: EventFormData) => {
       let imageUrl = data.image_url;
 
-      // Only upload new image if a file was selected
+      // Upload new image if a file was selected
       if (imageFile) {
         setIsUploading(true);
         try {
           imageUrl = await uploadImage(imageFile);
+          console.log('New image uploaded, URL:', imageUrl);
         } catch (error) {
+          console.error('Image upload failed:', error);
           throw new Error('Failed to upload image');
         } finally {
           setIsUploading(false);
         }
+      } else if (!imageUrl && event?.image_url) {
+        // Keep existing image if no new one was uploaded
+        imageUrl = event.image_url;
       }
 
       const eventData = {
@@ -81,19 +85,27 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
         user_id: user?.id || '',
       };
 
-      console.log('Saving event with image_url:', imageUrl);
+      console.log('Saving event with data:', eventData);
 
       if (event) {
         const { error } = await supabase
           .from('meetups')
           .update(eventData)
           .eq('id', event.id);
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
+        console.log('Event updated successfully');
       } else {
         const { error } = await supabase
           .from('meetups')
           .insert(eventData);
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
+        console.log('Event created successfully');
       }
     },
     onSuccess: () => {
@@ -107,6 +119,7 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
       onClose();
     },
     onError: (error) => {
+      console.error('Mutation error:', error);
       toast({ 
         title: 'Error', 
         description: error.message,
@@ -116,6 +129,7 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
   });
 
   const onSubmit = (data: EventFormData) => {
+    console.log('Form submitted with data:', data);
     createMutation.mutate(data);
   };
 
