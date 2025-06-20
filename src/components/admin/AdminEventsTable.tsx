@@ -19,7 +19,8 @@ import {
   MapPin,
   Video,
   Eye,
-  Star
+  Star,
+  Image
 } from 'lucide-react';
 import { Meetup } from '@/types/admin-events';
 
@@ -54,6 +55,18 @@ const AdminEventsTable = ({
     onToggleHomepageFeatured(eventId, checked);
   };
 
+  const getImageUrl = (imageUrl: string | undefined) => {
+    if (!imageUrl) {
+      return "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
+    }
+    
+    if (imageUrl.startsWith('http') || imageUrl.startsWith('data:')) {
+      return imageUrl;
+    }
+    
+    return imageUrl;
+  };
+
   return (
     <div className="border rounded-lg">
       <Table>
@@ -67,6 +80,7 @@ const AdminEventsTable = ({
                 className="rounded"
               />
             </TableHead>
+            <TableHead>Image</TableHead>
             <TableHead>Event</TableHead>
             <TableHead>Date & Time</TableHead>
             <TableHead>Location</TableHead>
@@ -90,6 +104,24 @@ const AdminEventsTable = ({
                     onChange={() => onSelectEvent(event.id)}
                     className="rounded"
                   />
+                </TableCell>
+                <TableCell>
+                  <div className="w-16 h-12 overflow-hidden rounded">
+                    {event.image_url ? (
+                      <img 
+                        src={getImageUrl(event.image_url)}
+                        alt={event.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <Image className="h-4 w-4 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div>
