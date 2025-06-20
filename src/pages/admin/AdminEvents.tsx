@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -82,7 +81,7 @@ const AdminEvents = () => {
       return (data || []).map(event => ({
         ...event,
         attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0,
-        profiles: event.profiles && typeof event.profiles === 'object' && 'full_name' in event.profiles 
+        profiles: event.profiles && typeof event.profiles === 'object' && event.profiles !== null && 'full_name' in event.profiles 
           ? event.profiles 
           : null
       }));
