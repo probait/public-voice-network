@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -44,6 +44,16 @@ const AdminEventsTable = ({
   onViewAttendees,
   onToggleHomepageFeatured
 }: AdminEventsTableProps) => {
+  const featuredEventsCount = events.filter(event => event.homepage_featured).length;
+
+  const handleFeaturedChange = (eventId: string, checked: boolean) => {
+    if (checked && featuredEventsCount >= 3) {
+      alert('You can only feature a maximum of 3 events. Please unfeature an existing event first.');
+      return;
+    }
+    onToggleHomepageFeatured(eventId, checked);
+  };
+
   return (
     <div className="border rounded-lg">
       <Table>
@@ -127,9 +137,9 @@ const AdminEventsTable = ({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Switch
+                  <Checkbox
                     checked={event.homepage_featured || false}
-                    onCheckedChange={(checked) => onToggleHomepageFeatured(event.id, checked)}
+                    onCheckedChange={(checked) => handleFeaturedChange(event.id, checked as boolean)}
                   />
                 </TableCell>
                 <TableCell>
