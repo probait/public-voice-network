@@ -1,18 +1,9 @@
+
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import {
   Dialog,
   DialogContent,
@@ -20,39 +11,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { format } from 'date-fns';
 import { 
   Plus, 
-  Edit2, 
-  Trash2, 
-  Users, 
-  Search, 
-  Calendar,
-  MapPin,
-  Video,
-  Eye
+  Search
 } from 'lucide-react';
 import AdminEventForm from '@/components/admin/AdminEventForm';
 import BulkActions from '@/components/admin/BulkActions';
-
-interface Meetup {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  date_time: string;
-  max_attendees: number | null;
-  category: string | null;
-  is_virtual: boolean | null;
-  meeting_link: string | null;
-  created_at: string;
-  attendee_count: number;
-  profiles: {
-    full_name: string | null;
-  } | null;
-}
+import AdminEventsStats from '@/components/admin/AdminEventsStats';
+import AdminEventsTable from '@/components/admin/AdminEventsTable';
+import { useAdminEvents } from '@/hooks/useAdminEvents';
+import { Meetup } from '@/types/admin-events';
 
 const AdminEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,94 +29,7 @@ const AdminEvents = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [viewingAttendees, setViewingAttendees] = useState<string | null>(null);
 
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: events = [], isLoading } = useQuery({
-    queryKey: ['admin-events'],
-    queryFn: async (): Promise<Meetup[]> => {
-      const { data, error } = await supabase
-        .from('meetups')
-        .select(`
-          *,
-          profiles!meetups_user_id_fkey(full_name),
-          attendees(count)
-        `)
-        .order('date_time', { ascending: false });
-
-      if (error) throw error;
-
-      return (data || []).map(event => {
-        // Safely extract the profiles data
-        let profileData: { full_name: string | null } | null = null;
-        
-        if (event.profiles && 
-            typeof event.profiles === 'object' && 
-            event.profiles !== null && 
-            'full_name' in event.profiles) {
-          profileData = event.profiles as { full_name: string | null };
-        }
-
-        return {
-          id: event.id,
-          title: event.title,
-          description: event.description,
-          location: event.location,
-          date_time: event.date_time,
-          max_attendees: event.max_attendees,
-          category: event.category,
-          is_virtual: event.is_virtual,
-          meeting_link: event.meeting_link,
-          created_at: event.created_at,
-          attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0,
-          profiles: profileData
-        };
-      });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (eventId: string) => {
-      const { error } = await supabase
-        .from('meetups')
-        .delete()
-        .eq('id', eventId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-events'] });
-      toast({ title: 'Event deleted successfully' });
-    },
-    onError: (error) => {
-      toast({ 
-        title: 'Error deleting event', 
-        description: error.message,
-        variant: 'destructive' 
-      });
-    }
-  });
-
-  const bulkDeleteMutation = useMutation({
-    mutationFn: async (eventIds: string[]) => {
-      const { error } = await supabase
-        .from('meetups')
-        .delete()
-        .in('id', eventIds);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-events'] });
-      setSelectedEvents(new Set());
-      toast({ title: 'Events deleted successfully' });
-    },
-    onError: (error) => {
-      toast({ 
-        title: 'Error deleting events', 
-        description: error.message,
-        variant: 'destructive' 
-      });
-    }
-  });
+  const { events, isLoading, deleteMutation, bulkDeleteMutation } = useAdminEvents();
 
   const filteredEvents = events.filter(event =>
     event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -188,19 +69,9 @@ const AdminEvents = () => {
   const handleBulkDelete = () => {
     if (confirm(`Are you sure you want to delete ${selectedEvents.size} events?`)) {
       bulkDeleteMutation.mutate([...selectedEvents]);
+      setSelectedEvents(new Set());
     }
   };
-
-  const getEventStats = () => {
-    const totalEvents = events.length;
-    const upcomingEvents = events.filter(e => new Date(e.date_time) > new Date()).length;
-    const totalAttendees = events.reduce((sum, event) => sum + event.attendee_count, 0);
-    const avgAttendance = totalEvents > 0 ? Math.round(totalAttendees / totalEvents) : 0;
-
-    return { totalEvents, upcomingEvents, totalAttendees, avgAttendance };
-  };
-
-  const stats = getEventStats();
 
   if (isLoading) {
     return (
@@ -251,51 +122,8 @@ const AdminEvents = () => {
           </Dialog>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Total Events
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalEvents}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Upcoming Events
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.upcomingEvents}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Total Attendees
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.totalAttendees}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Avg. Attendance
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-purple-600">{stats.avgAttendance}</div>
-            </CardContent>
-          </Card>
-        </div>
+        <AdminEventsStats events={events} />
 
-        {/* Search and Events Table */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -320,118 +148,15 @@ const AdminEvents = () => {
               />
             )}
 
-            <div className="border rounded-lg">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">
-                      <input
-                        type="checkbox"
-                        checked={selectedEvents.size === filteredEvents.length && filteredEvents.length > 0}
-                        onChange={handleSelectAll}
-                        className="rounded"
-                      />
-                    </TableHead>
-                    <TableHead>Event</TableHead>
-                    <TableHead>Date & Time</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Attendees</TableHead>
-                    <TableHead>Organizer</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredEvents.map((event) => {
-                    const isPastEvent = new Date(event.date_time) < new Date();
-                    
-                    return (
-                      <TableRow key={event.id}>
-                        <TableCell>
-                          <input
-                            type="checkbox"
-                            checked={selectedEvents.has(event.id)}
-                            onChange={() => handleSelectEvent(event.id)}
-                            className="rounded"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">{event.title}</div>
-                            <div className="text-sm text-gray-500 truncate max-w-xs">
-                              {event.description}
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-1">
-                            <Calendar className="h-4 w-4 text-gray-400" />
-                            <span className="text-sm">
-                              {format(new Date(event.date_time), 'MMM d, yyyy')}
-                            </span>
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {format(new Date(event.date_time), 'h:mm a')}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-1">
-                            {event.is_virtual ? (
-                              <Video className="h-4 w-4 text-blue-500" />
-                            ) : (
-                              <MapPin className="h-4 w-4 text-green-500" />
-                            )}
-                            <span className="text-sm truncate max-w-xs">
-                              {event.is_virtual ? 'Virtual' : event.location}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{event.category || 'General'}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-1">
-                            <Users className="h-4 w-4 text-gray-400" />
-                            <span>{event.attendee_count}/{event.max_attendees || 'Unlimited'}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            {event.profiles?.full_name || 'Unknown'}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setViewingAttendees(event.id)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleEdit(event)}
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDelete(event.id)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
+            <AdminEventsTable
+              events={filteredEvents}
+              selectedEvents={selectedEvents}
+              onSelectEvent={handleSelectEvent}
+              onSelectAll={handleSelectAll}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onViewAttendees={setViewingAttendees}
+            />
 
             {filteredEvents.length === 0 && (
               <div className="text-center py-8">
