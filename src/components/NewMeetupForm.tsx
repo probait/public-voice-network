@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, X } from 'lucide-react';
 
 interface MeetupData {
   title: string;
@@ -20,6 +19,7 @@ interface MeetupData {
   category: string;
   isVirtual: boolean;
   meetingLink: string;
+  imageUrl: string;
 }
 
 const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
@@ -31,11 +31,54 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
     maxAttendees: 20,
     category: 'general',
     isVirtual: false,
-    meetingLink: ''
+    meetingLink: '',
+    imageUrl: ''
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        setFormData(prev => ({ ...prev, imageUrl: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview('');
+    setFormData(prev => ({ ...prev, imageUrl: '' }));
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `event-images/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('event-images')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from('event-images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,9 +92,10 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
       return;
     }
 
-    if (!formData.title.trim() || !formData.description.trim() || !formData.dateTime) {
+    if (!formData.title.trim() || !formData.description.trim() || !formData.dateTime || !formData.imageUrl) {
       toast({
         title: "Please fill in all required fields",
+        description: "All fields including an event image are required.",
         variant: "destructive"
       });
       return;
@@ -70,6 +114,17 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
     setIsSubmitting(true);
     
     try {
+      let imageUrl = formData.imageUrl;
+
+      // Upload new image if a file was selected
+      if (imageFile) {
+        try {
+          imageUrl = await uploadImage(imageFile);
+        } catch (error) {
+          throw new Error('Failed to upload image');
+        }
+      }
+
       const { error } = await supabase
         .from('meetups')
         .insert({
@@ -81,7 +136,8 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
           max_attendees: formData.maxAttendees,
           category: formData.category,
           is_virtual: formData.isVirtual,
-          meeting_link: formData.isVirtual ? formData.meetingLink : null
+          meeting_link: formData.isVirtual ? formData.meetingLink : null,
+          image_url: imageUrl
         });
 
       if (error) throw error;
@@ -99,8 +155,11 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
         maxAttendees: 20,
         category: 'general',
         isVirtual: false,
-        meetingLink: ''
+        meetingLink: '',
+        imageUrl: ''
       });
+      setImageFile(null);
+      setImagePreview('');
       
       if (onSubmit) {
         onSubmit();
@@ -150,6 +209,48 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
               className="mt-2 min-h-[120px]"
               required
             />
+          </div>
+
+          <div>
+            <Label className="text-base font-medium">Event Image *</Label>
+            <div className="space-y-4 mt-2">
+              {imagePreview ? (
+                <div className="relative">
+                  <img 
+                    src={imagePreview} 
+                    alt="Event preview" 
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleRemoveImage}
+                    className="absolute top-2 right-2"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-500 mb-2">Upload an event image</p>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <Label 
+                    htmlFor="image-upload" 
+                    className="cursor-pointer inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Choose Image
+                  </Label>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

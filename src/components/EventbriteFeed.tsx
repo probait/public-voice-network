@@ -18,29 +18,12 @@ interface Meetup {
   is_virtual: boolean;
   meeting_link: string | null;
   created_at: string;
+  image_url?: string;
   profiles: {
     full_name: string;
   } | null;
   attendee_count: number;
 }
-
-const getImageForCategory = (category: string) => {
-  const categoryLower = category.toLowerCase();
-  
-  if (categoryLower.includes('workshop')) {
-    return "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=225&fit=crop";
-  } else if (categoryLower.includes('panel') || categoryLower.includes('discussion')) {
-    return "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=225&fit=crop";
-  } else if (categoryLower.includes('employment') || categoryLower.includes('job')) {
-    return "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=225&fit=crop";
-  } else if (categoryLower.includes('healthcare') || categoryLower.includes('health')) {
-    return "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=225&fit=crop";
-  } else if (categoryLower.includes('tech') || categoryLower.includes('ai') || categoryLower.includes('artificial')) {
-    return "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=400&h=225&fit=crop";
-  } else {
-    return "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
-  }
-};
 
 const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boolean }) => {
   const { data: meetups = [], isLoading, error } = useQuery({
@@ -62,7 +45,8 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
           meeting_link,
           created_at,
           user_id,
-          homepage_featured
+          homepage_featured,
+          image_url
         `)
         .order('date_time', { ascending: true });
 
@@ -118,6 +102,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
           is_virtual: meetup.is_virtual,
           meeting_link: meetup.meeting_link,
           created_at: meetup.created_at,
+          image_url: meetup.image_url,
           attendee_count: attendeeCount,
           profiles: profile ? { full_name: profile.full_name } : null
         };
@@ -172,8 +157,8 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
           <div className="relative">
             <div className="w-full h-48 overflow-hidden">
               <img 
-                src={getImageForCategory(meetup.category)} 
-                alt={meetup.category}
+                src={meetup.image_url || "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop"} 
+                alt={meetup.title}
                 className="w-full h-full object-cover"
               />
             </div>

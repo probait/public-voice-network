@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -27,6 +26,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { Upload, X } from 'lucide-react';
 
 const eventSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters'),
@@ -37,6 +37,7 @@ const eventSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   is_virtual: z.boolean(),
   meeting_link: z.string().url('Invalid URL').optional().or(z.literal('')),
+  image_url: z.string().min(1, 'Event image is required'),
 });
 
 type EventFormData = z.infer<typeof eventSchema>;
@@ -64,6 +65,9 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>(event?.image_url || '');
+  const [isUploading, setIsUploading] = useState(false);
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
@@ -76,11 +80,66 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
       category: event?.category || 'General',
       is_virtual: event?.is_virtual || false,
       meeting_link: event?.meeting_link || '',
+      image_url: event?.image_url || '',
     },
   });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+        form.setValue('image_url', result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview('');
+    form.setValue('image_url', '');
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `event-images/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('event-images')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from('event-images')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  };
+
   const createMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
+      let imageUrl = data.image_url;
+
+      // Upload new image if a file was selected
+      if (imageFile) {
+        setIsUploading(true);
+        try {
+          imageUrl = await uploadImage(imageFile);
+        } catch (error) {
+          throw new Error('Failed to upload image');
+        } finally {
+          setIsUploading(false);
+        }
+      }
+
       const eventData = {
         title: data.title,
         description: data.description,
@@ -90,6 +149,7 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
         category: data.category,
         is_virtual: data.is_virtual,
         meeting_link: data.is_virtual ? data.meeting_link || null : null,
+        image_url: imageUrl,
         user_id: user?.id || '',
       };
 
@@ -109,6 +169,7 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-events'] });
       queryClient.invalidateQueries({ queryKey: ['meetups'] });
+      queryClient.invalidateQueries({ queryKey: ['external-events'] });
       toast({ 
         title: event ? 'Event updated' : 'Event created',
         description: 'The event has been saved successfully.'
@@ -159,6 +220,57 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
                   className="min-h-[100px]"
                   {...field} 
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="image_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Event Image *</FormLabel>
+              <FormControl>
+                <div className="space-y-4">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img 
+                        src={imagePreview} 
+                        alt="Event preview" 
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={handleRemoveImage}
+                        className="absolute top-2 right-2"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                      <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                      <p className="text-gray-500 mb-2">Upload an event image</p>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                        id="image-upload"
+                      />
+                      <Label 
+                        htmlFor="image-upload" 
+                        className="cursor-pointer inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        Choose Image
+                      </Label>
+                    </div>
+                  )}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -298,10 +410,10 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
           </Button>
           <Button 
             type="submit" 
-            disabled={createMutation.isPending}
+            disabled={createMutation.isPending || isUploading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {createMutation.isPending ? 'Saving...' : (event ? 'Update Event' : 'Create Event')}
+            {(createMutation.isPending || isUploading) ? 'Saving...' : (event ? 'Update Event' : 'Create Event')}
           </Button>
         </div>
       </form>
