@@ -231,6 +231,7 @@ export type Database = {
           description: string
           homepage_featured: boolean | null
           id: string
+          image_url: string | null
           is_virtual: boolean | null
           location: string
           max_attendees: number | null
@@ -246,6 +247,7 @@ export type Database = {
           description: string
           homepage_featured?: boolean | null
           id?: string
+          image_url?: string | null
           is_virtual?: boolean | null
           location: string
           max_attendees?: number | null
@@ -261,6 +263,7 @@ export type Database = {
           description?: string
           homepage_featured?: boolean | null
           id?: string
+          image_url?: string | null
           is_virtual?: boolean | null
           location?: string
           max_attendees?: number | null
