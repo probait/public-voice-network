@@ -65,16 +65,8 @@ const ContributorForm = ({ contributor, onClose }: ContributorFormProps) => {
   const createMutation = useMutation({
     mutationFn: async (data: ContributorFormData) => {
       const contributorData = {
-        name: data.name,
-        email: data.email || null,
-        bio: data.bio || null,
-        organization: data.organization || null,
-        institution: data.institution || null,
-        twitter_url: data.twitter_url || null,
-        linkedin_url: data.linkedin_url || null,
-        website_url: data.website_url || null,
-        headshot_url: headshotUrl || null,
-        is_featured: data.is_featured || false,
+        ...data,
+        headshot_url: headshotUrl,
         featured_until: data.is_featured ? 
           new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null
       };
@@ -88,7 +80,7 @@ const ContributorForm = ({ contributor, onClose }: ContributorFormProps) => {
       } else {
         const { error } = await supabase
           .from('contributors')
-          .insert(contributorData);
+          .insert([contributorData]);
         if (error) throw error;
       }
     },
