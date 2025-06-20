@@ -90,7 +90,16 @@ const AdminEvents = () => {
         }
 
         return {
-          ...event,
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          location: event.location,
+          date_time: event.date_time,
+          max_attendees: event.max_attendees,
+          category: event.category,
+          is_virtual: event.is_virtual,
+          meeting_link: event.meeting_link,
+          created_at: event.created_at,
           attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0,
           profiles: profileData
         };
