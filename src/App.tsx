@@ -23,6 +23,14 @@ import PrivacyRights from "./pages/articles/PrivacyRights";
 import HealthcareInnovation from "./pages/articles/HealthcareInnovation";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
+import AdminContributors from "./pages/admin/AdminContributors";
+import AdminArticles from "./pages/admin/AdminArticles";
+import AdminEvents from "./pages/admin/AdminEvents";
+import AdminRoundtables from "./pages/admin/AdminRoundtables";
+import AdminPrompts from "./pages/admin/AdminPrompts";
+import AdminPartnerships from "./pages/admin/AdminPartnerships";
+import AdminDatasets from "./pages/admin/AdminDatasets";
+import AdminSettings from "./pages/admin/AdminSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +62,14 @@ const App = () => (
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/contributors" element={<AdminContributors />} />
+            <Route path="/admin/articles" element={<AdminArticles />} />
+            <Route path="/admin/events" element={<AdminEvents />} />
+            <Route path="/admin/roundtables" element={<AdminRoundtables />} />
+            <Route path="/admin/prompts" element={<AdminPrompts />} />
+            <Route path="/admin/partnerships" element={<AdminPartnerships />} />
+            <Route path="/admin/datasets" element={<AdminDatasets />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
