@@ -82,7 +82,7 @@ const AdminEvents = () => {
         ...event,
         attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0,
         profiles: event.profiles && typeof event.profiles === 'object' && event.profiles !== null && 'full_name' in event.profiles 
-          ? event.profiles 
+          ? { full_name: event.profiles.full_name }
           : null
       }));
     },
