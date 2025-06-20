@@ -80,7 +80,7 @@ const ContributorForm = ({ contributor, onClose }: ContributorFormProps) => {
       } else {
         const { error } = await supabase
           .from('contributors')
-          .insert([contributorData]);
+          .insert(contributorData);
         if (error) throw error;
       }
     },
