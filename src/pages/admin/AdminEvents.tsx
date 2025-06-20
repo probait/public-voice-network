@@ -81,7 +81,10 @@ const AdminEvents = () => {
 
       return (data || []).map(event => ({
         ...event,
-        attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0
+        attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0,
+        profiles: event.profiles && typeof event.profiles === 'object' && 'full_name' in event.profiles 
+          ? event.profiles 
+          : null
       }));
     },
   });
@@ -274,7 +277,7 @@ const AdminEvents = () => {
           </Card>
         </div>
 
-        {/* Search and Filters */}
+        {/* Search and Events Table */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
