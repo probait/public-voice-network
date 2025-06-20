@@ -16,8 +16,9 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
       reader.onload = (e) => {
         const result = e.target?.result as string;
         setImagePreview(result);
-        // Don't set the form value to the preview - we'll set it to the actual URL after upload
-        console.log('Image preview set');
+        // Set a temporary value to satisfy form validation while we have a pending upload
+        setValue('image_url', 'pending_upload');
+        console.log('Image preview set and form field updated');
       };
       reader.readAsDataURL(file);
     }

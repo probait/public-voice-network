@@ -10,7 +10,10 @@ export const eventSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   is_virtual: z.boolean(),
   meeting_link: z.string().url('Invalid URL').optional().or(z.literal('')),
-  image_url: z.string().min(1, 'Event image is required'),
+  image_url: z.string().min(1, 'Event image is required').refine(
+    (val) => val === 'pending_upload' || val.startsWith('http') || val.startsWith('data:'),
+    'Invalid image URL'
+  ),
 });
 
 export type EventFormData = z.infer<typeof eventSchema>;
