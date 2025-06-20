@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -9,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "react-router-dom";
 import SubmissionsFeed from "@/components/SubmissionsFeed";
+import MeetupFeed from "@/components/MeetupFeed";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 
@@ -84,7 +84,19 @@ const Index = () => {
               Join conversations, ask questions, and connect with experts discussing AI's impact on Canada
             </p>
           </div>
-          <EventbriteFeed />
+          
+          {/* Community Meetups */}
+          <div className="mb-12">
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">Community Meetups</h3>
+            <MeetupFeed limit={6} />
+          </div>
+
+          {/* External Events */}
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">External Events & Conferences</h3>
+            <EventbriteFeed />
+          </div>
+
           <div className="text-center mt-8">
             <Link to="/events">
               <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">

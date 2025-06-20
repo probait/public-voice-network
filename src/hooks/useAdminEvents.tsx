@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -26,12 +25,11 @@ export const useAdminEvents = () => {
         // Extract attendee count safely
         const attendeeCount = Array.isArray(event.attendees) ? event.attendees.length : 0;
         
-        // Extract organizer name safely - handle all possible profile structures
+        // Extract organizer name safely with proper null checking
         let organizerName: string | null = null;
-        if (event.profiles && typeof event.profiles === 'object' && event.profiles !== null) {
-          if ('full_name' in event.profiles) {
-            organizerName = (event.profiles as { full_name: string | null }).full_name;
-          }
+        if (event.profiles && typeof event.profiles === 'object') {
+          const profileObj = event.profiles as { full_name?: string | null };
+          organizerName = profileObj.full_name || null;
         }
 
         // Return the meetup object with safely processed data
