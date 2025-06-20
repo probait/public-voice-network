@@ -24,6 +24,24 @@ interface Meetup {
   attendee_count: number;
 }
 
+const getImageForCategory = (category: string) => {
+  const categoryLower = category.toLowerCase();
+  
+  if (categoryLower.includes('workshop')) {
+    return "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=225&fit=crop";
+  } else if (categoryLower.includes('panel') || categoryLower.includes('discussion')) {
+    return "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=225&fit=crop";
+  } else if (categoryLower.includes('employment') || categoryLower.includes('job')) {
+    return "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=225&fit=crop";
+  } else if (categoryLower.includes('healthcare') || categoryLower.includes('health')) {
+    return "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=225&fit=crop";
+  } else if (categoryLower.includes('tech') || categoryLower.includes('ai') || categoryLower.includes('artificial')) {
+    return "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=400&h=225&fit=crop";
+  } else {
+    return "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
+  }
+};
+
 const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boolean }) => {
   const { data: meetups = [], isLoading, error } = useQuery({
     queryKey: ['external-events', showFeaturedOnly],
@@ -152,11 +170,12 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
       {meetups.map((meetup) => (
         <Card key={meetup.id} className="hover:shadow-lg transition-shadow overflow-hidden">
           <div className="relative">
-            <div className="w-full h-48 bg-gradient-to-br from-red-100 to-orange-100 flex items-center justify-center">
-              <div className="text-center text-gray-600">
-                <Calendar className="h-12 w-12 mx-auto mb-2" />
-                <p className="text-sm font-medium">{meetup.category}</p>
-              </div>
+            <div className="w-full h-48 overflow-hidden">
+              <img 
+                src={getImageForCategory(meetup.category)} 
+                alt={meetup.category}
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
           <CardHeader>
