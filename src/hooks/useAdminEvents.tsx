@@ -23,16 +23,18 @@ export const useAdminEvents = () => {
       if (error) throw error;
 
       return (data || []).map(event => {
-        // Safely extract the profiles data
-        let profileData: { full_name: string | null } | null = null;
+        // Extract attendee count safely
+        const attendeeCount = Array.isArray(event.attendees) ? event.attendees.length : 0;
         
-        if (event.profiles && 
-            typeof event.profiles === 'object' && 
-            event.profiles !== null && 
-            'full_name' in event.profiles) {
-          profileData = event.profiles as { full_name: string | null };
+        // Extract organizer name safely - handle all possible profile structures
+        let organizerName: string | null = null;
+        if (event.profiles) {
+          if (typeof event.profiles === 'object' && 'full_name' in event.profiles) {
+            organizerName = event.profiles.full_name;
+          }
         }
 
+        // Return the meetup object with safely processed data
         return {
           id: event.id,
           title: event.title,
@@ -44,8 +46,8 @@ export const useAdminEvents = () => {
           is_virtual: event.is_virtual,
           meeting_link: event.meeting_link,
           created_at: event.created_at,
-          attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0,
-          profiles: profileData
+          attendee_count: attendeeCount,
+          profiles: organizerName ? { full_name: organizerName } : null
         };
       });
     },
