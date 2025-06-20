@@ -27,7 +27,8 @@ export const useAdminEvents = () => {
           is_virtual,
           meeting_link,
           created_at,
-          user_id
+          user_id,
+          homepage_featured
         `)
         .order('date_time', { ascending: false });
 
@@ -84,6 +85,7 @@ export const useAdminEvents = () => {
           is_virtual: meetup.is_virtual,
           meeting_link: meetup.meeting_link,
           created_at: meetup.created_at,
+          homepage_featured: meetup.homepage_featured,
           attendee_count: attendeeCount,
           profiles: profile ? { full_name: profile.full_name } : null
         };
@@ -101,6 +103,7 @@ export const useAdminEvents = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+      queryClient.invalidateQueries({ queryKey: ['external-events'] });
       toast({ title: 'Event deleted successfully' });
     },
     onError: (error) => {
@@ -122,6 +125,7 @@ export const useAdminEvents = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+      queryClient.invalidateQueries({ queryKey: ['external-events'] });
       toast({ title: 'Events deleted successfully' });
     },
     onError: (error) => {
@@ -133,10 +137,33 @@ export const useAdminEvents = () => {
     }
   });
 
+  const toggleHomepageFeaturedMutation = useMutation({
+    mutationFn: async ({ eventId, featured }: { eventId: string; featured: boolean }) => {
+      const { error } = await supabase
+        .from('meetups')
+        .update({ homepage_featured: featured })
+        .eq('id', eventId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+      queryClient.invalidateQueries({ queryKey: ['external-events'] });
+      toast({ title: 'Event feature status updated successfully' });
+    },
+    onError: (error) => {
+      toast({ 
+        title: 'Error updating event feature status', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    }
+  });
+
   return {
     events,
     isLoading,
     deleteMutation,
-    bulkDeleteMutation
+    bulkDeleteMutation,
+    toggleHomepageFeaturedMutation
   };
 };

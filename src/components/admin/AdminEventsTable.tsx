@@ -1,6 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import {
   Table,
   TableBody,
@@ -17,7 +18,8 @@ import {
   Calendar,
   MapPin,
   Video,
-  Eye
+  Eye,
+  Star
 } from 'lucide-react';
 import { Meetup } from '@/types/admin-events';
 
@@ -29,6 +31,7 @@ interface AdminEventsTableProps {
   onEdit: (event: Meetup) => void;
   onDelete: (eventId: string) => void;
   onViewAttendees: (eventId: string) => void;
+  onToggleHomepageFeatured: (eventId: string, featured: boolean) => void;
 }
 
 const AdminEventsTable = ({
@@ -38,7 +41,8 @@ const AdminEventsTable = ({
   onSelectAll,
   onEdit,
   onDelete,
-  onViewAttendees
+  onViewAttendees,
+  onToggleHomepageFeatured
 }: AdminEventsTableProps) => {
   return (
     <div className="border rounded-lg">
@@ -58,6 +62,7 @@ const AdminEventsTable = ({
             <TableHead>Location</TableHead>
             <TableHead>Category</TableHead>
             <TableHead>Attendees</TableHead>
+            <TableHead>Featured</TableHead>
             <TableHead>Organizer</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -78,7 +83,12 @@ const AdminEventsTable = ({
                 </TableCell>
                 <TableCell>
                   <div>
-                    <div className="font-medium">{event.title}</div>
+                    <div className="font-medium flex items-center gap-2">
+                      {event.title}
+                      {event.homepage_featured && (
+                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                      )}
+                    </div>
                     <div className="text-sm text-gray-500 truncate max-w-xs">
                       {event.description}
                     </div>
@@ -117,8 +127,14 @@ const AdminEventsTable = ({
                   </div>
                 </TableCell>
                 <TableCell>
+                  <Switch
+                    checked={event.homepage_featured || false}
+                    onCheckedChange={(checked) => onToggleHomepageFeatured(event.id, checked)}
+                  />
+                </TableCell>
+                <TableCell>
                   <div className="text-sm">
-                    {event.profiles?.full_name || 'Unknown'}
+                    {event.profiles?.full_name || 'System'}
                   </div>
                 </TableCell>
                 <TableCell>

@@ -11,6 +11,7 @@ export interface Meetup {
   meeting_link: string | null;
   created_at: string;
   attendee_count: number;
+  homepage_featured?: boolean;
   profiles: {
     full_name: string | null;
   } | null;

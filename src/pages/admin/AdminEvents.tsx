@@ -29,7 +29,13 @@ const AdminEvents = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [viewingAttendees, setViewingAttendees] = useState<string | null>(null);
 
-  const { events, isLoading, deleteMutation, bulkDeleteMutation } = useAdminEvents();
+  const { 
+    events, 
+    isLoading, 
+    deleteMutation, 
+    bulkDeleteMutation, 
+    toggleHomepageFeaturedMutation 
+  } = useAdminEvents();
 
   const filteredEvents = events.filter(event =>
     event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -71,6 +77,10 @@ const AdminEvents = () => {
       bulkDeleteMutation.mutate([...selectedEvents]);
       setSelectedEvents(new Set());
     }
+  };
+
+  const handleToggleHomepageFeatured = (eventId: string, featured: boolean) => {
+    toggleHomepageFeaturedMutation.mutate({ eventId, featured });
   };
 
   if (isLoading) {
@@ -156,6 +166,7 @@ const AdminEvents = () => {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onViewAttendees={setViewingAttendees}
+              onToggleHomepageFeatured={handleToggleHomepageFeatured}
             />
 
             {filteredEvents.length === 0 && (

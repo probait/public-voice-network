@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -85,16 +86,10 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Community Meetups */}
-          <div className="mb-12">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Community Meetups</h3>
-            <MeetupFeed limit={6} />
-          </div>
-
-          {/* External Events */}
+          {/* Featured Events - show up to 3 featured events */}
           <div className="mb-8">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">External Events & Conferences</h3>
-            <EventbriteFeed />
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">Featured Events</h3>
+            <EventbriteFeed showFeaturedOnly={true} />
           </div>
 
           <div className="text-center mt-8">

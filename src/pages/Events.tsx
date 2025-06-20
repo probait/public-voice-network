@@ -2,7 +2,6 @@
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import EventbriteFeed from "@/components/EventbriteFeed";
-import MeetupFeed from "@/components/MeetupFeed";
 
 const Events = () => {
   return (
@@ -19,15 +18,9 @@ const Events = () => {
             </p>
           </div>
 
-          {/* Database Meetups Section */}
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Community Meetups & Events</h2>
-            <MeetupFeed />
-          </div>
-
-          {/* Eventbrite Events Section */}
+          {/* All Events Section - now unified */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">External Events & Conferences</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Events</h2>
             <EventbriteFeed />
           </div>
         </div>

@@ -229,6 +229,7 @@ export type Database = {
           created_at: string
           date_time: string
           description: string
+          homepage_featured: boolean | null
           id: string
           is_virtual: boolean | null
           location: string
@@ -236,13 +237,14 @@ export type Database = {
           meeting_link: string | null
           title: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           category?: string | null
           created_at?: string
           date_time: string
           description: string
+          homepage_featured?: boolean | null
           id?: string
           is_virtual?: boolean | null
           location: string
@@ -250,13 +252,14 @@ export type Database = {
           meeting_link?: string | null
           title: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           category?: string | null
           created_at?: string
           date_time?: string
           description?: string
+          homepage_featured?: boolean | null
           id?: string
           is_virtual?: boolean | null
           location?: string
@@ -264,7 +267,7 @@ export type Database = {
           meeting_link?: string | null
           title?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
