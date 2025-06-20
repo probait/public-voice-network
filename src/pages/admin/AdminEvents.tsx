@@ -80,9 +80,14 @@ const AdminEvents = () => {
 
       return (data || []).map(event => {
         // Safely extract the profiles data
-        const profileData = event.profiles && typeof event.profiles === 'object' && event.profiles !== null && 'full_name' in event.profiles 
-          ? event.profiles as { full_name: string | null }
-          : null;
+        let profileData: { full_name: string | null } | null = null;
+        
+        if (event.profiles && 
+            typeof event.profiles === 'object' && 
+            event.profiles !== null && 
+            'full_name' in event.profiles) {
+          profileData = event.profiles as { full_name: string | null };
+        }
 
         return {
           ...event,
