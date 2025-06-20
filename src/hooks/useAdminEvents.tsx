@@ -28,9 +28,9 @@ export const useAdminEvents = () => {
         
         // Extract organizer name safely - handle all possible profile structures
         let organizerName: string | null = null;
-        if (event.profiles) {
-          if (typeof event.profiles === 'object' && 'full_name' in event.profiles) {
-            organizerName = event.profiles.full_name;
+        if (event.profiles && typeof event.profiles === 'object' && event.profiles !== null) {
+          if ('full_name' in event.profiles) {
+            organizerName = (event.profiles as { full_name: string | null }).full_name;
           }
         }
 
