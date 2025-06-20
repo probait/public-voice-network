@@ -13,7 +13,7 @@ export const useAdminEvents = () => {
     queryFn: async (): Promise<Meetup[]> => {
       console.log('Fetching admin events...');
       
-      // First get all meetups
+      // First get all meetups including image_url
       const { data: meetupsData, error } = await supabase
         .from('meetups')
         .select(`
@@ -28,7 +28,8 @@ export const useAdminEvents = () => {
           meeting_link,
           created_at,
           user_id,
-          homepage_featured
+          homepage_featured,
+          image_url
         `)
         .order('date_time', { ascending: false });
 
@@ -86,6 +87,7 @@ export const useAdminEvents = () => {
           meeting_link: meetup.meeting_link,
           created_at: meetup.created_at,
           homepage_featured: meetup.homepage_featured,
+          image_url: meetup.image_url,
           attendee_count: attendeeCount,
           profiles: profile ? { full_name: profile.full_name } : null
         };

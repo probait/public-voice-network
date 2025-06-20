@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -128,7 +129,7 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
     mutationFn: async (data: EventFormData) => {
       let imageUrl = data.image_url;
 
-      // Upload new image if a file was selected
+      // Only upload new image if a file was selected
       if (imageFile) {
         setIsUploading(true);
         try {
@@ -152,6 +153,8 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
         image_url: imageUrl,
         user_id: user?.id || '',
       };
+
+      console.log('Saving event with image_url:', imageUrl);
 
       if (event) {
         const { error } = await supabase
@@ -234,10 +237,10 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
               <FormLabel>Event Image *</FormLabel>
               <FormControl>
                 <div className="space-y-4">
-                  {imagePreview ? (
+                  {imagePreview || field.value ? (
                     <div className="relative">
                       <img 
-                        src={imagePreview} 
+                        src={imagePreview || field.value} 
                         alt="Event preview" 
                         className="w-full h-48 object-cover rounded-lg"
                       />
