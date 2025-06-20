@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -10,42 +11,81 @@ export const useAdminEvents = () => {
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['admin-events'],
     queryFn: async (): Promise<Meetup[]> => {
-      const { data, error } = await supabase
+      console.log('Fetching admin events...');
+      
+      // First get all meetups
+      const { data: meetupsData, error } = await supabase
         .from('meetups')
         .select(`
-          *,
-          profiles!meetups_user_id_fkey(full_name),
-          attendees(count)
+          id,
+          title,
+          description,
+          location,
+          date_time,
+          max_attendees,
+          category,
+          is_virtual,
+          meeting_link,
+          created_at,
+          user_id
         `)
         .order('date_time', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching meetups:', error);
+        throw error;
+      }
 
-      return (data || []).map(event => {
-        // Extract attendee count safely
-        const attendeeCount = Array.isArray(event.attendees) ? event.attendees.length : 0;
+      console.log('Meetups data:', meetupsData);
+
+      if (!meetupsData || meetupsData.length === 0) {
+        return [];
+      }
+
+      // Get attendees count for each meetup
+      const meetupIds = meetupsData.map(m => m.id);
+      const { data: attendeesData, error: attendeesError } = await supabase
+        .from('attendees')
+        .select('meetup_id')
+        .in('meetup_id', meetupIds);
+
+      if (attendeesError) {
+        console.error('Error fetching attendees:', attendeesError);
+      }
+
+      // Get profiles for organizers
+      const userIds = meetupsData.map(m => m.user_id).filter(Boolean);
+      let profilesData: any[] = [];
+      
+      if (userIds.length > 0) {
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .in('id', userIds);
         
-        // Extract organizer name safely with proper null checking
-        let organizerName: string | null = null;
-        if (event.profiles && typeof event.profiles === 'object') {
-          const profileObj = event.profiles as { full_name?: string | null };
-          organizerName = profileObj.full_name || null;
+        if (!profilesError && profiles) {
+          profilesData = profiles;
         }
+      }
 
-        // Return the meetup object with safely processed data
+      // Combine the data
+      return meetupsData.map(meetup => {
+        const attendeeCount = attendeesData?.filter(a => a.meetup_id === meetup.id).length || 0;
+        const profile = profilesData.find(p => p.id === meetup.user_id);
+        
         return {
-          id: event.id,
-          title: event.title,
-          description: event.description,
-          location: event.location,
-          date_time: event.date_time,
-          max_attendees: event.max_attendees,
-          category: event.category,
-          is_virtual: event.is_virtual,
-          meeting_link: event.meeting_link,
-          created_at: event.created_at,
+          id: meetup.id,
+          title: meetup.title,
+          description: meetup.description,
+          location: meetup.location,
+          date_time: meetup.date_time,
+          max_attendees: meetup.max_attendees,
+          category: meetup.category,
+          is_virtual: meetup.is_virtual,
+          meeting_link: meetup.meeting_link,
+          created_at: meetup.created_at,
           attendee_count: attendeeCount,
-          profiles: organizerName ? { full_name: organizerName } : null
+          profiles: profile ? { full_name: profile.full_name } : null
         };
       });
     },
