@@ -78,13 +78,18 @@ const AdminEvents = () => {
 
       if (error) throw error;
 
-      return (data || []).map(event => ({
-        ...event,
-        attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0,
-        profiles: event.profiles && typeof event.profiles === 'object' && event.profiles !== null && 'full_name' in event.profiles 
-          ? { full_name: event.profiles.full_name }
-          : null
-      }));
+      return (data || []).map(event => {
+        // Safely extract the profiles data
+        const profileData = event.profiles && typeof event.profiles === 'object' && event.profiles !== null && 'full_name' in event.profiles 
+          ? event.profiles as { full_name: string | null }
+          : null;
+
+        return {
+          ...event,
+          attendee_count: Array.isArray(event.attendees) ? event.attendees.length : 0,
+          profiles: profileData
+        };
+      });
     },
   });
 
