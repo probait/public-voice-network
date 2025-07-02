@@ -42,17 +42,20 @@ interface SystemSettings {
 }
 
 const AdminSettings = () => {
-  const [settings, setSettings] = useState<SystemSettings>({
-    siteName: 'AI Canada Voice',
-    adminEmail: 'admin@aicanadavoice.ca',
-    maxEventsPerUser: 5,
-    featuredEventsLimit: 3,
-    enableRegistration: true,
-    enableNotifications: true,
-    maintenanceMode: false,
-    allowEventCreation: true,
-    requireEventApproval: false,
-    enableRealTimeUpdates: true
+  const [settings, setSettings] = useState<SystemSettings>(() => {
+    const saved = localStorage.getItem('admin_settings');
+    return saved ? JSON.parse(saved) : {
+      siteName: 'AI Canada Voice',
+      adminEmail: 'admin@aicanadavoice.ca',
+      maxEventsPerUser: 5,
+      featuredEventsLimit: 3,
+      enableRegistration: true,
+      enableNotifications: true,
+      maintenanceMode: localStorage.getItem('maintenance_mode') === 'true',
+      allowEventCreation: true,
+      requireEventApproval: false,
+      enableRealTimeUpdates: true
+    };
   });
 
   const [backupStatus, setBackupStatus] = useState<'idle' | 'creating' | 'success' | 'error'>('idle');
@@ -84,12 +87,29 @@ const AdminSettings = () => {
     refetchInterval: 30000 // Refresh every 30 seconds
   });
 
+  const saveMutation = useMutation({
+    mutationFn: async (settingsData: SystemSettings) => {
+      // For demonstration - in production, this would save to a settings table
+      localStorage.setItem('admin_settings', JSON.stringify(settingsData));
+      
+      // Apply maintenance mode immediately if enabled
+      if (settingsData.maintenanceMode) {
+        localStorage.setItem('maintenance_mode', 'true');
+        window.location.reload();
+      } else {
+        localStorage.removeItem('maintenance_mode');
+      }
+    },
+    onSuccess: () => {
+      toast({ 
+        title: 'Settings saved successfully',
+        description: 'All configuration changes have been applied.'
+      });
+    }
+  });
+
   const handleSave = () => {
-    // In a real app, this would save to a settings table or environment variables
-    toast({ 
-      title: 'Settings saved successfully',
-      description: 'All configuration changes have been applied.'
-    });
+    saveMutation.mutate(settings);
   };
 
   const handleBackup = async () => {
@@ -431,9 +451,13 @@ const AdminSettings = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button onClick={handleSave} className="w-full">
+              <Button 
+                onClick={handleSave} 
+                className="w-full"
+                disabled={saveMutation.isPending}
+              >
                 <Save className="h-4 w-4 mr-2" />
-                Save All Settings
+                {saveMutation.isPending ? 'Saving...' : 'Save All Settings'}
               </Button>
               <Button 
                 variant="outline" 
