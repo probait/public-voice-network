@@ -96,38 +96,6 @@ const Navigation = () => {
                   Events
                 </Link>
 
-
-                <div 
-                  className="relative"
-                  onMouseEnter={() => handleMouseEnter('thought-leadership')}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <button className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
-                    Thought Leadership
-                    <ChevronDown className={`ml-1 h-3 w-3 transition-transform duration-200 ${openDropdown === 'thought-leadership' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {openDropdown === 'thought-leadership' && (
-                    <div className="absolute top-full left-0 mt-0 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                      <div className="p-4 space-y-3">
-                        <Link 
-                          to="/prompts" 
-                          className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="font-medium text-sm text-gray-900">Curated Prompts</div>
-                          <p className="text-sm text-gray-600 mt-1">Current prompts seeking policy contributions</p>
-                        </Link>
-                        <Link 
-                          to="/roundtables" 
-                          className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="font-medium text-sm text-gray-900">Roundtables</div>
-                          <p className="text-sm text-gray-600 mt-1">Upcoming and past contributor roundtables</p>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
                 <Link to="/get-involved" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Get Involved
                 </Link>
