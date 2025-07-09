@@ -12,10 +12,13 @@ import SubmissionsFeed from "@/components/SubmissionsFeed";
 import MeetupFeed from "@/components/MeetupFeed";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
+import { NewsletterPopup } from "@/components/NewsletterPopup";
+import { useNewsletterPopup } from "@/hooks/useNewsletterPopup";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { showPopup, hidePopup } = useNewsletterPopup();
 
   useEffect(() => {
     if (!loading && user) {
@@ -250,6 +253,8 @@ const Index = () => {
       </section>
 
       <Footer />
+      
+      <NewsletterPopup isOpen={showPopup} onClose={hidePopup} />
     </div>
   );
 };

@@ -11,7 +11,8 @@ import {
   Building2, 
   Settings,
   UserCheck,
-  Presentation
+  Presentation,
+  Mail
 } from 'lucide-react';
 import PolicyNowLogo from '@/components/PolicyNowLogo';
 
@@ -42,6 +43,12 @@ const AdminSidebar = () => {
       title: 'Events & Meetups',
       icon: Calendar,
       path: '/admin/events',
+      roles: ['content_manager']
+    },
+    {
+      title: 'Newsletter',
+      icon: Mail,
+      path: '/admin/newsletter',
       roles: ['content_manager']
     },
     {

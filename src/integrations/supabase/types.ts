@@ -279,6 +279,72 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_settings: {
+        Row: {
+          beehiv_publication_id: string | null
+          created_at: string | null
+          id: string
+          popup_delay_seconds: number | null
+          popup_enabled: boolean | null
+          popup_frequency_days: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          beehiv_publication_id?: string | null
+          created_at?: string | null
+          id?: string
+          popup_delay_seconds?: number | null
+          popup_enabled?: boolean | null
+          popup_frequency_days?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          beehiv_publication_id?: string | null
+          created_at?: string | null
+          id?: string
+          popup_delay_seconds?: number | null
+          popup_enabled?: boolean | null
+          popup_frequency_days?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      newsletter_subscribers: {
+        Row: {
+          beehiv_id: string | null
+          created_at: string | null
+          email: string
+          id: string
+          source: string | null
+          status: string | null
+          subscribed_at: string | null
+          unsubscribed_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          beehiv_id?: string | null
+          created_at?: string | null
+          email: string
+          id?: string
+          source?: string | null
+          status?: string | null
+          subscribed_at?: string | null
+          unsubscribed_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          beehiv_id?: string | null
+          created_at?: string | null
+          email?: string
+          id?: string
+          source?: string | null
+          status?: string | null
+          subscribed_at?: string | null
+          unsubscribed_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       partnerships: {
         Row: {
           created_at: string
