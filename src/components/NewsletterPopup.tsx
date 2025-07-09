@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Mail, X } from "lucide-react";
+import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -77,28 +77,22 @@ export function NewsletterPopup({ isOpen, onClose }: NewsletterPopupProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Mail className="h-5 w-5 text-primary" />
-              <DialogTitle>Join Our Newsletter</DialogTitle>
+      <DialogContent className="sm:max-w-lg border-0 bg-white/95 backdrop-blur-md shadow-2xl">
+        <DialogHeader className="text-center pb-4">
+          <div className="flex items-center justify-center space-x-2 mb-2">
+            <div className="p-2 bg-red-50 rounded-full">
+              <Mail className="h-5 w-5 text-red-600" />
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleDismiss}
-              className="h-6 w-6"
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
-          <DialogDescription>
+          <DialogTitle className="text-2xl font-bold text-gray-900">
+            Join Our Newsletter
+          </DialogTitle>
+          <DialogDescription className="text-gray-600 text-base mt-2">
             Get monthly insights on AI and Policy news within Canada delivered directly to your inbox.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Input
               type="email"
@@ -107,14 +101,15 @@ export function NewsletterPopup({ isOpen, onClose }: NewsletterPopupProps) {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
+              className="h-12 text-base border-2 border-gray-200 focus:border-red-500 focus:ring-red-500 rounded-lg"
             />
           </div>
           
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             <Button
               type="submit"
               disabled={isLoading}
-              className="flex-1"
+              className="flex-1 h-12 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
             >
               {isLoading ? "Subscribing..." : "Subscribe"}
             </Button>
@@ -123,13 +118,14 @@ export function NewsletterPopup({ isOpen, onClose }: NewsletterPopupProps) {
               variant="outline"
               onClick={handleDismiss}
               disabled={isLoading}
+              className="h-12 px-6 border-2 border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
             >
               Maybe Later
             </Button>
           </div>
         </form>
         
-        <p className="text-xs text-muted-foreground">
+        <p className="text-sm text-gray-500 text-center mt-4">
           By subscribing, you agree to receive our newsletter and can unsubscribe at any time.
         </p>
       </DialogContent>
