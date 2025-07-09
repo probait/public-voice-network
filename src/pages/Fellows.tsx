@@ -179,8 +179,8 @@ const Fellows = () => {
                 </Button>
                 <Button 
                   size="lg" 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-red-600"
+                  variant="ghost" 
+                  className="border-2 border-white text-white hover:bg-white hover:text-red-600 bg-transparent"
                   asChild
                 >
                   <Link to="/about">Learn More About Us</Link>
