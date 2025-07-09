@@ -63,9 +63,14 @@ export function useNewsletterPopup() {
     setShowPopup(false);
   };
 
+  const showPopupManually = () => {
+    setShowPopup(true);
+  };
+
   return {
     showPopup,
     hidePopup,
+    showPopupManually,
     settings,
   };
 }

@@ -18,7 +18,7 @@ import { useNewsletterPopup } from "@/hooks/useNewsletterPopup";
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const { showPopup, hidePopup } = useNewsletterPopup();
+  const { showPopup, hidePopup, showPopupManually } = useNewsletterPopup();
 
   useEffect(() => {
     if (!loading && user) {
@@ -57,6 +57,15 @@ const Index = () => {
                   Get Involved
                 </Button>
               </Link>
+              <div className="mt-4">
+                <Button 
+                  variant="ghost" 
+                  onClick={showPopupManually}
+                  className="text-white hover:text-white hover:bg-white/10 text-sm px-4 py-2 h-8 border border-white/20 backdrop-blur-sm"
+                >
+                  Join our Newsletter
+                </Button>
+              </div>
             </div>
             <div className="hidden lg:block">
               <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
