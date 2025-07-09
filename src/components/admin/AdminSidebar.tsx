@@ -9,7 +9,6 @@ import {
   Calendar, 
   MessageSquare, 
   Building2, 
-  Database,
   Settings,
   UserCheck,
   Presentation
@@ -62,12 +61,6 @@ const AdminSidebar = () => {
       icon: Building2,
       path: '/admin/partnerships',
       roles: ['moderator']
-    },
-    {
-      title: 'Datasets',
-      icon: Database,
-      path: '/admin/datasets',
-      roles: ['content_manager']
     },
     {
       title: 'User Management',

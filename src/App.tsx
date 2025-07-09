@@ -11,8 +11,6 @@ import Events from "./pages/Events";
 import GetInvolved from "./pages/GetInvolved";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
-import Data from "./pages/Data";
-import DataCommons from "./pages/DataCommons";
 import Contributors from "./pages/Contributors";
 import ContributorProfile from "./pages/ContributorProfile";
 import Fellows from "./pages/Fellows";
@@ -29,7 +27,7 @@ import AdminEvents from "./pages/admin/AdminEvents";
 import AdminRoundtables from "./pages/admin/AdminRoundtables";
 import AdminPrompts from "./pages/admin/AdminPrompts";
 import AdminPartnerships from "./pages/admin/AdminPartnerships";
-import AdminDatasets from "./pages/admin/AdminDatasets";
+
 import AdminSettings from "./pages/admin/AdminSettings";
 import NotFound from "./pages/NotFound";
 import MaintenanceMode from "./components/MaintenanceMode";
@@ -58,7 +56,7 @@ const App = () => {
             <Route path="/get-involved" element={<GetInvolved />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
-            <Route path="/data" element={<DataCommons />} />
+            
             <Route path="/contributors" element={<Contributors />} />
             <Route path="/contributors/:id" element={<ContributorProfile />} />
             <Route path="/fellows" element={<Fellows />} />
@@ -77,7 +75,7 @@ const App = () => {
             <Route path="/admin/roundtables" element={<AdminRoundtables />} />
             <Route path="/admin/prompts" element={<AdminPrompts />} />
             <Route path="/admin/partnerships" element={<AdminPartnerships />} />
-            <Route path="/admin/datasets" element={<AdminDatasets />} />
+            
             <Route path="/admin/settings" element={<AdminSettings />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

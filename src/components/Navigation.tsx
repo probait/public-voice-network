@@ -96,9 +96,6 @@ const Navigation = () => {
                   Events
                 </Link>
 
-                <Link to="/data" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Data Commons
-                </Link>
 
                 <div 
                   className="relative"
