@@ -39,7 +39,7 @@ const Index = () => {
             alt="Canada House of Commons"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-red-600/85 to-orange-600/85"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-red-600/85 to-red-800/85"></div>
         </div>
         
         {/* Content */}
