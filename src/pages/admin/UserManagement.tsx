@@ -29,7 +29,7 @@ const UserManagement = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users', searchTerm],
     queryFn: async () => {
-      // Get profiles with their roles in a single query using a join
+      // Get profiles with their roles directly from the user_role column
       let query = supabase
         .from('profiles')
         .select(`
@@ -37,7 +37,7 @@ const UserManagement = () => {
           full_name,
           email,
           created_at,
-          user_roles!left(role)
+          user_role
         `)
         .order('created_at', { ascending: false });
 
@@ -54,7 +54,7 @@ const UserManagement = () => {
         full_name: profile.full_name,
         email: profile.email,
         created_at: profile.created_at,
-        current_role: profile.user_roles?.[0]?.role || null
+        current_role: profile.user_role || null
       }));
 
       return usersWithRoles as UserWithRole[];
@@ -63,40 +63,14 @@ const UserManagement = () => {
 
   const assignRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string | null }) => {
-      if (role === null) {
-        // Remove role
-        const { error } = await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', userId);
-        if (error) throw error;
-      } else {
-        // Check if user already has a role
-        const { data: existingRole } = await supabase
-          .from('user_roles')
-          .select('id')
-          .eq('user_id', userId)
-          .maybeSingle();
-
-        if (existingRole) {
-          // Update existing role
-          const { error } = await supabase
-            .from('user_roles')
-            .update({ role: role as any })
-            .eq('user_id', userId);
-          if (error) throw error;
-        } else {
-          // Insert new role
-          const { error } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: userId,
-              role: role as any,
-              assigned_by: (await supabase.auth.getUser()).data.user?.id
-            });
-          if (error) throw error;
-        }
-      }
+      // Update the user_role directly in the profiles table
+      // The trigger will handle logging to user_role_history
+      const { error } = await supabase
+        .from('profiles')
+        .update({ user_role: role as any })
+        .eq('id', userId);
+      
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });

@@ -384,6 +384,7 @@ export type Database = {
           id: string
           location: string | null
           updated_at: string
+          user_role: Database["public"]["Enums"]["app_role"] | null
         }
         Insert: {
           avatar_url?: string | null
@@ -393,6 +394,7 @@ export type Database = {
           id: string
           location?: string | null
           updated_at?: string
+          user_role?: Database["public"]["Enums"]["app_role"] | null
         }
         Update: {
           avatar_url?: string | null
@@ -402,6 +404,7 @@ export type Database = {
           id?: string
           location?: string | null
           updated_at?: string
+          user_role?: Database["public"]["Enums"]["app_role"] | null
         }
         Relationships: []
       }
@@ -512,26 +515,35 @@ export type Database = {
         }
         Relationships: []
       }
-      user_roles: {
+      user_role_history: {
         Row: {
           assigned_at: string
           assigned_by: string | null
+          change_reason: string | null
+          change_type: string
           id: string
-          role: Database["public"]["Enums"]["app_role"]
+          new_role: Database["public"]["Enums"]["app_role"]
+          previous_role: Database["public"]["Enums"]["app_role"] | null
           user_id: string
         }
         Insert: {
           assigned_at?: string
           assigned_by?: string | null
+          change_reason?: string | null
+          change_type: string
           id?: string
-          role: Database["public"]["Enums"]["app_role"]
+          new_role: Database["public"]["Enums"]["app_role"]
+          previous_role?: Database["public"]["Enums"]["app_role"] | null
           user_id: string
         }
         Update: {
           assigned_at?: string
           assigned_by?: string | null
+          change_reason?: string | null
+          change_type?: string
           id?: string
-          role?: Database["public"]["Enums"]["app_role"]
+          new_role?: Database["public"]["Enums"]["app_role"]
+          previous_role?: Database["public"]["Enums"]["app_role"] | null
           user_id?: string
         }
         Relationships: []
