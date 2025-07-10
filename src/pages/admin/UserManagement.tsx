@@ -12,16 +12,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Search, UserPlus } from 'lucide-react';
 
-interface UserRole {
-  role: string;
-}
-
 interface UserWithRole {
   id: string;
   full_name: string | null;
   email: string;
   created_at: string;
-  user_roles: UserRole[];
+  current_role: string | null;
 }
 
 const UserManagement = () => {
@@ -33,59 +29,78 @@ const UserManagement = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users', searchTerm],
     queryFn: async () => {
-      // First get all profiles
-      let profilesQuery = supabase
+      // Get profiles with their roles in a single query using a join
+      let query = supabase
         .from('profiles')
-        .select('id, full_name, email, created_at')
+        .select(`
+          id,
+          full_name,
+          email,
+          created_at,
+          user_roles!left(role)
+        `)
         .order('created_at', { ascending: false });
 
       if (searchTerm) {
-        profilesQuery = profilesQuery.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`);
+        query = query.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`);
       }
 
-      const { data: profiles, error: profilesError } = await profilesQuery;
-      if (profilesError) throw profilesError;
+      const { data: profiles, error } = await query;
+      if (error) throw error;
 
-      // Then get user roles for each profile
-      const usersWithRoles = await Promise.all(
-        (profiles || []).map(async (profile) => {
-          const { data: roles, error: rolesError } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', profile.id);
-
-          if (rolesError) {
-            console.error('Error fetching roles for user:', profile.id, rolesError);
-            return {
-              ...profile,
-              user_roles: []
-            };
-          }
-
-          return {
-            ...profile,
-            user_roles: roles || []
-          };
-        })
-      );
+      // Transform the data to match our interface
+      const usersWithRoles = (profiles || []).map((profile: any) => ({
+        id: profile.id,
+        full_name: profile.full_name,
+        email: profile.email,
+        created_at: profile.created_at,
+        current_role: profile.user_roles?.[0]?.role || null
+      }));
 
       return usersWithRoles as UserWithRole[];
     },
   });
 
   const assignRoleMutation = useMutation({
-    mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      const { error } = await supabase
-        .from('user_roles')
-        .upsert({
-          user_id: userId,
-          role: role as any,
-        });
-      
-      if (error) throw error;
+    mutationFn: async ({ userId, role }: { userId: string; role: string | null }) => {
+      if (role === null) {
+        // Remove role
+        const { error } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId);
+        if (error) throw error;
+      } else {
+        // Check if user already has a role
+        const { data: existingRole } = await supabase
+          .from('user_roles')
+          .select('id')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (existingRole) {
+          // Update existing role
+          const { error } = await supabase
+            .from('user_roles')
+            .update({ role: role as any })
+            .eq('user_id', userId);
+          if (error) throw error;
+        } else {
+          // Insert new role
+          const { error } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: userId,
+              role: role as any,
+              assigned_by: (await supabase.auth.getUser()).data.user?.id
+            });
+          if (error) throw error;
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      setSelectedRole('');
       toast({
         title: 'Success',
         description: 'User role updated successfully',
@@ -102,7 +117,8 @@ const UserManagement = () => {
   });
 
   const handleAssignRole = (userId: string, role: string) => {
-    assignRoleMutation.mutate({ userId, role });
+    const roleValue = role === 'remove' ? null : role;
+    assignRoleMutation.mutate({ userId, role: roleValue });
   };
 
   const getRoleBadgeColor = (role: string) => {
@@ -161,9 +177,9 @@ const UserManagement = () => {
                       </TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
-                        {user.user_roles?.length > 0 ? (
-                          <Badge className={getRoleBadgeColor(user.user_roles[0].role)}>
-                            {user.user_roles[0].role.replace('_', ' ')}
+                        {user.current_role ? (
+                          <Badge className={getRoleBadgeColor(user.current_role)}>
+                            {user.current_role.replace('_', ' ')}
                           </Badge>
                         ) : (
                           <Badge variant="outline">No Role</Badge>
@@ -175,20 +191,24 @@ const UserManagement = () => {
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <Select
-                            value={selectedRole}
+                            value=""
                             onValueChange={(role) => {
-                              setSelectedRole(role);
                               handleAssignRole(user.id, role);
                             }}
                           >
-                            <SelectTrigger className="w-40">
-                              <SelectValue placeholder="Assign role" />
+                            <SelectTrigger className="w-44">
+                              <SelectValue placeholder={user.current_role ? "Change role" : "Assign role"} />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="viewer">Viewer</SelectItem>
                               <SelectItem value="content_manager">Content Manager</SelectItem>
                               <SelectItem value="moderator">Moderator</SelectItem>
                               <SelectItem value="admin">Admin</SelectItem>
+                              {user.current_role && (
+                                <SelectItem value="remove" className="text-red-600">
+                                  Remove Role
+                                </SelectItem>
+                              )}
                             </SelectContent>
                           </Select>
                         </div>
