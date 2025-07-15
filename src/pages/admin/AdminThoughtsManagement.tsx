@@ -40,21 +40,36 @@ interface ThoughtsSubmission {
 
 const AdminThoughtsManagement = () => {
   const [submissions, setSubmissions] = useState<ThoughtsSubmission[]>([]);
+  const [totalSubmissions, setTotalSubmissions] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
   const [viewingSubmission, setViewingSubmission] = useState<ThoughtsSubmission | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const { toast } = useToast();
 
   const fetchSubmissions = async () => {
     try {
-      const { data, error } = await supabase
+      // Calculate offset for pagination
+      const offset = (currentPage - 1) * pageSize;
+      
+      let query = supabase
         .from('thoughts_submissions')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + pageSize - 1);
+
+      // Apply search filter if there's a search term
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,subject.ilike.%${searchTerm}%,message.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,province.ilike.%${searchTerm}%`);
+      }
+
+      const { data, error, count } = await query;
 
       if (error) throw error;
       setSubmissions(data || []);
+      setTotalSubmissions(count || 0);
     } catch (error) {
       console.error('Error fetching submissions:', error);
       toast({
@@ -143,17 +158,20 @@ const AdminThoughtsManagement = () => {
 
   useEffect(() => {
     fetchSubmissions();
-  }, []);
+  }, [currentPage, searchTerm]);
 
-  // Filter submissions based on search term
-  const filteredSubmissions = submissions.filter(submission =>
-    submission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    submission.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    submission.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    submission.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    submission.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    submission.province.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Reset to first page when search term changes
+  useEffect(() => {
+    if (searchTerm) {
+      setCurrentPage(1);
+    }
+  }, [searchTerm]);
+
+  // Filter submissions based on search term (now handled in the query)
+  const filteredSubmissions = submissions;
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalSubmissions / pageSize);
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -262,7 +280,7 @@ const AdminThoughtsManagement = () => {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
-                All Submissions ({filteredSubmissions.length})
+                All Submissions ({totalSubmissions})
               </CardTitle>
               <div className="relative">
                 <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -385,6 +403,31 @@ const AdminThoughtsManagement = () => {
                     ))}
                   </TableBody>
                 </Table>
+              </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-gray-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </Button>
               </div>
             )}
           </CardContent>
