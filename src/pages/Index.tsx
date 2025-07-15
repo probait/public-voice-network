@@ -14,11 +14,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { NewsletterPopup } from "@/components/NewsletterPopup";
 import { useNewsletterPopup } from "@/hooks/useNewsletterPopup";
+import { useArticles } from "@/hooks/useArticles";
+import ArticleCard from "@/components/ArticleCard";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { showPopup, hidePopup, showPopupManually } = useNewsletterPopup();
+  const { data: articles, isLoading: articlesLoading } = useArticles();
 
   useEffect(() => {
     if (!loading && user) {
@@ -158,88 +161,62 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Issues */}
+      {/* Featured Articles */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-            Key Issues Facing Canada
+            Featured Articles
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Link to="/articles/job-displacement" className="group">
-              <Card className="h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-0 shadow-md">
-                <CardContent className="p-0">
-                  <div className="aspect-video overflow-hidden rounded-t-lg">
-                    <img 
-                      src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=400&h=225&fit=crop" 
-                      alt="Job displacement and automation" 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-3 group-hover:text-red-600 transition-colors">
-                      Job Displacement & Automation
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      How will AI automation affect Canadian workers across industries from manufacturing to professional services?
-                    </p>
-                    <div className="flex items-center text-red-600 font-medium">
-                      Read more <ArrowRight className="ml-2 w-4 h-4" />
+          {articlesLoading ? (
+            <div className="grid md:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, i) => (
+                <Card key={i} className="h-full animate-pulse bg-white border-0 shadow-md">
+                  <CardContent className="p-0">
+                    <div className="aspect-video bg-gray-200 rounded-t-lg"></div>
+                    <div className="p-6 space-y-4">
+                      <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-16 bg-gray-200 rounded"></div>
+                      <div className="h-4 bg-gray-200 rounded w-32"></div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/articles/privacy-rights" className="group">
-              <Card className="h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-0 shadow-md">
-                <CardContent className="p-0">
-                  <div className="aspect-video overflow-hidden rounded-t-lg">
-                    <img 
-                      src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=225&fit=crop" 
-                      alt="Privacy and digital rights" 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-3 group-hover:text-red-600 transition-colors">
-                      Privacy & Digital Rights
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      What safeguards do we need to protect Canadian privacy and civil liberties in an AI-driven world?
-                    </p>
-                    <div className="flex items-center text-red-600 font-medium">
-                      Read more <ArrowRight className="ml-2 w-4 h-4" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link to="/articles/healthcare-innovation" className="group">
-              <Card className="h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-0 shadow-md">
-                <CardContent className="p-0">
-                  <div className="aspect-video overflow-hidden rounded-t-lg">
-                    <img 
-                      src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=225&fit=crop" 
-                      alt="Healthcare innovation and AI" 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-3 group-hover:text-red-600 transition-colors">
-                      Healthcare Innovation
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      How can AI improve Canadian healthcare while ensuring equitable access across all provinces and territories?
-                    </p>
-                    <div className="flex items-center text-red-600 font-medium">
-                      Read more <ArrowRight className="ml-2 w-4 h-4" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8">
+              {articles?.slice(0, 3).map((article) => (
+                <div key={article.id} className="group">
+                  <Card className="h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-0 shadow-md">
+                    <CardContent className="p-0">
+                      <Link to={`/articles/${article.slug}`}>
+                        <div className="aspect-video overflow-hidden rounded-t-lg">
+                          <img 
+                            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=225&fit=crop" 
+                            alt={article.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                        <div className="p-6">
+                          <h3 className="text-xl font-semibold mb-3 group-hover:text-red-600 transition-colors">
+                            {article.title}
+                          </h3>
+                          <p className="text-gray-600 mb-4">
+                            {article.content 
+                              ? article.content.replace(/[#*`\[\]]/g, "").substring(0, 120) + "..."
+                              : "Read this article to learn more about this important topic."
+                            }
+                          </p>
+                          <div className="flex items-center text-red-600 font-medium">
+                            Read more <ArrowRight className="ml-2 w-4 h-4" />
+                          </div>
+                        </div>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

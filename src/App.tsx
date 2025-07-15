@@ -16,9 +16,7 @@ import ContributorProfile from "./pages/ContributorProfile";
 import Fellows from "./pages/Fellows";
 import Prompts from "./pages/Prompts";
 import Roundtables from "./pages/Roundtables";
-import JobDisplacement from "./pages/articles/JobDisplacement";
-import PrivacyRights from "./pages/articles/PrivacyRights";
-import HealthcareInnovation from "./pages/articles/HealthcareInnovation";
+import Article from "./pages/Article";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import AdminContributors from "./pages/admin/AdminContributors";
@@ -62,9 +60,7 @@ const App = () => {
             <Route path="/fellows" element={<Fellows />} />
             <Route path="/prompts" element={<Prompts />} />
             <Route path="/roundtables" element={<Roundtables />} />
-            <Route path="/articles/job-displacement" element={<JobDisplacement />} />
-            <Route path="/articles/privacy-rights" element={<PrivacyRights />} />
-            <Route path="/articles/healthcare-innovation" element={<HealthcareInnovation />} />
+            <Route path="/articles/:slug" element={<Article />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
