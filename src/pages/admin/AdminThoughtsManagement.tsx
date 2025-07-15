@@ -15,7 +15,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 import { Download, Star, StarOff, Search, MessageSquare, Users } from 'lucide-react';
 import BulkActions from '@/components/admin/BulkActions';
 
@@ -27,7 +27,6 @@ interface ThoughtsSubmission {
   category: string;
   subject: string;
   message: string;
-  status: string;
   featured: boolean;
   created_at: string;
   updated_at: string;
@@ -61,34 +60,6 @@ const AdminThoughtsManagement = () => {
     }
   };
 
-  const updateStatus = async (id: string, newStatus: string) => {
-    try {
-      const { error } = await supabase
-        .from('thoughts_submissions')
-        .update({ status: newStatus })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setSubmissions(prev => 
-        prev.map(sub => 
-          sub.id === id ? { ...sub, status: newStatus } : sub
-        )
-      );
-
-      toast({
-        title: "Status updated",
-        description: "Submission status has been updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive",
-      });
-    }
-  };
 
   const toggleFeatured = async (id: string, currentFeatured: boolean) => {
     try {
@@ -127,7 +98,6 @@ const AdminThoughtsManagement = () => {
       'Category',
       'Subject',
       'Message',
-      'Status',
       'Featured',
       'Submitted Date'
     ];
@@ -139,7 +109,6 @@ const AdminThoughtsManagement = () => {
       submission.category,
       submission.subject,
       submission.message.replace(/"/g, '""'), // Escape quotes
-      submission.status,
       submission.featured ? 'Yes' : 'No',
       new Date(submission.created_at).toLocaleDateString()
     ]);
@@ -222,20 +191,6 @@ const AdminThoughtsManagement = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'new':
-        return 'bg-blue-100 text-blue-800';
-      case 'reviewed':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'approved':
-        return 'bg-green-100 text-green-800';
-      case 'rejected':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   if (loading) {
     return (
@@ -310,13 +265,12 @@ const AdminThoughtsManagement = () => {
                           onCheckedChange={handleSelectAll}
                         />
                       </TableHead>
-                      <TableHead>Citizen</TableHead>
-                      <TableHead>Subject</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Province</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Featured</TableHead>
-                      <TableHead>Date</TableHead>
+                       <TableHead>Citizen</TableHead>
+                       <TableHead>Subject</TableHead>
+                       <TableHead>Category</TableHead>
+                       <TableHead>Province</TableHead>
+                       <TableHead>Featured</TableHead>
+                       <TableHead>Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -350,25 +304,9 @@ const AdminThoughtsManagement = () => {
                         <TableCell>
                           <Badge variant="outline">{submission.category}</Badge>
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{submission.province}</Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Select
-                            value={submission.status}
-                            onValueChange={(value) => updateStatus(submission.id, value)}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="new">New</SelectItem>
-                              <SelectItem value="reviewed">Reviewed</SelectItem>
-                              <SelectItem value="approved">Approved</SelectItem>
-                              <SelectItem value="rejected">Rejected</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </TableCell>
+                         <TableCell>
+                           <Badge variant="secondary">{submission.province}</Badge>
+                         </TableCell>
                         <TableCell>
                           <Button
                             variant="ghost"
