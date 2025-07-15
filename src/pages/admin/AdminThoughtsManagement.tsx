@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -33,6 +34,7 @@ interface ThoughtsSubmission {
 }
 
 const AdminThoughtsManagement = () => {
+  const navigate = useNavigate();
   const [submissions, setSubmissions] = useState<ThoughtsSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -274,8 +276,12 @@ const AdminThoughtsManagement = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredSubmissions.map((submission) => (
-                      <TableRow key={submission.id}>
+                     {filteredSubmissions.map((submission) => (
+                       <TableRow 
+                         key={submission.id}
+                         className="cursor-pointer hover:bg-muted/50"
+                         onClick={() => navigate(`/admin/thoughts/${submission.id}`)}
+                       >
                         <TableCell>
                           <Checkbox
                             checked={selectedSubmissions.includes(submission.id)}
@@ -307,21 +313,21 @@ const AdminThoughtsManagement = () => {
                          <TableCell>
                            <Badge variant="secondary">{submission.province}</Badge>
                          </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleFeatured(submission.id, submission.featured)}
-                            className="hover:bg-yellow-50"
-                          >
-                            {submission.featured ? (
-                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                            ) : (
-                              <StarOff className="h-4 w-4 text-gray-400" />
-                            )}
-                          </Button>
-                        </TableCell>
-                        <TableCell>
+                         <TableCell onClick={(e) => e.stopPropagation()}>
+                           <Button
+                             variant="ghost"
+                             size="sm"
+                             onClick={() => toggleFeatured(submission.id, submission.featured)}
+                             className="hover:bg-yellow-50"
+                           >
+                             {submission.featured ? (
+                               <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                             ) : (
+                               <StarOff className="h-4 w-4 text-gray-400" />
+                             )}
+                           </Button>
+                         </TableCell>
+                         <TableCell onClick={(e) => e.stopPropagation()}>
                           {new Date(submission.created_at).toLocaleDateString()}
                         </TableCell>
                       </TableRow>
