@@ -22,7 +22,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2 } from 'lucide-react';
+import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
 import BulkActions from '@/components/admin/BulkActions';
 
 interface ThoughtsSubmission {
@@ -356,9 +356,9 @@ const AdminThoughtsManagement = () => {
                              className="hover:bg-yellow-50"
                            >
                              {submission.featured ? (
-                               <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                               <Eye className="h-4 w-4" />
                              ) : (
-                               <StarOff className="h-4 w-4 text-gray-400" />
+                               <EyeOff className="h-4 w-4" />
                              )}
                            </Button>
                          </TableCell>
