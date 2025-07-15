@@ -13,7 +13,8 @@ import {
   UserCheck,
   Presentation,
   Mail,
-  Heart
+  Heart,
+  GraduationCap
 } from 'lucide-react';
 import PolicyNowLogo from '@/components/PolicyNowLogo';
 
@@ -32,6 +33,12 @@ const AdminSidebar = () => {
       title: 'Contributors',
       icon: Users,
       path: '/admin/contributors',
+      roles: ['content_manager']
+    },
+    {
+      title: 'Fellows',
+      icon: GraduationCap,
+      path: '/admin/fellows',
       roles: ['content_manager']
     },
     {

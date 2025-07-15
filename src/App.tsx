@@ -20,6 +20,7 @@ import Article from "./pages/Article";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import AdminContributors from "./pages/admin/AdminContributors";
+import AdminFellows from "./pages/admin/AdminFellows";
 import AdminArticles from "./pages/admin/AdminArticles";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminRoundtables from "./pages/admin/AdminRoundtables";
@@ -67,6 +68,7 @@ const App = () => {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/contributors" element={<AdminContributors />} />
+            <Route path="/admin/fellows" element={<AdminFellows />} />
             <Route path="/admin/articles" element={<AdminArticles />} />
             <Route path="/admin/events" element={<AdminEvents />} />
             <Route path="/admin/newsletter" element={<AdminNewsletter />} />
