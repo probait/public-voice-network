@@ -332,75 +332,84 @@ const AdminThoughtsManagement = () => {
 
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
-                All Submissions ({totalSubmissions})
-              </CardTitle>
-              <div className="flex items-center gap-4">
-                <div className="relative">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  All Submissions ({totalSubmissions})
+                </CardTitle>
+              </div>
+              
+              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                <div className="relative flex-1 min-w-0">
                   <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
                     placeholder="Search submissions..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 w-64"
+                    className="pl-10 w-full"
                   />
                 </div>
-                <Select value={featuredFilter} onValueChange={setFeaturedFilter}>
-                  <SelectTrigger className="w-32">
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="featured">Featured</SelectItem>
-                    <SelectItem value="not-featured">Not Featured</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {allCategories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={provinceFilter} onValueChange={setProvinceFilter}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Province" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Provinces</SelectItem>
-                    {allProvinces.map((province) => (
-                      <SelectItem key={province} value={province}>
-                        {province}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={`${orderBy}-${orderDirection}`} onValueChange={(value) => {
-                  const [field, direction] = value.split('-');
-                  setOrderBy(field);
-                  setOrderDirection(direction as 'asc' | 'desc');
-                }}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="created_at-desc">Newest First</SelectItem>
-                    <SelectItem value="created_at-asc">Oldest First</SelectItem>
-                    <SelectItem value="name-asc">Name A-Z</SelectItem>
-                    <SelectItem value="name-desc">Name Z-A</SelectItem>
-                    <SelectItem value="subject-asc">Subject A-Z</SelectItem>
-                    <SelectItem value="subject-desc">Subject Z-A</SelectItem>
-                  </SelectContent>
-                </Select>
+                
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select value={featuredFilter} onValueChange={setFeaturedFilter}>
+                    <SelectTrigger className="w-32">
+                      <Filter className="h-4 w-4 mr-2" />
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="featured">Featured</SelectItem>
+                      <SelectItem value="not-featured">Not Featured</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {allCategories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={provinceFilter} onValueChange={setProvinceFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Province" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Provinces</SelectItem>
+                      {allProvinces.map((province) => (
+                        <SelectItem key={province} value={province}>
+                          {province}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  
+                  <Select value={`${orderBy}-${orderDirection}`} onValueChange={(value) => {
+                    const [field, direction] = value.split('-');
+                    setOrderBy(field);
+                    setOrderDirection(direction as 'asc' | 'desc');
+                  }}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="created_at-desc">Newest First</SelectItem>
+                      <SelectItem value="created_at-asc">Oldest First</SelectItem>
+                      <SelectItem value="name-asc">Name A-Z</SelectItem>
+                      <SelectItem value="name-desc">Name Z-A</SelectItem>
+                      <SelectItem value="subject-asc">Subject A-Z</SelectItem>
+                      <SelectItem value="subject-desc">Subject Z-A</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </CardHeader>
@@ -421,6 +430,7 @@ const AdminThoughtsManagement = () => {
                 </p>
               </div>
             ) : (
+            <div className="overflow-x-auto">
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
@@ -431,13 +441,13 @@ const AdminThoughtsManagement = () => {
                           onCheckedChange={handleSelectAll}
                         />
                       </TableHead>
-                       <TableHead>Citizen</TableHead>
-                       <TableHead>Subject</TableHead>
-                       <TableHead>Category</TableHead>
-                       <TableHead>Province</TableHead>
-                       <TableHead>Date</TableHead>
-                       <TableHead>Featured</TableHead>
-                       <TableHead>Actions</TableHead>
+                       <TableHead className="min-w-[200px]">Citizen</TableHead>
+                       <TableHead className="min-w-[200px]">Subject</TableHead>
+                       <TableHead className="min-w-[120px]">Category</TableHead>
+                       <TableHead className="min-w-[120px]">Province</TableHead>
+                       <TableHead className="min-w-[100px]">Date</TableHead>
+                       <TableHead className="min-w-[80px]">Featured</TableHead>
+                       <TableHead className="min-w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -453,19 +463,19 @@ const AdminThoughtsManagement = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                               <Users className="h-4 w-4 text-blue-600" />
                             </div>
-                            <div>
-                              <div className="font-medium">{submission.name}</div>
-                              <div className="text-sm text-gray-500">{submission.email}</div>
+                            <div className="min-w-0">
+                              <div className="font-medium truncate">{submission.name}</div>
+                              <div className="text-sm text-gray-500 truncate">{submission.email}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="max-w-xs">
+                          <div className="min-w-0">
                             <div className="font-medium truncate">{submission.subject}</div>
-                            <div className="text-sm text-gray-500 truncate">{submission.message}</div>
+                            <div className="text-sm text-gray-500 truncate max-w-xs">{submission.message}</div>
                           </div>
                         </TableCell>
                          <TableCell>
@@ -515,6 +525,7 @@ const AdminThoughtsManagement = () => {
                   </TableBody>
                 </Table>
               </div>
+            </div>
             )}
 
             {/* Pagination */}
