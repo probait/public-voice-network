@@ -15,8 +15,14 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
-import { Download, Star, StarOff, Search, MessageSquare, Users } from 'lucide-react';
+import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2 } from 'lucide-react';
 import BulkActions from '@/components/admin/BulkActions';
 
 interface ThoughtsSubmission {
@@ -37,6 +43,7 @@ const AdminThoughtsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
+  const [viewingSubmission, setViewingSubmission] = useState<ThoughtsSubmission | null>(null);
   const { toast } = useToast();
 
   const fetchSubmissions = async () => {
@@ -164,6 +171,36 @@ const AdminThoughtsManagement = () => {
     }
   };
 
+  const handleEdit = (submission: ThoughtsSubmission) => {
+    setViewingSubmission(submission);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this submission?')) {
+      try {
+        const { error } = await supabase
+          .from('thoughts_submissions')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+
+        await fetchSubmissions();
+        toast({
+          title: 'Success',
+          description: 'Submission deleted successfully',
+        });
+      } catch (error) {
+        console.error('Error deleting submission:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to delete submission',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
   const handleBulkDelete = async () => {
     if (window.confirm(`Are you sure you want to delete ${selectedSubmissions.length} submissions?`)) {
       try {
@@ -271,6 +308,7 @@ const AdminThoughtsManagement = () => {
                        <TableHead>Province</TableHead>
                        <TableHead>Featured</TableHead>
                        <TableHead>Date</TableHead>
+                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -321,10 +359,29 @@ const AdminThoughtsManagement = () => {
                             )}
                           </Button>
                         </TableCell>
-                        <TableCell>
-                          {new Date(submission.created_at).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
+                         <TableCell>
+                           {new Date(submission.created_at).toLocaleDateString()}
+                         </TableCell>
+                         <TableCell>
+                           <div className="flex items-center space-x-2">
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               onClick={() => handleEdit(submission)}
+                             >
+                               <Edit2 className="h-4 w-4" />
+                             </Button>
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               onClick={() => handleDelete(submission.id)}
+                               className="text-red-600 hover:text-red-700"
+                             >
+                               <Trash2 className="h-4 w-4" />
+                             </Button>
+                           </div>
+                         </TableCell>
+                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
@@ -332,6 +389,92 @@ const AdminThoughtsManagement = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Detail Dialog */}
+        <Dialog open={!!viewingSubmission} onOpenChange={() => setViewingSubmission(null)}>
+          <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Thought Submission Details</DialogTitle>
+            </DialogHeader>
+            {viewingSubmission && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Name</label>
+                    <div className="p-3 bg-gray-50 rounded-md">{viewingSubmission.name}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Email</label>
+                    <div className="p-3 bg-gray-50 rounded-md">{viewingSubmission.email}</div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Province</label>
+                    <div className="p-3 bg-gray-50 rounded-md">{viewingSubmission.province}</div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Category</label>
+                    <div className="p-3 bg-gray-50 rounded-md">{viewingSubmission.category}</div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Subject</label>
+                  <div className="p-3 bg-gray-50 rounded-md font-medium">{viewingSubmission.subject}</div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2">Message</label>
+                  <div className="p-4 bg-gray-50 rounded-md whitespace-pre-wrap max-h-64 overflow-y-auto">
+                    {viewingSubmission.message}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <div className="flex items-center gap-4">
+                    <Badge variant={viewingSubmission.featured ? "default" : "secondary"}>
+                      {viewingSubmission.featured ? 'Featured' : 'Not Featured'}
+                    </Badge>
+                    <span className="text-sm text-gray-500">
+                      Submitted on {new Date(viewingSubmission.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => toggleFeatured(viewingSubmission.id, viewingSubmission.featured)}
+                    >
+                      {viewingSubmission.featured ? (
+                        <>
+                          <StarOff className="h-4 w-4 mr-2" />
+                          Unfeature
+                        </>
+                      ) : (
+                        <>
+                          <Star className="h-4 w-4 mr-2" />
+                          Feature
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        handleDelete(viewingSubmission.id);
+                        setViewingSubmission(null);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
