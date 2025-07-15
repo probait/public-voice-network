@@ -30,6 +30,10 @@ const EventImageUpload = ({ imagePreview, fieldValue, onImageChange, onRemoveIma
                 src={imagePreview || fieldValue} 
                 alt="Event preview" 
                 className="w-full h-48 object-cover rounded-lg"
+                onError={(e) => {
+                  console.error('Image failed to load:', imagePreview || fieldValue);
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
+                }}
               />
               <Button
                 type="button"

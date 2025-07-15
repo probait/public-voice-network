@@ -19,6 +19,7 @@ import {
   MapPin,
   Video,
   Eye,
+  EyeOff,
   Star,
   Image
 } from 'lucide-react';
@@ -169,10 +170,18 @@ const AdminEventsTable = ({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Checkbox
-                    checked={event.homepage_featured || false}
-                    onCheckedChange={(checked) => handleFeaturedChange(event.id, checked as boolean)}
-                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleFeaturedChange(event.id, !event.homepage_featured)}
+                    className="hover:bg-yellow-50"
+                  >
+                    {event.homepage_featured ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </Button>
                 </TableCell>
                 <TableCell>
                   <div className="text-sm">

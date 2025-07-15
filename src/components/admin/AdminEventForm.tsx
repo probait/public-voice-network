@@ -53,22 +53,32 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
 
   const createMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
+      console.log('Form submission started with data:', data);
+      console.log('Image file present:', !!imageFile);
+      console.log('Existing image URL:', event?.image_url);
+      
       let imageUrl = data.image_url;
 
       // Upload new image if a file was selected
       if (imageFile) {
+        console.log('Uploading new image file...');
         setIsUploading(true);
         try {
           imageUrl = await uploadImage(imageFile);
-          console.log('New image uploaded, URL:', imageUrl);
+          console.log('New image uploaded successfully, URL:', imageUrl);
         } catch (error) {
           console.error('Image upload failed:', error);
           throw new Error('Failed to upload image');
         } finally {
           setIsUploading(false);
         }
+      } else if (data.image_url === 'pending_upload') {
+        // Handle case where form thinks there's a pending upload but no file
+        console.warn('Form shows pending upload but no image file present');
+        imageUrl = event?.image_url || '';
       } else if (!imageUrl && event?.image_url) {
         // Keep existing image if no new one was uploaded
+        console.log('Keeping existing image URL:', event.image_url);
         imageUrl = event.image_url;
       }
 
@@ -85,9 +95,10 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
         user_id: user?.id || '',
       };
 
-      console.log('Saving event with data:', eventData);
+      console.log('Saving event with final data:', eventData);
 
       if (event) {
+        console.log('Updating existing event with ID:', event.id);
         const { error } = await supabase
           .from('meetups')
           .update(eventData)
@@ -98,6 +109,7 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
         }
         console.log('Event updated successfully');
       } else {
+        console.log('Creating new event');
         const { error } = await supabase
           .from('meetups')
           .insert(eventData);
