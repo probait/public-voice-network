@@ -17,16 +17,18 @@ const SubmissionCard = ({ name, province, category, subject, message, timeAgo }:
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      employment: "bg-blue-100 text-blue-800",
-      healthcare: "bg-green-100 text-green-800", 
-      education: "bg-purple-100 text-purple-800",
-      privacy: "bg-red-100 text-red-800",
-      ethics: "bg-orange-100 text-orange-800",
-      economy: "bg-yellow-100 text-yellow-800",
-      regulation: "bg-gray-100 text-gray-800",
-      other: "bg-pink-100 text-pink-800"
+      employment: "bg-blue-50 text-blue-700 border border-blue-200",
+      healthcare: "bg-emerald-50 text-emerald-700 border border-emerald-200", 
+      education: "bg-purple-50 text-purple-700 border border-purple-200",
+      privacy: "bg-red-50 text-red-700 border border-red-200",
+      ethics: "bg-orange-50 text-orange-700 border border-orange-200",
+      economy: "bg-amber-50 text-amber-700 border border-amber-200",
+      regulation: "bg-slate-50 text-slate-700 border border-slate-200",
+      environment: "bg-green-50 text-green-700 border border-green-200",
+      transportation: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+      other: "bg-pink-50 text-pink-700 border border-pink-200"
     };
-    return colors[category as keyof typeof colors] || colors.other;
+    return colors[category.toLowerCase() as keyof typeof colors] || colors.other;
   };
 
   return (
