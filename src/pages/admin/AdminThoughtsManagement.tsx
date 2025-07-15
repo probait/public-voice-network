@@ -306,8 +306,8 @@ const AdminThoughtsManagement = () => {
                        <TableHead>Subject</TableHead>
                        <TableHead>Category</TableHead>
                        <TableHead>Province</TableHead>
-                       <TableHead>Featured</TableHead>
                        <TableHead>Date</TableHead>
+                       <TableHead>Featured</TableHead>
                        <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -339,28 +339,28 @@ const AdminThoughtsManagement = () => {
                             <div className="text-sm text-gray-500 truncate">{submission.message}</div>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{submission.category}</Badge>
-                        </TableCell>
                          <TableCell>
-                           <Badge variant="secondary">{submission.province}</Badge>
+                           <Badge variant="outline">{submission.category}</Badge>
                          </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => toggleFeatured(submission.id, submission.featured)}
-                            className="hover:bg-yellow-50"
-                          >
-                            {submission.featured ? (
-                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                            ) : (
-                              <StarOff className="h-4 w-4 text-gray-400" />
-                            )}
-                          </Button>
-                        </TableCell>
+                          <TableCell>
+                            <Badge variant="secondary">{submission.province}</Badge>
+                          </TableCell>
                          <TableCell>
                            {new Date(submission.created_at).toLocaleDateString()}
+                         </TableCell>
+                         <TableCell>
+                           <Button
+                             variant="ghost"
+                             size="sm"
+                             onClick={() => toggleFeatured(submission.id, submission.featured)}
+                             className="hover:bg-yellow-50"
+                           >
+                             {submission.featured ? (
+                               <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                             ) : (
+                               <StarOff className="h-4 w-4 text-gray-400" />
+                             )}
+                           </Button>
                          </TableCell>
                          <TableCell>
                            <div className="flex items-center space-x-2">
