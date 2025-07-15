@@ -340,8 +340,9 @@ const AdminThoughtsManagement = () => {
                 </CardTitle>
               </div>
               
-              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                <div className="relative flex-1 min-w-0">
+              {/* Search Row */}
+              <div className="w-full">
+                <div className="relative max-w-md">
                   <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <Input
                     placeholder="Search submissions..."
@@ -350,66 +351,67 @@ const AdminThoughtsManagement = () => {
                     className="pl-10 w-full"
                   />
                 </div>
+              </div>
+              
+              {/* Filters Row */}
+              <div className="flex flex-wrap items-center gap-3">
+                <Select value={featuredFilter} onValueChange={setFeaturedFilter}>
+                  <SelectTrigger className="w-36">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="featured">Featured</SelectItem>
+                    <SelectItem value="not-featured">Not Featured</SelectItem>
+                  </SelectContent>
+                </Select>
                 
-                <div className="flex flex-wrap items-center gap-2">
-                  <Select value={featuredFilter} onValueChange={setFeaturedFilter}>
-                    <SelectTrigger className="w-32">
-                      <Filter className="h-4 w-4 mr-2" />
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="featured">Featured</SelectItem>
-                      <SelectItem value="not-featured">Not Featured</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Categories</SelectItem>
-                      {allCategories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select value={provinceFilter} onValueChange={setProvinceFilter}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Province" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Provinces</SelectItem>
-                      {allProvinces.map((province) => (
-                        <SelectItem key={province} value={province}>
-                          {province}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                  <Select value={`${orderBy}-${orderDirection}`} onValueChange={(value) => {
-                    const [field, direction] = value.split('-');
-                    setOrderBy(field);
-                    setOrderDirection(direction as 'asc' | 'desc');
-                  }}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="created_at-desc">Newest First</SelectItem>
-                      <SelectItem value="created_at-asc">Oldest First</SelectItem>
-                      <SelectItem value="name-asc">Name A-Z</SelectItem>
-                      <SelectItem value="name-desc">Name Z-A</SelectItem>
-                      <SelectItem value="subject-asc">Subject A-Z</SelectItem>
-                      <SelectItem value="subject-desc">Subject Z-A</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {allCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={provinceFilter} onValueChange={setProvinceFilter}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="All Provinces" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Provinces</SelectItem>
+                    {allProvinces.map((province) => (
+                      <SelectItem key={province} value={province}>
+                        {province}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={`${orderBy}-${orderDirection}`} onValueChange={(value) => {
+                  const [field, direction] = value.split('-');
+                  setOrderBy(field);
+                  setOrderDirection(direction as 'asc' | 'desc');
+                }}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="Newest First" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="created_at-desc">Newest First</SelectItem>
+                    <SelectItem value="created_at-asc">Oldest First</SelectItem>
+                    <SelectItem value="name-asc">Name A-Z</SelectItem>
+                    <SelectItem value="name-desc">Name Z-A</SelectItem>
+                    <SelectItem value="subject-asc">Subject A-Z</SelectItem>
+                    <SelectItem value="subject-desc">Subject Z-A</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardHeader>
