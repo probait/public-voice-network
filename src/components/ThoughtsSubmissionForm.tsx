@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { useThoughtsSubmission, type ThoughtsSubmissionData } from "@/hooks/useThoughtsSubmission";
 import {
   Form,
   FormControl,
@@ -29,8 +28,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const ThoughtsSubmissionForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const { submitThoughts, isSubmitting } = useThoughtsSubmission();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -45,30 +43,9 @@ const ThoughtsSubmissionForm = () => {
   });
 
   const onSubmit = async (data: FormData) => {
-    setIsSubmitting(true);
-    
-    try {
-      // For now, just simulate submission - will implement database later
-      console.log('Submission data:', data);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      toast({
-        title: "Thank you for your submission!",
-        description: "Your thoughts have been received and will be reviewed.",
-      });
-
+    const result = await submitThoughts(data as ThoughtsSubmissionData);
+    if (result.success) {
       form.reset();
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      toast({
-        title: "Error",
-        description: "There was an error submitting your thoughts. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 

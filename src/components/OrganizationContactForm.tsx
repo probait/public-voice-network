@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Building2, Mail, Phone, User } from "lucide-react";
+import { usePartnershipInquiry } from "@/hooks/usePartnershipInquiry";
 
 const OrganizationContactForm = () => {
+  const { submitInquiry, isSubmitting } = usePartnershipInquiry();
   const [formData, setFormData] = useState({
     organizationName: "",
     contactName: "",
@@ -16,10 +18,29 @@ const OrganizationContactForm = () => {
     message: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Organization contact form submitted:", formData);
-    // TODO: Handle form submission
+    
+    const submissionData = {
+      organization_name: formData.organizationName,
+      contact_name: formData.contactName,
+      email: formData.email,
+      phone: formData.phone || undefined,
+      organization_type: formData.organizationType,
+      message: formData.message,
+    };
+    
+    const result = await submitInquiry(submissionData);
+    if (result.success) {
+      setFormData({
+        organizationName: "",
+        contactName: "",
+        email: "",
+        phone: "",
+        organizationType: "",
+        message: "",
+      });
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -129,8 +150,8 @@ const OrganizationContactForm = () => {
         />
       </div>
 
-      <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white">
-        Send Partnership Inquiry
+      <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white" disabled={isSubmitting}>
+        {isSubmitting ? "Submitting..." : "Send Partnership Inquiry"}
       </Button>
     </form>
   );

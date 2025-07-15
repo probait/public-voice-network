@@ -345,6 +345,45 @@ export type Database = {
         }
         Relationships: []
       }
+      partnership_inquiries: {
+        Row: {
+          contact_name: string
+          created_at: string
+          email: string
+          id: string
+          message: string
+          organization_name: string
+          organization_type: string
+          phone: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_name: string
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          organization_name: string
+          organization_type: string
+          phone?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          organization_name?: string
+          organization_type?: string
+          phone?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       partnerships: {
         Row: {
           created_at: string
@@ -512,6 +551,45 @@ export type Database = {
           summary?: string | null
           title?: string
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      thoughts_submissions: {
+        Row: {
+          category: string
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          province: string
+          status: string | null
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          province: string
+          status?: string | null
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          province?: string
+          status?: string | null
+          subject?: string
+          updated_at?: string
         }
         Relationships: []
       }
