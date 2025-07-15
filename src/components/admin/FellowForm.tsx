@@ -57,7 +57,7 @@ const FellowForm = ({ fellow, onClose }: FellowFormProps) => {
   const form = useForm<FellowFormData>({
     resolver: zodResolver(fellowSchema),
     defaultValues: {
-      contributor_id: fellow?.contributor_id || '',
+      contributor_id: fellow?.contributor_id || 'none',
       program_description: fellow?.program_description || '',
       start_date: fellow?.start_date ? new Date(fellow.start_date) : undefined,
       end_date: fellow?.end_date ? new Date(fellow.end_date) : undefined,
@@ -83,7 +83,7 @@ const FellowForm = ({ fellow, onClose }: FellowFormProps) => {
     mutationFn: async (data: FellowFormData) => {
       const fellowData = {
         ...data,
-        contributor_id: data.contributor_id || null,
+        contributor_id: data.contributor_id === 'none' ? null : data.contributor_id || null,
         start_date: data.start_date ? data.start_date.toISOString().split('T')[0] : null,
         end_date: data.end_date ? data.end_date.toISOString().split('T')[0] : null,
       };
@@ -137,7 +137,7 @@ const FellowForm = ({ fellow, onClose }: FellowFormProps) => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">No contributor</SelectItem>
+                  <SelectItem value="none">No contributor</SelectItem>
                   {contributors?.map((contributor) => (
                     <SelectItem key={contributor.id} value={contributor.id}>
                       {contributor.name}
