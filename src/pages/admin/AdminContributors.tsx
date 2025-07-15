@@ -307,9 +307,9 @@ const AdminContributors = () => {
                               })}
                             >
                               {contributor.is_featured ? (
-                                <StarOff className="h-4 w-4" />
+                                <Star className="h-4 w-4 text-yellow-500 fill-current" />
                               ) : (
-                                <Star className="h-4 w-4" />
+                                <Star className="h-4 w-4 text-gray-400" />
                               )}
                             </Button>
                             <Button

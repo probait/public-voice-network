@@ -534,11 +534,11 @@ const AdminThoughtsManagement = () => {
                              onClick={() => toggleFeatured(submission.id, submission.featured)}
                              className="hover:bg-yellow-50"
                            >
-                             {submission.featured ? (
-                               <Eye className="h-4 w-4" />
-                             ) : (
-                               <EyeOff className="h-4 w-4" />
-                             )}
+                              {submission.featured ? (
+                                <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                              ) : (
+                                <Star className="h-4 w-4 text-gray-400" />
+                              )}
                            </Button>
                          </TableCell>
                          <TableCell>
