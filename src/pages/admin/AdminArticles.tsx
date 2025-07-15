@@ -453,9 +453,9 @@ const AdminArticles = () => {
                               })}
                             >
                               {article.is_published ? (
-                                <EyeOff className="h-4 w-4" />
+                                <Eye className="h-4 w-4 text-green-600" />
                               ) : (
-                                <Eye className="h-4 w-4" />
+                                <EyeOff className="h-4 w-4 text-gray-400" />
                               )}
                             </Button>
                             <Button
