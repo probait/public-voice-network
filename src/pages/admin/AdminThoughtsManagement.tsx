@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Table, 
   TableBody, 
@@ -22,7 +23,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2, Eye, EyeOff } from 'lucide-react';
+import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2, Eye, EyeOff, Filter } from 'lucide-react';
 import BulkActions from '@/components/admin/BulkActions';
 
 interface ThoughtsSubmission {
@@ -43,6 +44,11 @@ const AdminThoughtsManagement = () => {
   const [totalSubmissions, setTotalSubmissions] = useState(0);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [featuredFilter, setFeaturedFilter] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [provinceFilter, setProvinceFilter] = useState('all');
+  const [orderBy, setOrderBy] = useState('created_at');
+  const [orderDirection, setOrderDirection] = useState<'asc' | 'desc'>('desc');
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
   const [viewingSubmission, setViewingSubmission] = useState<ThoughtsSubmission | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -57,13 +63,30 @@ const AdminThoughtsManagement = () => {
       let query = supabase
         .from('thoughts_submissions')
         .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false })
         .range(offset, offset + pageSize - 1);
 
       // Apply search filter if there's a search term
       if (searchTerm) {
         query = query.or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,subject.ilike.%${searchTerm}%,message.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,province.ilike.%${searchTerm}%`);
       }
+
+      // Apply featured filter
+      if (featuredFilter !== 'all') {
+        query = query.eq('featured', featuredFilter === 'featured');
+      }
+
+      // Apply category filter
+      if (categoryFilter !== 'all') {
+        query = query.eq('category', categoryFilter);
+      }
+
+      // Apply province filter
+      if (provinceFilter !== 'all') {
+        query = query.eq('province', provinceFilter);
+      }
+
+      // Apply ordering
+      query = query.order(orderBy, { ascending: orderDirection === 'asc' });
 
       const { data, error, count } = await query;
 
@@ -158,14 +181,46 @@ const AdminThoughtsManagement = () => {
 
   useEffect(() => {
     fetchSubmissions();
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection]);
 
-  // Reset to first page when search term changes
+  // Reset to first page when filters change
   useEffect(() => {
-    if (searchTerm) {
+    if (searchTerm || featuredFilter !== 'all' || categoryFilter !== 'all' || provinceFilter !== 'all') {
       setCurrentPage(1);
     }
-  }, [searchTerm]);
+  }, [searchTerm, featuredFilter, categoryFilter, provinceFilter]);
+
+  // Get unique categories and provinces for filter options
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [allProvinces, setAllProvinces] = useState<string[]>([]);
+
+  // Fetch filter options
+  useEffect(() => {
+    const fetchFilterOptions = async () => {
+      try {
+        const { data: categories } = await supabase
+          .from('thoughts_submissions')
+          .select('category')
+          .order('category');
+        
+        const { data: provinces } = await supabase
+          .from('thoughts_submissions')
+          .select('province')
+          .order('province');
+
+        if (categories) {
+          setAllCategories([...new Set(categories.map(c => c.category))]);
+        }
+        if (provinces) {
+          setAllProvinces([...new Set(provinces.map(p => p.province))]);
+        }
+      } catch (error) {
+        console.error('Error fetching filter options:', error);
+      }
+    };
+
+    fetchFilterOptions();
+  }, []);
 
   // Filter submissions based on search term (now handled in the query)
   const filteredSubmissions = submissions;
@@ -282,14 +337,70 @@ const AdminThoughtsManagement = () => {
                 <MessageSquare className="h-5 w-5" />
                 All Submissions ({totalSubmissions})
               </CardTitle>
-              <div className="relative">
-                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <Input
-                  placeholder="Search submissions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64"
-                />
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search submissions..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 w-64"
+                  />
+                </div>
+                <Select value={featuredFilter} onValueChange={setFeaturedFilter}>
+                  <SelectTrigger className="w-32">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="featured">Featured</SelectItem>
+                    <SelectItem value="not-featured">Not Featured</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {allCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={provinceFilter} onValueChange={setProvinceFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Province" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Provinces</SelectItem>
+                    {allProvinces.map((province) => (
+                      <SelectItem key={province} value={province}>
+                        {province}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={`${orderBy}-${orderDirection}`} onValueChange={(value) => {
+                  const [field, direction] = value.split('-');
+                  setOrderBy(field);
+                  setOrderDirection(direction as 'asc' | 'desc');
+                }}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="created_at-desc">Newest First</SelectItem>
+                    <SelectItem value="created_at-asc">Oldest First</SelectItem>
+                    <SelectItem value="name-asc">Name A-Z</SelectItem>
+                    <SelectItem value="name-desc">Name Z-A</SelectItem>
+                    <SelectItem value="subject-asc">Subject A-Z</SelectItem>
+                    <SelectItem value="subject-desc">Subject Z-A</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardHeader>
