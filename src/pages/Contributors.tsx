@@ -16,6 +16,7 @@ const Contributors = () => {
       const { data, error } = await supabase
         .from('contributors')
         .select('*')
+        .eq('is_published', true)
         .order('name');
 
       if (error) throw error;

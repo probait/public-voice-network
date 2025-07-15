@@ -107,6 +107,7 @@ export type Database = {
           id: string
           institution: string | null
           is_featured: boolean | null
+          is_published: boolean | null
           linkedin_url: string | null
           name: string
           organization: string | null
@@ -123,6 +124,7 @@ export type Database = {
           id?: string
           institution?: string | null
           is_featured?: boolean | null
+          is_published?: boolean | null
           linkedin_url?: string | null
           name: string
           organization?: string | null
@@ -139,6 +141,7 @@ export type Database = {
           id?: string
           institution?: string | null
           is_featured?: boolean | null
+          is_published?: boolean | null
           linkedin_url?: string | null
           name?: string
           organization?: string | null

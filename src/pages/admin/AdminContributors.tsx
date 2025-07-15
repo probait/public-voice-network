@@ -27,8 +27,8 @@ import {
   Search, 
   Edit2, 
   Trash2, 
-  Star, 
-  StarOff,
+  Eye, 
+  EyeOff,
   Users,
   Building,
   Mail
@@ -91,24 +91,19 @@ const AdminContributors = () => {
     }
   });
 
-  // Toggle featured status mutation
-  const toggleFeaturedMutation = useMutation({
-    mutationFn: async ({ id, isFeatured }: { id: string; isFeatured: boolean }) => {
-      const updates = {
-        is_featured: !isFeatured,
-        featured_until: !isFeatured ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null
-      };
-
+  // Toggle published status mutation
+  const togglePublishedMutation = useMutation({
+    mutationFn: async ({ id, isPublished }: { id: string; isPublished: boolean }) => {
       const { error } = await supabase
         .from('contributors')
-        .update(updates)
+        .update({ is_published: !isPublished })
         .eq('id', id);
       
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contributors'] });
-      toast({ title: 'Featured status updated' });
+      toast({ title: 'Published status updated' });
     }
   });
 
@@ -203,9 +198,6 @@ const AdminContributors = () => {
               <BulkActions
                 selectedCount={selectedContributors.length}
                 onBulkDelete={() => bulkDeleteMutation.mutate(selectedContributors)}
-                onBulkFeature={() => {
-                  // Implementation for bulk feature toggle
-                }}
               />
             )}
 
@@ -222,7 +214,6 @@ const AdminContributors = () => {
                     <TableHead>Name</TableHead>
                     <TableHead>Organization</TableHead>
                     <TableHead>Email</TableHead>
-                    <TableHead>Status</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -230,13 +221,13 @@ const AdminContributors = () => {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
+                      <TableCell colSpan={6} className="text-center py-8">
                         Loading contributors...
                       </TableCell>
                     </TableRow>
                   ) : contributorsData?.contributors.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
+                      <TableCell colSpan={6} className="text-center py-8">
                         No contributors found
                       </TableCell>
                     </TableRow>
@@ -285,15 +276,6 @@ const AdminContributors = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
-                            {contributor.is_featured && (
-                              <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                                Featured
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
                           {new Date(contributor.created_at).toLocaleDateString()}
                         </TableCell>
                         <TableCell className="text-right">
@@ -301,15 +283,15 @@ const AdminContributors = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => toggleFeaturedMutation.mutate({
+                              onClick={() => togglePublishedMutation.mutate({
                                 id: contributor.id,
-                                isFeatured: contributor.is_featured
+                                isPublished: contributor.is_published
                               })}
                             >
-                              {contributor.is_featured ? (
-                                <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                              {contributor.is_published ? (
+                                <Eye className="h-4 w-4 text-green-600" />
                               ) : (
-                                <Star className="h-4 w-4 text-gray-400" />
+                                <EyeOff className="h-4 w-4 text-gray-400" />
                               )}
                             </Button>
                             <Button
