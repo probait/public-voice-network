@@ -1,13 +1,23 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
-import { Download, Star } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import AdminLayout from '@/components/admin/AdminLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Download, Star, StarOff, Search, MessageSquare, Users } from 'lucide-react';
+import BulkActions from '@/components/admin/BulkActions';
 
 interface ThoughtsSubmission {
   id: string;
@@ -26,6 +36,8 @@ interface ThoughtsSubmission {
 const AdminThoughtsManagement = () => {
   const [submissions, setSubmissions] = useState<ThoughtsSubmission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
   const { toast } = useToast();
 
   const fetchSubmissions = async () => {
@@ -129,7 +141,7 @@ const AdminThoughtsManagement = () => {
       submission.message.replace(/"/g, '""'), // Escape quotes
       submission.status,
       submission.featured ? 'Yes' : 'No',
-      format(new Date(submission.created_at), 'yyyy-MM-dd HH:mm:ss')
+      new Date(submission.created_at).toLocaleDateString()
     ]);
 
     const csvContent = [
@@ -141,7 +153,7 @@ const AdminThoughtsManagement = () => {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', `thoughts-submissions-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    link.setAttribute('download', `thoughts-submissions-${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -157,135 +169,233 @@ const AdminThoughtsManagement = () => {
     fetchSubmissions();
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'new':
-        return 'bg-blue-500';
-      case 'reviewed':
-        return 'bg-yellow-500';
-      case 'responded':
-        return 'bg-green-500';
-      case 'archived':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-500';
+  // Filter submissions based on search term
+  const filteredSubmissions = submissions.filter(submission =>
+    submission.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    submission.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    submission.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    submission.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    submission.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    submission.province.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedSubmissions(filteredSubmissions.map(s => s.id));
+    } else {
+      setSelectedSubmissions([]);
     }
   };
 
-  const featuredCount = submissions.filter(s => s.featured).length;
+  const handleSelectSubmission = (id: string, checked: boolean) => {
+    if (checked) {
+      setSelectedSubmissions([...selectedSubmissions, id]);
+    } else {
+      setSelectedSubmissions(selectedSubmissions.filter(sId => sId !== id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (window.confirm(`Are you sure you want to delete ${selectedSubmissions.length} submissions?`)) {
+      try {
+        const { error } = await supabase
+          .from('thoughts_submissions')
+          .delete()
+          .in('id', selectedSubmissions);
+
+        if (error) throw error;
+
+        await fetchSubmissions();
+        setSelectedSubmissions([]);
+        toast({
+          title: 'Success',
+          description: `${selectedSubmissions.length} submissions deleted successfully`,
+        });
+      } catch (error) {
+        console.error('Error deleting submissions:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to delete submissions',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'new':
+        return 'bg-blue-100 text-blue-800';
+      case 'reviewed':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'approved':
+        return 'bg-green-100 text-green-800';
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   if (loading) {
-    return <div className="p-6">Loading thoughts submissions...</div>;
+    return (
+      <AdminLayout requiredRole="admin">
+        <div className="space-y-6">
+          <h1 className="text-3xl font-bold text-gray-900">Thoughts Management</h1>
+          <div className="animate-pulse space-y-4">
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </AdminLayout>
+    );
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Thoughts Management</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage citizen thoughts and feature them on the homepage
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-muted-foreground">
-            <Badge variant="outline" className="mr-2">
-              {submissions.length} total
-            </Badge>
-            <Badge variant="outline" className="mr-2">
-              <Star className="w-3 h-3 mr-1" />
-              {featuredCount} featured
-            </Badge>
+    <AdminLayout requiredRole="admin">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Thoughts Management</h1>
+            <p className="text-gray-600 mt-2">Manage citizen submissions and feature them on the homepage</p>
           </div>
-          <Button onClick={exportToCSV} variant="outline">
-            <Download className="w-4 h-4 mr-2" />
+          <Button onClick={exportToCSV} className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
             Export CSV
           </Button>
         </div>
-      </div>
 
-      <div className="grid gap-4">
-        {submissions.map((submission) => (
-          <Card key={submission.id} className={submission.featured ? "border-yellow-200 bg-yellow-50/50" : ""}>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CardTitle className="text-lg">{submission.subject}</CardTitle>
-                    {submission.featured && (
-                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    From: {submission.name} ({submission.email}) • {submission.province}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Category: {submission.category} • Submitted: {format(new Date(submission.created_at), 'PPP')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className={getStatusColor(submission.status)}>
-                    {submission.status}
-                  </Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Message:</h4>
-                  <p className="text-sm bg-muted p-3 rounded leading-relaxed">{submission.message}</p>
-                </div>
-                
-                <div className="flex items-center justify-between border-t pt-4">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`featured-${submission.id}`}
-                        checked={submission.featured}
-                        onCheckedChange={() => toggleFeatured(submission.id, submission.featured)}
-                      />
-                      <label
-                        htmlFor={`featured-${submission.id}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Feature on homepage
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">Status:</span>
-                    <Select
-                      value={submission.status}
-                      onValueChange={(value) => updateStatus(submission.id, value)}
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="reviewed">Reviewed</SelectItem>
-                        <SelectItem value="responded">Responded</SelectItem>
-                        <SelectItem value="archived">Archived</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {submissions.length === 0 && (
         <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-muted-foreground">No thoughts submissions yet.</p>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                All Submissions ({filteredSubmissions.length})
+              </CardTitle>
+              <div className="relative">
+                <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder="Search submissions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {selectedSubmissions.length > 0 && (
+              <BulkActions
+                selectedCount={selectedSubmissions.length}
+                onBulkDelete={handleBulkDelete}
+                onClearSelection={() => setSelectedSubmissions([])}
+              />
+            )}
+
+            {filteredSubmissions.length === 0 ? (
+              <div className="text-center py-8">
+                <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">
+                  {searchTerm ? 'No submissions found matching your search.' : 'No thoughts submitted yet.'}
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedSubmissions.length === filteredSubmissions.length}
+                          onCheckedChange={handleSelectAll}
+                        />
+                      </TableHead>
+                      <TableHead>Citizen</TableHead>
+                      <TableHead>Subject</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Province</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Featured</TableHead>
+                      <TableHead>Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredSubmissions.map((submission) => (
+                      <TableRow key={submission.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedSubmissions.includes(submission.id)}
+                            onCheckedChange={(checked) => 
+                              handleSelectSubmission(submission.id, checked as boolean)
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                              <Users className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div>
+                              <div className="font-medium">{submission.name}</div>
+                              <div className="text-sm text-gray-500">{submission.email}</div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="max-w-xs">
+                            <div className="font-medium truncate">{submission.subject}</div>
+                            <div className="text-sm text-gray-500 truncate">{submission.message}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{submission.category}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{submission.province}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={submission.status}
+                            onValueChange={(value) => updateStatus(submission.id, value)}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="new">New</SelectItem>
+                              <SelectItem value="reviewed">Reviewed</SelectItem>
+                              <SelectItem value="approved">Approved</SelectItem>
+                              <SelectItem value="rejected">Rejected</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleFeatured(submission.id, submission.featured)}
+                            className="hover:bg-yellow-50"
+                          >
+                            {submission.featured ? (
+                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                            ) : (
+                              <StarOff className="h-4 w-4 text-gray-400" />
+                            )}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(submission.created_at).toLocaleDateString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
-    </div>
+      </div>
+    </AdminLayout>
   );
 };
 
