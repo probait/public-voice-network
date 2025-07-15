@@ -135,48 +135,86 @@ const AdminThoughtsManagement = () => {
     }
   };
 
-  const exportToCSV = () => {
-    const headers = [
-      'Name',
-      'Email', 
-      'Province',
-      'Category',
-      'Subject',
-      'Message',
-      'Featured',
-      'Submitted Date'
-    ];
+  const exportToCSV = async () => {
+    try {
+      // Fetch ALL submissions for export (not just current page)
+      let query = supabase
+        .from('thoughts_submissions')
+        .select('*');
 
-    const csvData = submissions.map(submission => [
-      submission.name,
-      submission.email,
-      submission.province,
-      submission.category,
-      submission.subject,
-      submission.message.replace(/"/g, '""'), // Escape quotes
-      submission.featured ? 'Yes' : 'No',
-      new Date(submission.created_at).toLocaleDateString()
-    ]);
+      // Apply the same filters that are currently active
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,subject.ilike.%${searchTerm}%,message.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,province.ilike.%${searchTerm}%`);
+      }
 
-    const csvContent = [
-      headers.join(','),
-      ...csvData.map(row => row.map(field => `"${field}"`).join(','))
-    ].join('\n');
+      if (featuredFilter !== 'all') {
+        query = query.eq('featured', featuredFilter === 'featured');
+      }
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `thoughts-submissions-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      if (categoryFilter !== 'all') {
+        query = query.eq('category', categoryFilter);
+      }
 
-    toast({
-      title: "Export complete",
-      description: "CSV file has been downloaded",
-    });
+      if (provinceFilter !== 'all') {
+        query = query.eq('province', provinceFilter);
+      }
+
+      // Apply ordering
+      query = query.order(orderBy, { ascending: orderDirection === 'asc' });
+
+      const { data: allSubmissions, error } = await query;
+
+      if (error) throw error;
+
+      const headers = [
+        'Name',
+        'Email', 
+        'Province',
+        'Category',
+        'Subject',
+        'Message',
+        'Featured',
+        'Submitted Date'
+      ];
+
+      const csvData = (allSubmissions || []).map(submission => [
+        submission.name,
+        submission.email,
+        submission.province,
+        submission.category,
+        submission.subject,
+        submission.message.replace(/"/g, '""'), // Escape quotes
+        submission.featured ? 'Yes' : 'No',
+        new Date(submission.created_at).toLocaleDateString()
+      ]);
+
+      const csvContent = [
+        headers.join(','),
+        ...csvData.map(row => row.map(field => `"${field}"`).join(','))
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `thoughts-submissions-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Export complete",
+        description: `CSV file with ${csvData.length} thoughts has been downloaded`,
+      });
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the CSV file",
+        variant: "destructive",
+      });
+    }
   };
 
   useEffect(() => {

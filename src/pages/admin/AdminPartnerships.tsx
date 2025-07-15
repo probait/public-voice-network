@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -101,48 +102,82 @@ const AdminPartnerships = () => {
     }
   };
 
-  const exportToCSV = () => {
-    const headers = [
-      'Organization Name',
-      'Contact Name',
-      'Email',
-      'Phone',
-      'Organization Type',
-      'Status',
-      'Message',
-      'Submitted Date'
-    ];
+  const exportToCSV = async () => {
+    try {
+      // Fetch ALL inquiries for export (not just current page)
+      let query = supabase
+        .from('partnership_inquiries')
+        .select('*');
 
-    const csvData = inquiries.map(inquiry => [
-      inquiry.organization_name,
-      inquiry.contact_name,
-      inquiry.email,
-      inquiry.phone || '',
-      inquiry.organization_type,
-      inquiry.status || 'new',
-      inquiry.message.replace(/"/g, '""'), // Escape quotes
-      new Date(inquiry.created_at).toLocaleDateString()
-    ]);
+      // Apply the same filters that are currently active
+      if (searchTerm) {
+        query = query.or(`contact_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,organization_name.ilike.%${searchTerm}%,message.ilike.%${searchTerm}%`);
+      }
 
-    const csvContent = [
-      headers.join(','),
-      ...csvData.map(row => row.map(field => `"${field}"`).join(','))
-    ].join('\n');
+      if (statusFilter !== 'all') {
+        query = query.eq('status', statusFilter);
+      }
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `partnership-inquiries-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      if (organizationTypeFilter !== 'all') {
+        query = query.eq('organization_type', organizationTypeFilter);
+      }
 
-    toast({
-      title: "Export complete",
-      description: "CSV file has been downloaded",
-    });
+      // Apply ordering
+      query = query.order(orderBy, { ascending: orderDirection === 'asc' });
+
+      const { data: allInquiries, error } = await query;
+
+      if (error) throw error;
+
+      const headers = [
+        'Organization Name',
+        'Contact Name',
+        'Email',
+        'Phone',
+        'Organization Type',
+        'Status',
+        'Message',
+        'Submitted Date'
+      ];
+
+      const csvData = (allInquiries || []).map(inquiry => [
+        inquiry.organization_name,
+        inquiry.contact_name,
+        inquiry.email,
+        inquiry.phone || '',
+        inquiry.organization_type,
+        inquiry.status || 'new',
+        inquiry.message.replace(/"/g, '""'), // Escape quotes
+        new Date(inquiry.created_at).toLocaleDateString()
+      ]);
+
+      const csvContent = [
+        headers.join(','),
+        ...csvData.map(row => row.map(field => `"${field}"`).join(','))
+      ].join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `partnership-inquiries-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Export complete",
+        description: `CSV file with ${csvData.length} partnership inquiries has been downloaded`,
+      });
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the CSV file",
+        variant: "destructive",
+      });
+    }
   };
 
   const totalPages = Math.ceil(totalInquiries / pageSize);
