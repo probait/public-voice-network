@@ -34,6 +34,7 @@ interface AdminEventsTableProps {
   onDelete: (eventId: string) => void;
   onViewAttendees: (eventId: string) => void;
   onToggleHomepageFeatured: (eventId: string, featured: boolean) => void;
+  onTogglePublished: (eventId: string, published: boolean) => void;
 }
 
 const AdminEventsTable = ({
@@ -44,7 +45,8 @@ const AdminEventsTable = ({
   onEdit,
   onDelete,
   onViewAttendees,
-  onToggleHomepageFeatured
+  onToggleHomepageFeatured,
+  onTogglePublished
 }: AdminEventsTableProps) => {
   const featuredEventsCount = events.filter(event => event.homepage_featured).length;
 
@@ -177,9 +179,9 @@ const AdminEventsTable = ({
                     className="hover:bg-yellow-50"
                   >
                     {event.homepage_featured ? (
-                      <Eye className="h-4 w-4" />
+                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
                     ) : (
-                      <EyeOff className="h-4 w-4" />
+                      <Star className="h-4 w-4 text-gray-400" />
                     )}
                   </Button>
                 </TableCell>
@@ -193,14 +195,28 @@ const AdminEventsTable = ({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onViewAttendees(event.id)}
+                      onClick={() => onTogglePublished(event.id, !event.is_published)}
+                      title={event.is_published ? "Unpublish event" : "Publish event"}
                     >
-                      <Eye className="h-4 w-4" />
+                      {event.is_published ? (
+                        <Eye className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onViewAttendees(event.id)}
+                      title="View attendees"
+                    >
+                      <Users className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => onEdit(event)}
+                      title="Edit event"
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>
@@ -209,6 +225,7 @@ const AdminEventsTable = ({
                       size="sm"
                       onClick={() => onDelete(event.id)}
                       className="text-red-600 hover:text-red-700"
+                      title="Delete event"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

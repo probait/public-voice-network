@@ -29,7 +29,8 @@ export const useAdminEvents = () => {
           created_at,
           user_id,
           homepage_featured,
-          image_url
+          image_url,
+          is_published
         `)
         .order('date_time', { ascending: false });
 
@@ -88,6 +89,7 @@ export const useAdminEvents = () => {
           created_at: meetup.created_at,
           homepage_featured: meetup.homepage_featured,
           image_url: meetup.image_url,
+          is_published: meetup.is_published,
           attendee_count: attendeeCount,
           profiles: profile ? { full_name: profile.full_name } : null
         };
@@ -161,11 +163,34 @@ export const useAdminEvents = () => {
     }
   });
 
+  const togglePublishedMutation = useMutation({
+    mutationFn: async ({ eventId, published }: { eventId: string; published: boolean }) => {
+      const { error } = await supabase
+        .from('meetups')
+        .update({ is_published: published })
+        .eq('id', eventId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-events'] });
+      queryClient.invalidateQueries({ queryKey: ['external-events'] });
+      toast({ title: 'Event published status updated successfully' });
+    },
+    onError: (error) => {
+      toast({ 
+        title: 'Error updating event published status', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    }
+  });
+
   return {
     events,
     isLoading,
     deleteMutation,
     bulkDeleteMutation,
-    toggleHomepageFeaturedMutation
+    toggleHomepageFeaturedMutation,
+    togglePublishedMutation
   };
 };

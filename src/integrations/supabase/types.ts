@@ -237,6 +237,7 @@ export type Database = {
           homepage_featured: boolean | null
           id: string
           image_url: string | null
+          is_published: boolean | null
           is_virtual: boolean | null
           location: string
           max_attendees: number | null
@@ -253,6 +254,7 @@ export type Database = {
           homepage_featured?: boolean | null
           id?: string
           image_url?: string | null
+          is_published?: boolean | null
           is_virtual?: boolean | null
           location: string
           max_attendees?: number | null
@@ -269,6 +271,7 @@ export type Database = {
           homepage_featured?: boolean | null
           id?: string
           image_url?: string | null
+          is_published?: boolean | null
           is_virtual?: boolean | null
           location?: string
           max_attendees?: number | null

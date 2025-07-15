@@ -34,7 +34,8 @@ const AdminEvents = () => {
     isLoading, 
     deleteMutation, 
     bulkDeleteMutation, 
-    toggleHomepageFeaturedMutation 
+    toggleHomepageFeaturedMutation,
+    togglePublishedMutation 
   } = useAdminEvents();
 
   const filteredEvents = events.filter(event =>
@@ -81,6 +82,10 @@ const AdminEvents = () => {
 
   const handleToggleHomepageFeatured = (eventId: string, featured: boolean) => {
     toggleHomepageFeaturedMutation.mutate({ eventId, featured });
+  };
+
+  const handleTogglePublished = (eventId: string, published: boolean) => {
+    togglePublishedMutation.mutate({ eventId, published });
   };
 
   if (isLoading) {
@@ -167,6 +172,7 @@ const AdminEvents = () => {
               onDelete={handleDelete}
               onViewAttendees={setViewingAttendees}
               onToggleHomepageFeatured={handleToggleHomepageFeatured}
+              onTogglePublished={handleTogglePublished}
             />
 
             {filteredEvents.length === 0 && (
