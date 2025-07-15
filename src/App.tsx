@@ -25,6 +25,7 @@ import AdminEvents from "./pages/admin/AdminEvents";
 import AdminRoundtables from "./pages/admin/AdminRoundtables";
 import AdminPrompts from "./pages/admin/AdminPrompts";
 import AdminPartnerships from "./pages/admin/AdminPartnerships";
+import AdminThoughtsManagement from "./pages/admin/AdminThoughtsManagement";
 import AdminNewsletter from "./pages/admin/AdminNewsletter";
 import AdminSettings from "./pages/admin/AdminSettings";
 import NotFound from "./pages/NotFound";
@@ -72,6 +73,7 @@ const App = () => {
             <Route path="/admin/roundtables" element={<AdminRoundtables />} />
             <Route path="/admin/prompts" element={<AdminPrompts />} />
             <Route path="/admin/partnerships" element={<AdminPartnerships />} />
+            <Route path="/admin/thoughts" element={<AdminThoughtsManagement />} />
             
             <Route path="/admin/settings" element={<AdminSettings />} />
             

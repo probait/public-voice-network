@@ -559,6 +559,7 @@ export type Database = {
           category: string
           created_at: string
           email: string
+          featured: boolean
           id: string
           message: string
           name: string
@@ -571,6 +572,7 @@ export type Database = {
           category: string
           created_at?: string
           email: string
+          featured?: boolean
           id?: string
           message: string
           name: string
@@ -583,6 +585,7 @@ export type Database = {
           category?: string
           created_at?: string
           email?: string
+          featured?: boolean
           id?: string
           message?: string
           name?: string

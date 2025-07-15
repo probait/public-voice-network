@@ -12,7 +12,8 @@ import {
   Settings,
   UserCheck,
   Presentation,
-  Mail
+  Mail,
+  Heart
 } from 'lucide-react';
 import PolicyNowLogo from '@/components/PolicyNowLogo';
 
@@ -61,6 +62,12 @@ const AdminSidebar = () => {
       title: 'Prompts',
       icon: MessageSquare,
       path: '/admin/prompts',
+      roles: ['content_manager']
+    },
+    {
+      title: 'Citizen Thoughts',
+      icon: Heart,
+      path: '/admin/thoughts',
       roles: ['content_manager']
     },
     {
