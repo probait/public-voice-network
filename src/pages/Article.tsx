@@ -85,7 +85,7 @@ const Article = () => {
 
           <div className="aspect-[16/9] overflow-hidden rounded-lg mb-8">
             <img
-              src={fallbackImage}
+              src={article.image_url || fallbackImage}
               alt={article.title}
               className="w-full h-full object-cover"
             />
