@@ -12,6 +12,7 @@ interface ArticleCardProps {
     slug: string;
     content: string | null;
     published_at: string | null;
+    image_url: string | null;
     contributors?: {
       id: string;
       name: string;
@@ -42,7 +43,7 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
         <Link to={`/articles/${article.slug}`}>
           <div className="aspect-[16/9] overflow-hidden rounded-t-lg">
             <ResponsiveImage
-              src={fallbackImage}
+              src={article.image_url || fallbackImage}
               alt={article.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
