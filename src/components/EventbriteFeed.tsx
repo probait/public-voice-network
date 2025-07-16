@@ -173,7 +173,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {meetups.map((meetup) => (
-        <Card key={meetup.id} className="hover:shadow-lg transition-shadow overflow-hidden">
+        <Card key={meetup.id} className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full">
           <div className="relative">
             <div className="w-full h-48 overflow-hidden">
               <img 
@@ -187,60 +187,62 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
               />
             </div>
           </div>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
-                  {meetup.title}
-                </CardTitle>
-                <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{format(new Date(meetup.date_time), 'MMM d, yyyy at h:mm a')}</span>
+          <div className="flex flex-col flex-1">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
+                    {meetup.title}
+                  </CardTitle>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                    <div className="flex items-center space-x-1">
+                      <Calendar className="h-4 w-4" />
+                      <span>{format(new Date(meetup.date_time), 'MMM d, yyyy at h:mm a')}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      {meetup.is_virtual ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+                      <span>{meetup.is_virtual ? 'Virtual Meeting' : meetup.location}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Users className="h-4 w-4" />
+                      <span>{meetup.attendee_count}/{meetup.max_attendees}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    {meetup.is_virtual ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
-                    <span>{meetup.is_virtual ? 'Virtual Meeting' : meetup.location}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Users className="h-4 w-4" />
-                    <span>{meetup.attendee_count}/{meetup.max_attendees}</span>
-                  </div>
+              </div>
+            </CardHeader>
+            <CardContent className="flex flex-col flex-1">
+              <p className="text-gray-600 mb-4 line-clamp-3 flex-1">
+                {meetup.description}
+              </p>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {meetup.category}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    Free
+                  </Badge>
                 </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600 mb-4 line-clamp-3">
-              {meetup.description}
-            </p>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <Badge variant="secondary" className="text-xs">
-                  {meetup.category}
-                </Badge>
-                <Badge variant="outline" className="text-xs">
-                  Free
-                </Badge>
-              </div>
-            </div>
-            {meetup.profiles && (
-              <div className="text-sm text-gray-500 mb-3">
-                Organized by {meetup.profiles.full_name}
-              </div>
-            )}
-            <Button 
-              asChild 
-              className="w-full bg-red-600 hover:bg-red-700 text-white"
-            >
-              <a href={meetup.meeting_link || '#'} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View event details
-              </a>
-            </Button>
-          </CardContent>
+              {meetup.profiles && (
+                <div className="text-sm text-gray-500 mb-3">
+                  Organized by {meetup.profiles.full_name}
+                </div>
+              )}
+              <Button 
+                asChild 
+                className="w-full bg-red-600 hover:bg-red-700 text-white mt-auto"
+              >
+                <a href={meetup.meeting_link || '#'} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  View event details
+                </a>
+              </Button>
+            </CardContent>
+          </div>
         </Card>
       ))}
     </div>
