@@ -20,7 +20,7 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const { signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithFacebook } = useAuth();
+  const { signInWithEmail, signUpWithEmail, signInWithMagicLink, signInWithGoogle, signInWithFacebook } = useAuth();
   const { toast } = useToast();
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
@@ -89,6 +89,28 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     setIsLoading(false);
   };
 
+  const handleMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    const { error } = await signInWithMagicLink(email);
+    
+    if (error) {
+      toast({
+        title: "Error sending magic link",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Magic link sent!",
+        description: "Check your email for the sign-in link.",
+      });
+    }
+    
+    setIsLoading(false);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -100,8 +122,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         
         <div className="mt-4">
           <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
+              <TabsTrigger value="magiclink">Magic Link</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
             
@@ -134,6 +157,30 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 >
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Sign In
+                </Button>
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="magiclink">
+              <form onSubmit={handleMagicLink} className="space-y-4 mt-4">
+                <div>
+                  <Label htmlFor="magiclink-email">Email</Label>
+                  <Input
+                    id="magiclink-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email address"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-red-600 hover:bg-red-700"
+                  disabled={isLoading}
+                >
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Send Magic Link
                 </Button>
               </form>
             </TabsContent>
