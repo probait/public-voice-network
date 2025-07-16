@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
 import GetInvolved from "./pages/GetInvolved";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
@@ -53,6 +54,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/get-involved" element={<GetInvolved />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />

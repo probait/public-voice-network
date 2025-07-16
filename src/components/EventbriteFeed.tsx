@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Calendar, MapPin, Users, Video, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import ResponsiveImage from "@/components/ResponsiveImage";
 
 interface Meetup {
@@ -195,7 +196,17 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
-                      <span>{format(new Date(meetup.date_time), 'MMM d, yyyy at h:mm a')}</span>
+                      <span>
+                        {(() => {
+                          console.log('DEBUG - Date formatting for event:', meetup.id);
+                          console.log('DEBUG - Original date_time:', meetup.date_time);
+                          const dateObj = new Date(meetup.date_time);
+                          console.log('DEBUG - Date object:', dateObj);
+                          const formatted = format(dateObj, 'MMM d, yyyy at h:mm a');
+                          console.log('DEBUG - Formatted date:', formatted);
+                          return formatted;
+                        })()}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4 text-sm text-gray-600">
@@ -234,10 +245,9 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
                 asChild 
                 className="w-full bg-red-600 hover:bg-red-700 text-white mt-auto"
               >
-                <a href={meetup.meeting_link || '#'} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                <Link to={`/events/${meetup.id}`}>
                   View event details
-                </a>
+                </Link>
               </Button>
             </CardContent>
           </div>
