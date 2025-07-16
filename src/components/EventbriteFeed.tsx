@@ -197,15 +197,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
                     <div className="flex items-center space-x-1">
                       <Calendar className="h-4 w-4" />
                       <span>
-                        {(() => {
-                          console.log('DEBUG - Date formatting for event:', meetup.id);
-                          console.log('DEBUG - Original date_time:', meetup.date_time);
-                          const dateObj = new Date(meetup.date_time);
-                          console.log('DEBUG - Date object:', dateObj);
-                          const formatted = format(dateObj, 'MMM d, yyyy at h:mm a');
-                          console.log('DEBUG - Formatted date:', formatted);
-                          return formatted;
-                        })()}
+                        {format(new Date(meetup.date_time), 'MMM d, yyyy at h:mm a')}
                       </span>
                     </div>
                   </div>
