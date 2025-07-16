@@ -9,16 +9,6 @@ import { Calendar, MapPin, Users, Video, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import ResponsiveImage from "@/components/ResponsiveImage";
 
-// Import event images
-import governanceSummitImg from "@/assets/event-governance-summit.jpg";
-import ethicsRoundtableImg from "@/assets/event-ethics-roundtable.jpg";
-import provincialWorkshopImg from "@/assets/event-provincial-workshop.jpg";
-import healthcarePolicyImg from "@/assets/event-healthcare-policy.jpg";
-import internationalForumImg from "@/assets/event-international-forum.jpg";
-import regulationWorkshopImg from "@/assets/event-regulation-workshop.jpg";
-import citizensConsultationImg from "@/assets/event-citizens-consultation.jpg";
-import educationSymposiumImg from "@/assets/event-education-symposium.jpg";
-
 interface Meetup {
   id: string;
   title: string;
@@ -167,23 +157,6 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
   const getImageUrl = (imageUrl: string | undefined) => {
     if (!imageUrl) {
       return "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
-    }
-    
-    // Handle local asset images
-    const imageMap: { [key: string]: string } = {
-      '/src/assets/event-governance-summit.jpg': governanceSummitImg,
-      '/src/assets/event-ethics-roundtable.jpg': ethicsRoundtableImg,
-      '/src/assets/event-provincial-workshop.jpg': provincialWorkshopImg,
-      '/src/assets/event-healthcare-policy.jpg': healthcarePolicyImg,
-      '/src/assets/event-international-forum.jpg': internationalForumImg,
-      '/src/assets/event-regulation-workshop.jpg': regulationWorkshopImg,
-      '/src/assets/event-citizens-consultation.jpg': citizensConsultationImg,
-      '/src/assets/event-education-symposium.jpg': educationSymposiumImg,
-    };
-    
-    // Check if it's a local asset
-    if (imageMap[imageUrl]) {
-      return imageMap[imageUrl];
     }
     
     // If it's already a full URL (starts with http), return as is
