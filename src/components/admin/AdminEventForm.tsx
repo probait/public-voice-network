@@ -29,6 +29,7 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
   const {
     imageFile,
     imagePreview,
+    imageMetadata,
     isUploading,
     setIsUploading,
     handleImageChange,
@@ -92,6 +93,9 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
         is_virtual: data.is_virtual,
         meeting_link: data.is_virtual ? data.meeting_link || null : null,
         image_url: imageUrl,
+        image_width: imageMetadata?.width || null,
+        image_height: imageMetadata?.height || null,
+        image_file_size: imageMetadata?.fileSize || null,
         user_id: user?.id || '',
       };
 
@@ -159,6 +163,7 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
             <EventImageUpload
               imagePreview={imagePreview}
               fieldValue={field.value}
+              imageMetadata={imageMetadata}
               onImageChange={(e) => handleImageChange(e, form.setValue)}
               onRemoveImage={() => handleRemoveImage(form.setValue)}
             />

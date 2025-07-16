@@ -20,6 +20,10 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
+          image_file_size: number | null
+          image_height: number | null
+          image_url: string | null
+          image_width: number | null
           is_published: boolean | null
           partnership_id: string | null
           published_at: string | null
@@ -32,6 +36,10 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          image_file_size?: number | null
+          image_height?: number | null
+          image_url?: string | null
+          image_width?: number | null
           is_published?: boolean | null
           partnership_id?: string | null
           published_at?: string | null
@@ -44,6 +52,10 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          image_file_size?: number | null
+          image_height?: number | null
+          image_url?: string | null
+          image_width?: number | null
           is_published?: boolean | null
           partnership_id?: string | null
           published_at?: string | null
@@ -239,7 +251,10 @@ export type Database = {
           description: string
           homepage_featured: boolean | null
           id: string
+          image_file_size: number | null
+          image_height: number | null
           image_url: string | null
+          image_width: number | null
           is_published: boolean | null
           is_virtual: boolean | null
           location: string
@@ -256,7 +271,10 @@ export type Database = {
           description: string
           homepage_featured?: boolean | null
           id?: string
+          image_file_size?: number | null
+          image_height?: number | null
           image_url?: string | null
+          image_width?: number | null
           is_published?: boolean | null
           is_virtual?: boolean | null
           location: string
@@ -273,7 +291,10 @@ export type Database = {
           description?: string
           homepage_featured?: boolean | null
           id?: string
+          image_file_size?: number | null
+          image_height?: number | null
           image_url?: string | null
+          image_width?: number | null
           is_published?: boolean | null
           is_virtual?: boolean | null
           location?: string

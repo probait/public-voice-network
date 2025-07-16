@@ -14,11 +14,16 @@ import { Upload, X } from 'lucide-react';
 interface EventImageUploadProps {
   imagePreview: string;
   fieldValue: string;
+  imageMetadata?: {
+    width: number;
+    height: number;
+    fileSize: number;
+  } | null;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onRemoveImage: () => void;
 }
 
-const EventImageUpload = ({ imagePreview, fieldValue, onImageChange, onRemoveImage }: EventImageUploadProps) => {
+const EventImageUpload = ({ imagePreview, fieldValue, imageMetadata, onImageChange, onRemoveImage }: EventImageUploadProps) => {
   return (
     <FormItem>
       <FormLabel>Event Image *</FormLabel>
@@ -44,6 +49,11 @@ const EventImageUpload = ({ imagePreview, fieldValue, onImageChange, onRemoveIma
               >
                 <X className="h-4 w-4" />
               </Button>
+              {imageMetadata && (
+                <div className="absolute bottom-2 left-2 bg-black/75 text-white text-xs px-2 py-1 rounded">
+                  {imageMetadata.width}×{imageMetadata.height} • {(imageMetadata.fileSize / 1024 / 1024).toFixed(1)}MB
+                </div>
+              )}
             </div>
           ) : (
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">

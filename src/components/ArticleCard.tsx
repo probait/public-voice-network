@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User } from "lucide-react";
+import ResponsiveImage from "@/components/ResponsiveImage";
 import fallbackImage from "@/assets/fallback-article-image.jpg";
 
 interface ArticleCardProps {
@@ -40,10 +41,11 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
       <CardContent className="p-0">
         <Link to={`/articles/${article.slug}`}>
           <div className="aspect-[16/9] overflow-hidden rounded-t-lg">
-            <img
+            <ResponsiveImage
               src={fallbackImage}
               alt={article.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
           <div className="p-6">

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Calendar, MapPin, Users, Video, ExternalLink } from "lucide-react";
+import ResponsiveImage from "@/components/ResponsiveImage";
 
 interface Meetup {
   id: string;
@@ -176,14 +177,11 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
         <Card key={meetup.id} className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full">
           <div className="relative">
             <div className="w-full h-48 overflow-hidden">
-              <img 
+              <ResponsiveImage
                 src={getImageUrl(meetup.image_url)}
                 alt={meetup.title}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  console.log('Image failed to load for meetup:', meetup.id, 'URL:', meetup.image_url);
-                  e.currentTarget.src = "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=225&fit=crop";
-                }}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             </div>
           </div>

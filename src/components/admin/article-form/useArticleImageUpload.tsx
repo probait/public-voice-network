@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useEventImageUpload = (initialImageUrl?: string) => {
+export const useArticleImageUpload = (initialImageUrl?: string) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(initialImageUrl || '');
   const [isUploading, setIsUploading] = useState(false);
@@ -36,13 +35,13 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>, setValue: (name: string, value: any) => void) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log('Image file selected:', file.name, file.size);
+      console.log('Article image file selected:', file.name, file.size);
       setImageFile(file);
       
       // Extract metadata
       const metadata = await extractImageMetadata(file);
       setImageMetadata(metadata);
-      console.log('Image metadata extracted:', metadata);
+      console.log('Article image metadata extracted:', metadata);
       
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -50,7 +49,7 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
         setImagePreview(result);
         // Set a temporary value to satisfy form validation while we have a pending upload
         setValue('image_url', 'pending_upload');
-        console.log('Image preview set and form field updated');
+        console.log('Article image preview set and form field updated');
       };
       reader.readAsDataURL(file);
     }
@@ -64,13 +63,13 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
   };
 
   const uploadImage = async (file: File): Promise<string> => {
-    console.log('Starting image upload for file:', file.name);
+    console.log('Starting article image upload for file:', file.name);
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `event-images/${fileName}`;
+    const filePath = `article-images/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
-      .from('event-images')
+      .from('event-images') // Using the same bucket for now
       .upload(filePath, file);
 
     if (uploadError) {
@@ -82,7 +81,7 @@ export const useEventImageUpload = (initialImageUrl?: string) => {
       .from('event-images')
       .getPublicUrl(filePath);
 
-    console.log('Image uploaded successfully. Public URL:', data.publicUrl);
+    console.log('Article image uploaded successfully. Public URL:', data.publicUrl);
     return data.publicUrl;
   };
 
