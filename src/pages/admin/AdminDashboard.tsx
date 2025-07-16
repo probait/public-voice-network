@@ -1,54 +1,26 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Users, 
-  FileText, 
-  Calendar, 
-  MessageSquare, 
-  TrendingUp,
-  Star,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  BarChart3
-} from 'lucide-react';
+import { Users, FileText, Calendar, MessageSquare, TrendingUp, Star, Clock, CheckCircle, AlertTriangle, BarChart3 } from 'lucide-react';
 import { format, subDays, isAfter } from 'date-fns';
-
 const AdminDashboard = () => {
-  const { data: stats, isLoading } = useQuery({
+  const {
+    data: stats,
+    isLoading
+  } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
-      const [
-        contributors, 
-        articles, 
-        events, 
-        prompts, 
-        users,
-        featuredEvents,
-        upcomingEvents,
-        recentUsers
-      ] = await Promise.all([
-        supabase.from('contributors').select('id', { count: 'exact', head: true }),
-        supabase.from('articles').select('id, is_published', { count: 'exact' }),
-        supabase.from('meetups').select('id, date_time'),
-        supabase.from('prompts').select('id, is_active'),
-        supabase.from('profiles').select('id, created_at'),
-        supabase.from('meetups').select('id').eq('homepage_featured', true),
-        supabase.from('meetups').select('id').gte('date_time', new Date().toISOString()),
-        supabase.from('profiles').select('id, created_at').gte('created_at', subDays(new Date(), 7).toISOString())
-      ]);
-
+      const [contributors, articles, events, prompts, users, featuredEvents, upcomingEvents, recentUsers] = await Promise.all([supabase.from('contributors').select('id', {
+        count: 'exact',
+        head: true
+      }), supabase.from('articles').select('id, is_published', {
+        count: 'exact'
+      }), supabase.from('meetups').select('id, date_time'), supabase.from('prompts').select('id, is_active'), supabase.from('profiles').select('id, created_at'), supabase.from('meetups').select('id').eq('homepage_featured', true), supabase.from('meetups').select('id').gte('date_time', new Date().toISOString()), supabase.from('profiles').select('id, created_at').gte('created_at', subDays(new Date(), 7).toISOString())]);
       const publishedArticles = articles.data?.filter(a => a.is_published).length || 0;
       const activePrompts = prompts.data?.filter(p => p.is_active).length || 0;
-      const todaysEvents = events.data?.filter(e => 
-        isAfter(new Date(e.date_time), new Date()) &&
-        format(new Date(e.date_time), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
-      ).length || 0;
-
+      const todaysEvents = events.data?.filter(e => isAfter(new Date(e.date_time), new Date()) && format(new Date(e.date_time), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')).length || 0;
       return {
         contributors: contributors.count || 0,
         articles: articles.count || 0,
@@ -62,121 +34,102 @@ const AdminDashboard = () => {
         recentUsers: recentUsers.data?.length || 0,
         todaysEvents
       };
-    },
+    }
   });
-
-  const { data: recentActivity } = useQuery({
+  const {
+    data: recentActivity
+  } = useQuery({
     queryKey: ['recent-activity'],
     queryFn: async () => {
-      const [recentContributors, recentArticles, recentEvents, recentMeetups] = await Promise.all([
-        supabase
-          .from('contributors')
-          .select('name, created_at, is_featured')
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('articles')
-          .select('title, created_at, is_published')
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('meetups')
-          .select('title, created_at, date_time, homepage_featured')
-          .order('created_at', { ascending: false })
-          .limit(5),
-        supabase
-          .from('attendees')
-          .select('created_at, meetup_id, meetups(title)')
-          .order('created_at', { ascending: false })
-          .limit(10)
-      ]);
-
+      const [recentContributors, recentArticles, recentEvents, recentMeetups] = await Promise.all([supabase.from('contributors').select('name, created_at, is_featured').order('created_at', {
+        ascending: false
+      }).limit(5), supabase.from('articles').select('title, created_at, is_published').order('created_at', {
+        ascending: false
+      }).limit(5), supabase.from('meetups').select('title, created_at, date_time, homepage_featured').order('created_at', {
+        ascending: false
+      }).limit(5), supabase.from('attendees').select('created_at, meetup_id, meetups(title)').order('created_at', {
+        ascending: false
+      }).limit(10)]);
       return {
         contributors: recentContributors.data || [],
         articles: recentArticles.data || [],
         events: recentEvents.data || [],
         attendees: recentMeetups.data || []
       };
-    },
+    }
   });
-
-  const { data: systemHealth } = useQuery({
+  const {
+    data: systemHealth
+  } = useQuery({
     queryKey: ['system-health'],
     queryFn: async () => {
       const now = new Date();
       const weekAgo = subDays(now, 7);
-      
       const [errorLogs, totalEvents, totalUsers] = await Promise.all([
-        // Check for any system issues (placeholder - would implement real error tracking)
-        Promise.resolve([]),
-        supabase.from('meetups').select('id', { count: 'exact', head: true }),
-        supabase.from('profiles').select('id', { count: 'exact', head: true })
-      ]);
-
+      // Check for any system issues (placeholder - would implement real error tracking)
+      Promise.resolve([]), supabase.from('meetups').select('id', {
+        count: 'exact',
+        head: true
+      }), supabase.from('profiles').select('id', {
+        count: 'exact',
+        head: true
+      })]);
       return {
-        status: 'healthy', // Could be 'healthy', 'warning', 'error'
+        status: 'healthy',
+        // Could be 'healthy', 'warning', 'error'
         lastChecked: now,
         errors: errorLogs.length,
-        uptime: '99.9%', // Would calculate from real data
+        uptime: '99.9%',
+        // Would calculate from real data
         totalEvents: totalEvents.count || 0,
         totalUsers: totalUsers.count || 0
       };
     }
   });
-
-  const statCards = [
-    {
-      title: 'Total Contributors',
-      value: stats?.contributors || 0,
-      subtitle: `${stats?.recentUsers || 0} this week`,
-      icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
-    },
-    {
-      title: 'Published Articles',
-      value: stats?.publishedArticles || 0,
-      subtitle: `${stats?.articles || 0} total drafts`,
-      icon: FileText,
-      color: 'text-green-600',
-      bgColor: 'bg-green-50'
-    },
-    {
-      title: 'Events Today',
-      value: stats?.todaysEvents || 0,
-      subtitle: `${stats?.upcomingEvents || 0} upcoming`,
-      icon: Calendar,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50'
-    },
-    {
-      title: 'Active Prompts',
-      value: stats?.activePrompts || 0,
-      subtitle: `${stats?.prompts || 0} total`,
-      icon: MessageSquare,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50'
-    },
-    {
-      title: 'Featured Events',
-      value: stats?.featuredEvents || 0,
-      subtitle: '3 max allowed',
-      icon: Star,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-50'
-    },
-    {
-      title: 'System Health',
-      value: systemHealth?.uptime || '99.9%',
-      subtitle: systemHealth?.status || 'Healthy',
-      icon: BarChart3,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-50'
-    }
-  ];
-
-  return (
-    <AdminLayout>
+  const statCards = [{
+    title: 'Total Contributors',
+    value: stats?.contributors || 0,
+    subtitle: `${stats?.recentUsers || 0} this week`,
+    icon: Users,
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50'
+  }, {
+    title: 'Published Articles',
+    value: stats?.publishedArticles || 0,
+    subtitle: `${stats?.articles || 0} total drafts`,
+    icon: FileText,
+    color: 'text-green-600',
+    bgColor: 'bg-green-50'
+  }, {
+    title: 'Events Today',
+    value: stats?.todaysEvents || 0,
+    subtitle: `${stats?.upcomingEvents || 0} upcoming`,
+    icon: Calendar,
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50'
+  }, {
+    title: 'Active Prompts',
+    value: stats?.activePrompts || 0,
+    subtitle: `${stats?.prompts || 0} total`,
+    icon: MessageSquare,
+    color: 'text-orange-600',
+    bgColor: 'bg-orange-50'
+  }, {
+    title: 'Featured Events',
+    value: stats?.featuredEvents || 0,
+    subtitle: '3 max allowed',
+    icon: Star,
+    color: 'text-yellow-600',
+    bgColor: 'bg-yellow-50'
+  }, {
+    title: 'System Health',
+    value: systemHealth?.uptime || '99.9%',
+    subtitle: systemHealth?.status || 'Healthy',
+    icon: BarChart3,
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50'
+  }];
+  return <AdminLayout>
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
@@ -185,18 +138,14 @@ const AdminDashboard = () => {
               Welcome back! Here's what's happening with AI Canada Voice.
             </p>
           </div>
-          <Badge variant="outline" className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-green-500" />
-            System Operational
-          </Badge>
+          
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-          {statCards.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={stat.title} className="hover:shadow-md transition-shadow">
+          {statCards.map(stat => {
+          const Icon = stat.icon;
+          return <Card key={stat.title} className="hover:shadow-md transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600">
                     {stat.title}
@@ -213,9 +162,8 @@ const AdminDashboard = () => {
                     {stat.subtitle}
                   </p>
                 </CardContent>
-              </Card>
-            );
-          })}
+              </Card>;
+        })}
         </div>
 
         {/* Quick Actions */}
@@ -263,27 +211,21 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentActivity?.contributors.slice(0, 5).map((contributor, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                {recentActivity?.contributors.slice(0, 5).map((contributor, index) => <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
                         {contributor.name.charAt(0)}
                       </div>
                       <div>
                         <span className="font-medium text-sm">{contributor.name}</span>
-                        {contributor.is_featured && (
-                          <Star className="h-3 w-3 text-yellow-500 inline ml-1" />
-                        )}
+                        {contributor.is_featured && <Star className="h-3 w-3 text-yellow-500 inline ml-1" />}
                       </div>
                     </div>
                     <span className="text-xs text-gray-500">
                       {format(new Date(contributor.created_at), 'MMM d')}
                     </span>
-                  </div>
-                ))}
-                {!recentActivity?.contributors.length && (
-                  <p className="text-gray-500 text-sm text-center py-4">No recent contributors</p>
-                )}
+                  </div>)}
+                {!recentActivity?.contributors.length && <p className="text-gray-500 text-sm text-center py-4">No recent contributors</p>}
               </div>
             </CardContent>
           </Card>
@@ -297,8 +239,7 @@ const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentActivity?.events.slice(0, 5).map((event, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                {recentActivity?.events.slice(0, 5).map((event, index) => <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
                         <Calendar className="h-4 w-4 text-white" />
@@ -306,9 +247,7 @@ const AdminDashboard = () => {
                       <div>
                         <span className="font-medium text-sm truncate max-w-[200px] block">{event.title}</span>
                         <div className="flex items-center gap-1">
-                          {event.homepage_featured && (
-                            <Star className="h-3 w-3 text-yellow-500" />
-                          )}
+                          {event.homepage_featured && <Star className="h-3 w-3 text-yellow-500" />}
                           <span className="text-xs text-gray-500">
                             {format(new Date(event.date_time), 'MMM d, h:mm a')}
                           </span>
@@ -318,11 +257,8 @@ const AdminDashboard = () => {
                     <span className="text-xs text-gray-500">
                       {format(new Date(event.created_at), 'MMM d')}
                     </span>
-                  </div>
-                ))}
-                {!recentActivity?.events.length && (
-                  <p className="text-gray-500 text-sm text-center py-4">No recent events</p>
-                )}
+                  </div>)}
+                {!recentActivity?.events.length && <p className="text-gray-500 text-sm text-center py-4">No recent events</p>}
               </div>
             </CardContent>
           </Card>
@@ -360,8 +296,6 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
-  );
+    </AdminLayout>;
 };
-
 export default AdminDashboard;
