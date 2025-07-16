@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatEventDate } from "@/lib/dateUtils";
+import { format } from "date-fns";
 import { Calendar, MapPin, Users, Video, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import ResponsiveImage from "@/components/ResponsiveImage";
@@ -197,7 +197,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
                      <div className="flex items-center space-x-1">
                        <Calendar className="h-4 w-4" />
                        <span>
-                         {formatEventDate(meetup.date_time)}
+                         {format(new Date(meetup.date_time), 'MMM d, yyyy \'at\' h:mm a')}
                        </span>
                      </div>
                    </div>
