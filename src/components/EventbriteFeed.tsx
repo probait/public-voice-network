@@ -174,8 +174,15 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {meetups.map((meetup) => (
-        <Card key={meetup.id} className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full">
+      {meetups.map((meetup) => {
+        console.log(`CARD DEBUG - Meetup ${meetup.id}:`, {
+          title: meetup.title,
+          date_time: meetup.date_time,
+          date_timestamp: new Date(meetup.date_time).getTime(),
+          full_meetup: meetup
+        });
+        return (
+        <Card key={meetup.id} className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full" data-meetup-id={meetup.id}>
           <div className="relative">
             <div className="w-full h-48 overflow-hidden">
               <ResponsiveImage
@@ -193,14 +200,14 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
                   <CardTitle className="text-lg font-semibold text-gray-900 mb-2">
                     {meetup.title}
                   </CardTitle>
-                  <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                    <div className="flex items-center space-x-1">
-                      <Calendar className="h-4 w-4" />
-                      <span>
-                        {format(new Date(meetup.date_time), 'MMM d, yyyy at h:mm a')}
-                      </span>
-                    </div>
-                  </div>
+                   <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                     <div className="flex items-center space-x-1">
+                       <Calendar className="h-4 w-4" />
+                       <span style={{background: 'orange', color: 'black', fontWeight: 'bold'}}>
+                         ISOLATED_DATE_TEST
+                       </span>
+                     </div>
+                   </div>
                   <div className="flex items-center space-x-4 text-sm text-gray-600">
                     <div className="flex items-center space-x-1">
                       {meetup.is_virtual ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
@@ -244,7 +251,8 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
             </CardContent>
           </div>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 };
