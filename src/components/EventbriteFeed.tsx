@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { formatEventDate } from "@/lib/dateUtils";
 import { Calendar, MapPin, Users, Video, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import ResponsiveImage from "@/components/ResponsiveImage";
@@ -174,14 +174,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {meetups.map((meetup) => {
-        console.log(`CARD DEBUG - Meetup ${meetup.id}:`, {
-          title: meetup.title,
-          date_time: meetup.date_time,
-          date_timestamp: new Date(meetup.date_time).getTime(),
-          full_meetup: meetup
-        });
-        return (
+      {meetups.map((meetup) => (
         <Card key={meetup.id} className="hover:shadow-lg transition-shadow overflow-hidden flex flex-col h-full" data-meetup-id={meetup.id}>
           <div className="relative">
             <div className="w-full h-48 overflow-hidden">
@@ -203,8 +196,8 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                      <div className="flex items-center space-x-1">
                        <Calendar className="h-4 w-4" />
-                       <span style={{background: 'orange', color: 'black', fontWeight: 'bold'}}>
-                         ISOLATED_DATE_TEST
+                       <span>
+                         {formatEventDate(meetup.date_time)}
                        </span>
                      </div>
                    </div>
@@ -251,8 +244,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
             </CardContent>
           </div>
         </Card>
-        );
-      })}
+      ))}
     </div>
   );
 };
