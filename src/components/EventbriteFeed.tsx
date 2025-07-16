@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { formatEventDate } from "@/lib/dateUtils";
 import { Calendar, MapPin, Users, Video, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import ResponsiveImage from "@/components/ResponsiveImage";
@@ -31,7 +31,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
   const { data: meetups = [], isLoading, error } = useQuery({
     queryKey: ['external-events', showFeaturedOnly],
     queryFn: async (): Promise<Meetup[]> => {
-      console.log('Fetching external events, showFeaturedOnly:', showFeaturedOnly);
+      
       
       let query = supabase
         .from('meetups')
@@ -63,7 +63,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
         throw error;
       }
 
-      console.log('Fetched meetups with images:', meetupsData?.map(m => ({ id: m.id, title: m.title, image_url: m.image_url })));
+      
 
       // Get attendees count for each meetup
       if (!meetupsData || meetupsData.length === 0) {
@@ -197,7 +197,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
                      <div className="flex items-center space-x-1">
                        <Calendar className="h-4 w-4" />
                        <span>
-                         {format(new Date(meetup.date_time), 'MMM d, yyyy \'at\' h:mm a')}
+                         {formatEventDate(meetup.date_time)}
                        </span>
                      </div>
                    </div>

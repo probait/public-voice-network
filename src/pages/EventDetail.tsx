@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { formatEventDetailDate } from "@/lib/dateUtils";
 import { Calendar, MapPin, Users, Video, ExternalLink, ArrowLeft } from "lucide-react";
 import ResponsiveImage from "@/components/ResponsiveImage";
 
@@ -57,7 +57,7 @@ const EventDetail = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching event:', error);
+        
         throw error;
       }
 
@@ -187,9 +187,9 @@ const EventDetail = () => {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2 text-gray-600">
                       <Calendar className="h-5 w-5" />
-                      <span className="text-lg">
-                        {format(new Date(event.date_time), 'EEEE, MMMM d, yyyy \'at\' h:mm a')}
-                      </span>
+                       <span className="text-lg">
+                         {formatEventDetailDate(event.date_time)}
+                       </span>
                     </div>
                     
                     <div className="flex items-center space-x-2 text-gray-600">
