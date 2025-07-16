@@ -185,35 +185,7 @@ const Index = () => {
           ) : (
             <div className="grid md:grid-cols-3 gap-8">
               {articles?.slice(0, 3).map((article) => (
-                <div key={article.id} className="group">
-                  <Card className="h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-0 shadow-md">
-                    <CardContent className="p-0">
-                      <Link to={`/articles/${article.slug}`}>
-                        <div className="aspect-video overflow-hidden rounded-t-lg">
-                          <img 
-                            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=225&fit=crop" 
-                            alt={article.title} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        </div>
-                        <div className="p-6">
-                          <h3 className="text-xl font-semibold mb-3 group-hover:text-red-600 transition-colors">
-                            {article.title}
-                          </h3>
-                          <p className="text-gray-600 mb-4">
-                            {article.content 
-                              ? article.content.replace(/[#*`\[\]]/g, "").substring(0, 120) + "..."
-                              : "Read this article to learn more about this important topic."
-                            }
-                          </p>
-                          <div className="flex items-center text-red-600 font-medium">
-                            Read more <ArrowRight className="ml-2 w-4 h-4" />
-                          </div>
-                        </div>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                </div>
+                <ArticleCard key={article.id} article={article} />
               ))}
             </div>
           )}
