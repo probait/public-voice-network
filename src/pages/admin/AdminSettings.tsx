@@ -8,26 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  Settings, 
-  Shield, 
-  Database,
-  Mail,
-  Bell,
-  Users,
-  Globe,
-  Lock,
-  Activity,
-  Save,
-  RefreshCw,
-  AlertTriangle,
-  CheckCircle,
-  Zap,
-  Download,
-  Upload
-} from 'lucide-react';
+import { Settings, Shield, Database, Mail, Bell, Users, Globe, Lock, Activity, Save, RefreshCw, AlertTriangle, CheckCircle, Zap, Download, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
 interface SystemSettings {
   siteName: string;
   adminEmail: string;
@@ -40,7 +22,6 @@ interface SystemSettings {
   requireEventApproval: boolean;
   enableRealTimeUpdates: boolean;
 }
-
 const AdminSettings = () => {
   const [settings, setSettings] = useState<SystemSettings>(() => {
     const saved = localStorage.getItem('admin_settings');
@@ -57,41 +38,50 @@ const AdminSettings = () => {
       enableRealTimeUpdates: true
     };
   });
-
   const [backupStatus, setBackupStatus] = useState<'idle' | 'creating' | 'success' | 'error'>('idle');
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const queryClient = useQueryClient();
 
   // Get system statistics
-  const { data: systemStats } = useQuery({
+  const {
+    data: systemStats
+  } = useQuery({
     queryKey: ['system-stats'],
     queryFn: async () => {
-      const [users, events, articles, contributors] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('meetups').select('id', { count: 'exact', head: true }),
-        supabase.from('articles').select('id', { count: 'exact', head: true }),
-        supabase.from('contributors').select('id', { count: 'exact', head: true })
-      ]);
-
+      const [users, events, articles, contributors] = await Promise.all([supabase.from('profiles').select('id', {
+        count: 'exact',
+        head: true
+      }), supabase.from('meetups').select('id', {
+        count: 'exact',
+        head: true
+      }), supabase.from('articles').select('id', {
+        count: 'exact',
+        head: true
+      }), supabase.from('contributors').select('id', {
+        count: 'exact',
+        head: true
+      })]);
       return {
         totalUsers: users.count || 0,
         totalEvents: events.count || 0,
         totalArticles: articles.count || 0,
         totalContributors: contributors.count || 0,
         lastUpdated: new Date(),
-        diskUsage: '2.4 GB', // Mock data - would be real in production
+        diskUsage: '2.4 GB',
+        // Mock data - would be real in production
         memoryUsage: '68%',
         uptime: '99.8%'
       };
     },
     refetchInterval: 30000 // Refresh every 30 seconds
   });
-
   const saveMutation = useMutation({
     mutationFn: async (settingsData: SystemSettings) => {
       // For demonstration - in production, this would save to a settings table
       localStorage.setItem('admin_settings', JSON.stringify(settingsData));
-      
+
       // Apply maintenance mode immediately if enabled
       if (settingsData.maintenanceMode) {
         localStorage.setItem('maintenance_mode', 'true');
@@ -101,91 +91,91 @@ const AdminSettings = () => {
       }
     },
     onSuccess: () => {
-      toast({ 
+      toast({
         title: 'Settings saved successfully',
         description: 'All configuration changes have been applied.'
       });
     }
   });
-
   const handleSave = () => {
     saveMutation.mutate(settings);
   };
-
   const handleBackup = async () => {
     setBackupStatus('creating');
     try {
       // Simulate backup process
       await new Promise(resolve => setTimeout(resolve, 3000));
       setBackupStatus('success');
-      toast({ 
+      toast({
         title: 'Backup created successfully',
         description: `Database backup created at ${new Date().toLocaleString()}`
       });
       setTimeout(() => setBackupStatus('idle'), 3000);
     } catch (error) {
       setBackupStatus('error');
-      toast({ 
+      toast({
         title: 'Backup failed',
         description: 'There was an error creating the database backup.',
         variant: 'destructive'
       });
     }
   };
-
   const handleTestEmail = async () => {
     try {
       // In a real app, this would trigger a test email
-      toast({ 
+      toast({
         title: 'Test email sent',
         description: `Test email sent to ${settings.adminEmail}`
       });
     } catch (error) {
-      toast({ 
+      toast({
         title: 'Email test failed',
         description: 'Could not send test email.',
         variant: 'destructive'
       });
     }
   };
-
   const handleEmergencyLock = () => {
     if (confirm('This will put the site in emergency maintenance mode. Are you sure?')) {
-      setSettings(prev => ({ ...prev, maintenanceMode: true }));
-      toast({ 
+      setSettings(prev => ({
+        ...prev,
+        maintenanceMode: true
+      }));
+      toast({
         title: 'Emergency lock activated',
         description: 'Site is now in maintenance mode.',
         variant: 'destructive'
       });
     }
   };
-
   const clearCache = () => {
     queryClient.clear();
-    toast({ 
+    toast({
       title: 'Cache cleared',
       description: 'All cached data has been cleared.'
     });
   };
-
   const getSystemHealthStatus = () => {
     const health = systemStats;
-    if (!health) return { status: 'loading', color: 'gray' };
-    
+    if (!health) return {
+      status: 'loading',
+      color: 'gray'
+    };
     const memoryUsagePercent = parseInt(health.memoryUsage);
     const uptimePercent = parseFloat(health.uptime);
-    
     if (memoryUsagePercent > 90 || uptimePercent < 95) {
-      return { status: 'Warning', color: 'yellow' };
+      return {
+        status: 'Warning',
+        color: 'yellow'
+      };
     }
-    
-    return { status: 'Healthy', color: 'green' };
+    return {
+      status: 'Healthy',
+      color: 'green'
+    };
   };
-
   const healthStatus = getSystemHealthStatus();
-
-  return (
-    <AdminLayout requiredRole="admin">
+  return <AdminLayout requiredRole="admin">
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
@@ -193,16 +183,7 @@ const AdminSettings = () => {
             <p className="text-gray-600 mt-2">Configure system settings and preferences</p>
           </div>
           <div className="flex items-center gap-4">
-            <Badge variant="outline" className={`flex items-center gap-2 ${
-              healthStatus.color === 'green' ? 'border-green-500 text-green-700' : 
-              healthStatus.color === 'yellow' ? 'border-yellow-500 text-yellow-700' : 
-              'border-gray-500 text-gray-700'
-            }`}>
-              {healthStatus.color === 'green' ? <CheckCircle className="h-4 w-4" /> : 
-               healthStatus.color === 'yellow' ? <AlertTriangle className="h-4 w-4" /> : 
-               <Activity className="h-4 w-4" />}
-              System {healthStatus.status}
-            </Badge>
+            
             <Button onClick={clearCache} variant="outline" size="sm">
               <RefreshCw className="h-4 w-4 mr-2" />
               Clear Cache
@@ -270,35 +251,32 @@ const AdminSettings = () => {
             <CardContent className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-2">Site Name</label>
-                <Input
-                  value={settings.siteName}
-                  onChange={(e) => setSettings({...settings, siteName: e.target.value})}
-                />
+                <Input value={settings.siteName} onChange={e => setSettings({
+                ...settings,
+                siteName: e.target.value
+              })} />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">Admin Email</label>
-                <Input
-                  type="email"
-                  value={settings.adminEmail}
-                  onChange={(e) => setSettings({...settings, adminEmail: e.target.value})}
-                />
+                <Input type="email" value={settings.adminEmail} onChange={e => setSettings({
+                ...settings,
+                adminEmail: e.target.value
+              })} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">Max Events Per User</label>
-                  <Input
-                    type="number"
-                    value={settings.maxEventsPerUser}
-                    onChange={(e) => setSettings({...settings, maxEventsPerUser: parseInt(e.target.value)})}
-                  />
+                  <Input type="number" value={settings.maxEventsPerUser} onChange={e => setSettings({
+                  ...settings,
+                  maxEventsPerUser: parseInt(e.target.value)
+                })} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Featured Events Limit</label>
-                  <Input
-                    type="number"
-                    value={settings.featuredEventsLimit}
-                    onChange={(e) => setSettings({...settings, featuredEventsLimit: parseInt(e.target.value)})}
-                  />
+                  <Input type="number" value={settings.featuredEventsLimit} onChange={e => setSettings({
+                  ...settings,
+                  featuredEventsLimit: parseInt(e.target.value)
+                })} />
                 </div>
               </div>
             </CardContent>
@@ -318,12 +296,10 @@ const AdminSettings = () => {
                   <h4 className="font-medium">User Registration</h4>
                   <p className="text-sm text-gray-500">Allow new users to register</p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.enableRegistration}
-                  onChange={(e) => setSettings({...settings, enableRegistration: e.target.checked})}
-                  className="rounded"
-                />
+                <input type="checkbox" checked={settings.enableRegistration} onChange={e => setSettings({
+                ...settings,
+                enableRegistration: e.target.checked
+              })} className="rounded" />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
@@ -331,12 +307,10 @@ const AdminSettings = () => {
                   <h4 className="font-medium">Event Creation</h4>
                   <p className="text-sm text-gray-500">Allow users to create events</p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.allowEventCreation}
-                  onChange={(e) => setSettings({...settings, allowEventCreation: e.target.checked})}
-                  className="rounded"
-                />
+                <input type="checkbox" checked={settings.allowEventCreation} onChange={e => setSettings({
+                ...settings,
+                allowEventCreation: e.target.checked
+              })} className="rounded" />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
@@ -344,12 +318,10 @@ const AdminSettings = () => {
                   <h4 className="font-medium">Event Approval</h4>
                   <p className="text-sm text-gray-500">Require admin approval for events</p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.requireEventApproval}
-                  onChange={(e) => setSettings({...settings, requireEventApproval: e.target.checked})}
-                  className="rounded"
-                />
+                <input type="checkbox" checked={settings.requireEventApproval} onChange={e => setSettings({
+                ...settings,
+                requireEventApproval: e.target.checked
+              })} className="rounded" />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
@@ -357,12 +329,10 @@ const AdminSettings = () => {
                   <h4 className="font-medium">Maintenance Mode</h4>
                   <p className="text-sm text-gray-500">Put site in maintenance mode</p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.maintenanceMode}
-                  onChange={(e) => setSettings({...settings, maintenanceMode: e.target.checked})}
-                  className="rounded"
-                />
+                <input type="checkbox" checked={settings.maintenanceMode} onChange={e => setSettings({
+                ...settings,
+                maintenanceMode: e.target.checked
+              })} className="rounded" />
               </div>
             </CardContent>
           </Card>
@@ -381,12 +351,10 @@ const AdminSettings = () => {
                   <h4 className="font-medium">Real-time Updates</h4>
                   <p className="text-sm text-gray-500">Enable live data synchronization</p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.enableRealTimeUpdates}
-                  onChange={(e) => setSettings({...settings, enableRealTimeUpdates: e.target.checked})}
-                  className="rounded"
-                />
+                <input type="checkbox" checked={settings.enableRealTimeUpdates} onChange={e => setSettings({
+                ...settings,
+                enableRealTimeUpdates: e.target.checked
+              })} className="rounded" />
               </div>
               <Separator />
               <div className="flex items-center justify-between">
@@ -394,12 +362,10 @@ const AdminSettings = () => {
                   <h4 className="font-medium">Email Notifications</h4>
                   <p className="text-sm text-gray-500">Send system notifications via email</p>
                 </div>
-                <input
-                  type="checkbox"
-                  checked={settings.enableNotifications}
-                  onChange={(e) => setSettings({...settings, enableNotifications: e.target.checked})}
-                  className="rounded"
-                />
+                <input type="checkbox" checked={settings.enableNotifications} onChange={e => setSettings({
+                ...settings,
+                enableNotifications: e.target.checked
+              })} className="rounded" />
               </div>
             </CardContent>
           </Card>
@@ -451,25 +417,12 @@ const AdminSettings = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button 
-                onClick={handleSave} 
-                className="w-full"
-                disabled={saveMutation.isPending}
-              >
+              <Button onClick={handleSave} className="w-full" disabled={saveMutation.isPending}>
                 <Save className="h-4 w-4 mr-2" />
                 {saveMutation.isPending ? 'Saving...' : 'Save All Settings'}
               </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={handleBackup}
-                disabled={backupStatus === 'creating'}
-              >
-                {backupStatus === 'creating' ? (
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Download className="h-4 w-4 mr-2" />
-                )}
+              <Button variant="outline" className="w-full" onClick={handleBackup} disabled={backupStatus === 'creating'}>
+                {backupStatus === 'creating' ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
                 {backupStatus === 'creating' ? 'Creating...' : 'Backup Database'}
               </Button>
               <Button variant="outline" className="w-full" onClick={handleTestEmail}>
@@ -482,28 +435,22 @@ const AdminSettings = () => {
               </Button>
             </div>
             
-            {backupStatus === 'success' && (
-              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+            {backupStatus === 'success' && <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
                 <div className="flex items-center gap-2 text-green-800">
                   <CheckCircle className="h-4 w-4" />
                   <span className="text-sm">Backup completed successfully</span>
                 </div>
-              </div>
-            )}
+              </div>}
             
-            {backupStatus === 'error' && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+            {backupStatus === 'error' && <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
                 <div className="flex items-center gap-2 text-red-800">
                   <AlertTriangle className="h-4 w-4" />
                   <span className="text-sm">Backup failed - please try again</span>
                 </div>
-              </div>
-            )}
+              </div>}
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
-  );
+    </AdminLayout>;
 };
-
 export default AdminSettings;
