@@ -24,6 +24,7 @@ export type Database = {
           image_height: number | null
           image_url: string | null
           image_width: number | null
+          is_featured: boolean | null
           is_published: boolean | null
           partnership_id: string | null
           published_at: string | null
@@ -40,6 +41,7 @@ export type Database = {
           image_height?: number | null
           image_url?: string | null
           image_width?: number | null
+          is_featured?: boolean | null
           is_published?: boolean | null
           partnership_id?: string | null
           published_at?: string | null
@@ -56,6 +58,7 @@ export type Database = {
           image_height?: number | null
           image_url?: string | null
           image_width?: number | null
+          is_featured?: boolean | null
           is_published?: boolean | null
           partnership_id?: string | null
           published_at?: string | null

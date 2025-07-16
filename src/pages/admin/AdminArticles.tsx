@@ -33,10 +33,13 @@ import {
   FileText,
   Filter,
   Calendar,
-  User
+  User,
+  Star
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
+import { useArticleImageUpload } from '@/components/admin/article-form/useArticleImageUpload';
+import ArticleImageUpload from '@/components/admin/article-form/ArticleImageUpload';
 
 interface ArticleFormData {
   title: string;
@@ -44,6 +47,8 @@ interface ArticleFormData {
   content: string;
   author_id?: string;
   is_published: boolean;
+  is_featured: boolean;
+  image_url?: string;
 }
 
 const AdminArticles = () => {
@@ -58,6 +63,17 @@ const AdminArticles = () => {
   const queryClient = useQueryClient();
 
   const { register, handleSubmit, reset, setValue, watch } = useForm<ArticleFormData>();
+  
+  const {
+    imageFile,
+    imagePreview,
+    imageMetadata,
+    isUploading,
+    setIsUploading,
+    handleImageChange,
+    handleRemoveImage,
+    uploadImage
+  } = useArticleImageUpload();
 
   // Fetch contributors for author selection
   const { data: contributors } = useQuery({
@@ -102,18 +118,40 @@ const AdminArticles = () => {
 
   const createMutation = useMutation({
     mutationFn: async (data: ArticleFormData) => {
+      setIsUploading(true);
+      
+      let imageUrl = data.image_url;
+      let imageWidth, imageHeight, imageFileSize;
+      
+      // Upload image if there's a new file
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+        if (imageMetadata) {
+          imageWidth = imageMetadata.width;
+          imageHeight = imageMetadata.height;
+          imageFileSize = imageMetadata.fileSize;
+        }
+      }
+      
       const { error } = await supabase
         .from('articles')
         .insert([{
           ...data,
+          image_url: imageUrl,
+          image_width: imageWidth,
+          image_height: imageHeight,
+          image_file_size: imageFileSize,
           published_at: data.is_published ? new Date().toISOString() : null
         }]);
       if (error) throw error;
+      
+      setIsUploading(false);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-articles'] });
       setShowForm(false);
       reset();
+      handleRemoveImage(setValue);
       toast({ title: 'Article created successfully' });
     },
     onError: (error) => {
@@ -127,21 +165,48 @@ const AdminArticles = () => {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: ArticleFormData }) => {
+      setIsUploading(true);
+      
+      let imageUrl = data.image_url;
+      let imageWidth, imageHeight, imageFileSize;
+      
+      // Upload image if there's a new file
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+        if (imageMetadata) {
+          imageWidth = imageMetadata.width;
+          imageHeight = imageMetadata.height;
+          imageFileSize = imageMetadata.fileSize;
+        }
+      }
+      
+      const updateData: any = {
+        ...data,
+        published_at: data.is_published ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString()
+      };
+      
+      if (imageUrl) {
+        updateData.image_url = imageUrl;
+        updateData.image_width = imageWidth;
+        updateData.image_height = imageHeight;
+        updateData.image_file_size = imageFileSize;
+      }
+      
       const { error } = await supabase
         .from('articles')
-        .update({
-          ...data,
-          published_at: data.is_published ? new Date().toISOString() : null,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', id);
       if (error) throw error;
+      
+      setIsUploading(false);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-articles'] });
       setShowForm(false);
       setEditingArticle(null);
       reset();
+      handleRemoveImage(setValue);
       toast({ title: 'Article updated successfully' });
     }
   });
@@ -178,6 +243,23 @@ const AdminArticles = () => {
     }
   });
 
+  const toggleFeaturedMutation = useMutation({
+    mutationFn: async ({ id, isFeatured }: { id: string; isFeatured: boolean }) => {
+      const { error } = await supabase
+        .from('articles')
+        .update({
+          is_featured: !isFeatured,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-articles'] });
+      toast({ title: 'Article featured status updated' });
+    }
+  });
+
   const onSubmit = (data: ArticleFormData) => {
     if (editingArticle) {
       updateMutation.mutate({ id: editingArticle.id, data });
@@ -193,6 +275,8 @@ const AdminArticles = () => {
     setValue('content', article.content || '');
     setValue('author_id', article.author_id || '');
     setValue('is_published', article.is_published || false);
+    setValue('is_featured', article.is_featured || false);
+    setValue('image_url', article.image_url || '');
     setShowForm(true);
   };
 
@@ -269,6 +353,14 @@ const AdminArticles = () => {
                   </Select>
                 </div>
 
+                <ArticleImageUpload
+                  imagePreview={imagePreview}
+                  fieldValue={watch('image_url') || ''}
+                  imageMetadata={imageMetadata}
+                  onImageChange={(e) => handleImageChange(e, setValue)}
+                  onRemoveImage={() => handleRemoveImage(setValue)}
+                />
+
                 <div>
                   <label className="block text-sm font-medium mb-2">Content</label>
                   <Textarea
@@ -279,21 +371,35 @@ const AdminArticles = () => {
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    {...register('is_published')}
-                    id="published"
-                    className="rounded"
-                  />
-                  <label htmlFor="published" className="text-sm font-medium">
-                    Publish immediately
-                  </label>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      {...register('is_published')}
+                      id="published"
+                      className="rounded"
+                    />
+                    <label htmlFor="published" className="text-sm font-medium">
+                      Publish immediately
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      {...register('is_featured')}
+                      id="featured"
+                      className="rounded"
+                    />
+                    <label htmlFor="featured" className="text-sm font-medium">
+                      Feature this article
+                    </label>
+                  </div>
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
-                    {editingArticle ? 'Update' : 'Create'} Article
+                  <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending || isUploading}>
+                    {isUploading ? 'Uploading...' : editingArticle ? 'Update' : 'Create'} Article
                   </Button>
                   <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                     Cancel
@@ -395,6 +501,7 @@ const AdminArticles = () => {
                     <TableHead>Title</TableHead>
                     <TableHead>Author</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Featured</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Updated</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -403,13 +510,13 @@ const AdminArticles = () => {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8">
+                      <TableCell colSpan={7} className="text-center py-8">
                         Loading articles...
                       </TableCell>
                     </TableRow>
                   ) : articlesData?.articles.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8">
+                      <TableCell colSpan={7} className="text-center py-8">
                         {searchTerm ? 'No articles found matching your search.' : 'No articles created yet.'}
                       </TableCell>
                     </TableRow>
@@ -432,6 +539,23 @@ const AdminArticles = () => {
                           <Badge variant={article.is_published ? "default" : "secondary"}>
                             {article.is_published ? 'Published' : 'Draft'}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleFeaturedMutation.mutate({
+                              id: article.id,
+                              isFeatured: article.is_featured
+                            })}
+                            className="hover:bg-yellow-50"
+                          >
+                            {article.is_featured ? (
+                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                            ) : (
+                              <Star className="h-4 w-4 text-gray-400" />
+                            )}
+                          </Button>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
