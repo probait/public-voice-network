@@ -108,26 +108,12 @@ const AdminDashboard = () => {
     color: 'text-purple-600',
     bgColor: 'bg-purple-50'
   }, {
-    title: 'Active Prompts',
-    value: stats?.activePrompts || 0,
-    subtitle: `${stats?.prompts || 0} total`,
-    icon: MessageSquare,
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-50'
-  }, {
     title: 'Featured Events',
     value: stats?.featuredEvents || 0,
     subtitle: '3 max allowed',
     icon: Star,
     color: 'text-yellow-600',
     bgColor: 'bg-yellow-50'
-  }, {
-    title: 'System Health',
-    value: systemHealth?.uptime || '99.9%',
-    subtitle: systemHealth?.status || 'Healthy',
-    icon: BarChart3,
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-50'
   }];
   return <AdminLayout>
       <div className="space-y-8">
@@ -264,37 +250,6 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* System Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              System Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {systemHealth?.uptime || '99.9%'}
-                </div>
-                <p className="text-sm text-gray-500">Uptime</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {stats?.users || 0}
-                </div>
-                <p className="text-sm text-gray-500">Total Users</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {stats?.events || 0}
-                </div>
-                <p className="text-sm text-gray-500">Total Events</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </AdminLayout>;
 };
