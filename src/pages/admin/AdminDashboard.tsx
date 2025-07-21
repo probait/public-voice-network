@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Users, FileText, Calendar, MessageSquare, TrendingUp, Star, Clock, CheckCircle, AlertTriangle, BarChart3 } from 'lucide-react';
 import { format, subDays, isAfter } from 'date-fns';
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+  
   const {
     data: stats,
     isLoading
@@ -155,26 +158,30 @@ const AdminDashboard = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <button className="p-4 border rounded-lg hover:bg-gray-50 text-left transition-colors">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <button 
+                onClick={() => navigate('/admin/events')}
+                className="p-4 border rounded-lg hover:bg-gray-50 text-left transition-colors"
+              >
                 <Calendar className="h-6 w-6 text-blue-600 mb-2" />
                 <h4 className="font-medium">Create Event</h4>
                 <p className="text-sm text-gray-500">Add a new meetup or event</p>
               </button>
-              <button className="p-4 border rounded-lg hover:bg-gray-50 text-left transition-colors">
+              <button 
+                onClick={() => navigate('/admin/contributors')}
+                className="p-4 border rounded-lg hover:bg-gray-50 text-left transition-colors"
+              >
                 <Users className="h-6 w-6 text-green-600 mb-2" />
                 <h4 className="font-medium">Add Contributor</h4>
                 <p className="text-sm text-gray-500">Register a new expert</p>
               </button>
-              <button className="p-4 border rounded-lg hover:bg-gray-50 text-left transition-colors">
+              <button 
+                onClick={() => navigate('/admin/articles')}
+                className="p-4 border rounded-lg hover:bg-gray-50 text-left transition-colors"
+              >
                 <FileText className="h-6 w-6 text-purple-600 mb-2" />
                 <h4 className="font-medium">Draft Article</h4>
                 <p className="text-sm text-gray-500">Start writing content</p>
-              </button>
-              <button className="p-4 border rounded-lg hover:bg-gray-50 text-left transition-colors">
-                <TrendingUp className="h-6 w-6 text-orange-600 mb-2" />
-                <h4 className="font-medium">View Analytics</h4>
-                <p className="text-sm text-gray-500">Check engagement metrics</p>
               </button>
             </div>
           </CardContent>
