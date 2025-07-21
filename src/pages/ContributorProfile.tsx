@@ -45,24 +45,26 @@ const ContributorProfile = () => {
     enabled: !!id,
   });
 
-  const { data: fellowship } = useQuery({
-    queryKey: ['contributor-fellowship', id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('fellows')
-        .select('*')
-        .eq('contributor_id', id)
-        .eq('is_current', true)
-        .single();
+  // Temporarily hidden - Fellowship query
+  // const { data: fellowship } = useQuery({
+  //   queryKey: ['contributor-fellowship', id],
+  //   queryFn: async () => {
+  //     const { data, error } = await supabase
+  //       .from('fellows')
+  //       .select('*')
+  //       .eq('contributor_id', id)
+  //       .eq('is_current', true)
+  //       .single();
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
+  //     if (error && error.code !== 'PGRST116') {
+  //       throw error;
+  //     }
 
-      return data;
-    },
-    enabled: !!id,
-  });
+  //     return data;
+  //   },
+  //   enabled: !!id,
+  // });
+  const fellowship = null; // Temporarily disabled
 
   if (isLoading) {
     return (
@@ -148,9 +150,10 @@ const ContributorProfile = () => {
                       {contributor.is_featured && (
                         <Badge className="bg-red-100 text-red-800">Featured Contributor</Badge>
                       )}
-                      {fellowship && (
+                      {/* Temporarily hidden - Fellowship badge */}
+                      {/* {fellowship && (
                         <Badge className="bg-blue-100 text-blue-800">PolicyNow Fellow</Badge>
-                      )}
+                      )} */}
                     </div>
                   </div>
                   
@@ -197,7 +200,8 @@ const ContributorProfile = () => {
             </CardContent>
           </Card>
 
-          {fellowship && (
+          {/* Temporarily hidden - Fellowship card */}
+          {/* {fellowship && (
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -218,7 +222,7 @@ const ContributorProfile = () => {
                 </div>
               </CardContent>
             </Card>
-          )}
+          )} */}
 
           {articles && articles.length > 0 && (
             <Card>

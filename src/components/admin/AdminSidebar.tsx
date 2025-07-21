@@ -35,12 +35,13 @@ const AdminSidebar = () => {
       path: '/admin/contributors',
       roles: ['content_manager']
     },
-    {
-      title: 'Fellows',
-      icon: GraduationCap,
-      path: '/admin/fellows',
-      roles: ['content_manager']
-    },
+    // Temporarily hidden - Fellows section
+    // {
+    //   title: 'Fellows',
+    //   icon: GraduationCap,
+    //   path: '/admin/fellows',
+    //   roles: ['content_manager']
+    // },
     {
       title: 'Articles',
       icon: FileText,

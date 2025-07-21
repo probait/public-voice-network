@@ -58,7 +58,8 @@ const App = () => {
             
             <Route path="/contributors" element={<Contributors />} />
             <Route path="/contributors/:id" element={<ContributorProfile />} />
-            <Route path="/fellows" element={<Fellows />} />
+            {/* Temporarily hidden - Fellows route */}
+            {/* <Route path="/fellows" element={<Fellows />} /> */}
             <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:slug" element={<Article />} />
             
@@ -66,7 +67,8 @@ const App = () => {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/contributors" element={<AdminContributors />} />
-            <Route path="/admin/fellows" element={<AdminFellows />} />
+            {/* Temporarily hidden - Admin Fellows route */}
+            {/* <Route path="/admin/fellows" element={<AdminFellows />} /> */}
             <Route path="/admin/articles" element={<AdminArticles />} />
             <Route path="/admin/events" element={<AdminEvents />} />
             <Route path="/admin/newsletter" element={<AdminNewsletter />} />

@@ -80,13 +80,14 @@ const Navigation = () => {
                           <div className="font-medium text-sm text-gray-900">Contributors</div>
                           <p className="text-sm text-gray-600 mt-1">Meet our expert contributors and policy researchers</p>
                         </Link>
-                        <Link 
+                        {/* Temporarily hidden - Fellows section */}
+                        {/* <Link 
                           to="/fellows" 
                           className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
                         >
                           <div className="font-medium text-sm text-gray-900">PolicyNow Fellows</div>
                           <p className="text-sm text-gray-600 mt-1">Current and past fellows in our research program</p>
-                        </Link>
+                        </Link> */}
                       </div>
                     </div>
                   )}
