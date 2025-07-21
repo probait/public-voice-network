@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -14,14 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import AuthModal from "@/components/AuthModal";
 import PolicyNowLogo from "@/components/PolicyNowLogo";
-import { ChevronDown, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
   const { isContentManager } = useUserRole();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSignOut = async () => {
     await signOut();
@@ -29,19 +27,6 @@ const Navigation = () => {
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
-
-  const handleMouseEnter = (dropdown: string) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setOpenDropdown(dropdown);
-  };
-
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setOpenDropdown(null);
-    }, 150); // Small delay to allow moving to submenu
   };
 
   return (
@@ -61,37 +46,9 @@ const Navigation = () => {
                   Home
                 </Link>
                 
-                <div 
-                  className="relative"
-                  onMouseEnter={() => handleMouseEnter('community')}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <button className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
-                    Community
-                    <ChevronDown className={`ml-1 h-3 w-3 transition-transform duration-200 ${openDropdown === 'community' ? 'rotate-180' : ''}`} />
-                  </button>
-                  {openDropdown === 'community' && (
-                    <div className="absolute top-full left-0 mt-0 w-80 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                      <div className="p-4 space-y-3">
-                        <Link 
-                          to="/contributors" 
-                          className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="font-medium text-sm text-gray-900">Contributors</div>
-                          <p className="text-sm text-gray-600 mt-1">Meet our expert contributors and policy researchers</p>
-                        </Link>
-                        {/* Temporarily hidden - Fellows section */}
-                        {/* <Link 
-                          to="/fellows" 
-                          className="block p-3 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="font-medium text-sm text-gray-900">PolicyNow Fellows</div>
-                          <p className="text-sm text-gray-600 mt-1">Current and past fellows in our research program</p>
-                        </Link> */}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <Link to="/contributors" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  Contributors
+                </Link>
 
                 <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Events
