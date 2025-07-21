@@ -245,13 +245,15 @@ const AdminContributors = () => {
                         <TableCell>
                           <div className="flex items-center gap-3">
                             {contributor.headshot_url ? (
-                              <img
-                                src={contributor.headshot_url} 
-                                alt={contributor.name}
-                                className="w-8 h-8 rounded-full object-cover"
-                              />
+                              <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                                <img
+                                  src={contributor.headshot_url} 
+                                  alt={contributor.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                                 <Users className="h-4 w-4 text-gray-500" />
                               </div>
                             )}

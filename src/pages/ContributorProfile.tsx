@@ -117,12 +117,19 @@ const ContributorProfile = () => {
           <Card className="mb-8">
             <CardContent className="p-8">
               <div className="flex flex-col lg:flex-row items-start gap-6">
-                <Avatar className="w-32 h-32 mx-auto lg:mx-0">
-                  <AvatarImage src={contributor.headshot_url || ''} alt={contributor.name} />
-                  <AvatarFallback className="bg-red-100 text-red-600 text-3xl font-semibold">
-                    {contributor.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="w-32 h-32 rounded-full overflow-hidden bg-red-100 mx-auto lg:mx-0 flex-shrink-0">
+                  {contributor.headshot_url ? (
+                    <img
+                      src={contributor.headshot_url}
+                      alt={contributor.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-red-600 text-3xl font-semibold">
+                      {contributor.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                  )}
+                </div>
                 
                 <div className="flex-1 text-center lg:text-left">
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">

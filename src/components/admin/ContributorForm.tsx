@@ -152,11 +152,13 @@ const ContributorForm = ({ contributor, onClose }: ContributorFormProps) => {
           <div className="flex items-center gap-4">
             {headshotUrl && (
               <div className="relative">
-                <img
-                  src={headshotUrl}
-                  alt="Headshot preview"
-                  className="w-16 h-16 rounded-full object-cover"
-                />
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100">
+                  <img
+                    src={headshotUrl}
+                    alt="Headshot preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <Button
                   type="button"
                   variant="destructive"

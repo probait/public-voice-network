@@ -36,12 +36,19 @@ const FeaturedContributor = () => {
     <Card className="bg-gradient-to-r from-red-50 to-orange-50 border-red-200">
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
-          <Avatar className="w-16 h-16">
-            <AvatarImage src={contributor.headshot_url || ''} alt={contributor.name} />
-            <AvatarFallback className="bg-red-100 text-red-600 text-lg font-semibold">
-              {contributor.name.split(' ').map(n => n[0]).join('')}
-            </AvatarFallback>
-          </Avatar>
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-red-100 flex-shrink-0">
+            {contributor.headshot_url ? (
+              <img
+                src={contributor.headshot_url}
+                alt={contributor.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-red-600 text-lg font-semibold">
+                {contributor.name.split(' ').map(n => n[0]).join('')}
+              </div>
+            )}
+          </div>
           
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
