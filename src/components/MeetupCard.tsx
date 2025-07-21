@@ -67,10 +67,6 @@ const MeetupCard = ({ meetup, onAttendanceChange }: MeetupCardProps) => {
                 {meetup.is_virtual ? <Video className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
                 <span>{meetup.is_virtual ? 'Virtual Meeting' : meetup.location}</span>
               </div>
-              <div className="flex items-center space-x-1">
-                <Users className="h-4 w-4" />
-                <span>{meetup.attendee_count}/{meetup.max_attendees}</span>
-              </div>
             </div>
           </div>
         </div>

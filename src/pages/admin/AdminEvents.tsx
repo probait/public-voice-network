@@ -27,7 +27,6 @@ const AdminEvents = () => {
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
   const [editingEvent, setEditingEvent] = useState<Meetup | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [viewingAttendees, setViewingAttendees] = useState<string | null>(null);
 
   const { 
     events, 
@@ -170,7 +169,6 @@ const AdminEvents = () => {
               onSelectAll={handleSelectAll}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              onViewAttendees={setViewingAttendees}
               onToggleHomepageFeatured={handleToggleHomepageFeatured}
               onTogglePublished={handleTogglePublished}
             />

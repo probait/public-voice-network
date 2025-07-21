@@ -32,7 +32,6 @@ interface AdminEventsTableProps {
   onSelectAll: () => void;
   onEdit: (event: Meetup) => void;
   onDelete: (eventId: string) => void;
-  onViewAttendees: (eventId: string) => void;
   onToggleHomepageFeatured: (eventId: string, featured: boolean) => void;
   onTogglePublished: (eventId: string, published: boolean) => void;
 }
@@ -44,7 +43,6 @@ const AdminEventsTable = ({
   onSelectAll,
   onEdit,
   onDelete,
-  onViewAttendees,
   onToggleHomepageFeatured,
   onTogglePublished
 }: AdminEventsTableProps) => {
@@ -88,7 +86,6 @@ const AdminEventsTable = ({
             <TableHead>Date & Time</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>Category</TableHead>
-            <TableHead>Attendees</TableHead>
             <TableHead>Featured</TableHead>
             <TableHead>Organizer</TableHead>
             <TableHead>Actions</TableHead>
@@ -166,12 +163,6 @@ const AdminEventsTable = ({
                   <Badge variant="secondary">{event.category || 'General'}</Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center space-x-1">
-                    <Users className="h-4 w-4 text-gray-400" />
-                    <span>{event.attendee_count}/{event.max_attendees || 'Unlimited'}</span>
-                  </div>
-                </TableCell>
-                <TableCell>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -203,14 +194,6 @@ const AdminEventsTable = ({
                       ) : (
                         <EyeOff className="h-4 w-4 text-gray-400" />
                       )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onViewAttendees(event.id)}
-                      title="View attendees"
-                    >
-                      <Users className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
