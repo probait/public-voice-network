@@ -2,10 +2,12 @@ import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import SubmissionCard from "./SubmissionCard";
 import { useFeaturedThoughts } from "@/hooks/useFeaturedThoughts";
+import { useTotalThoughtsCount } from "@/hooks/useTotalThoughtsCount";
 
 const SubmissionsFeed = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { data: submissions = [], isLoading } = useFeaturedThoughts();
+  const { data: totalCount = 0, isLoading: countLoading } = useTotalThoughtsCount();
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
@@ -67,8 +69,14 @@ const SubmissionsFeed = () => {
       {/* Voices Count Metric */}
       <div className="mt-3 text-center">
         <div className="text-white/90 text-sm">
-          <span className="font-semibold text-lg">{submissions.length.toLocaleString()}</span>
-          <span className="ml-1">Canadians have shared their thoughts</span>
+          {countLoading ? (
+            <span className="text-white/70">Loading count...</span>
+          ) : (
+            <>
+              <span className="font-semibold text-lg">{totalCount.toLocaleString()}</span>
+              <span className="ml-1">Canadians have shared their thoughts</span>
+            </>
+          )}
         </div>
       </div>
     </div>
