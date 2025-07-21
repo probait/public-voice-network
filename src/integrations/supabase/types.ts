@@ -477,36 +477,6 @@ export type Database = {
         }
         Relationships: []
       }
-      prompts: {
-        Row: {
-          category: string | null
-          created_at: string
-          deadline: string | null
-          description: string | null
-          id: string
-          is_active: boolean | null
-          title: string
-        }
-        Insert: {
-          category?: string | null
-          created_at?: string
-          deadline?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          title: string
-        }
-        Update: {
-          category?: string | null
-          created_at?: string
-          deadline?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          title?: string
-        }
-        Relationships: []
-      }
       thoughts_submissions: {
         Row: {
           category: string

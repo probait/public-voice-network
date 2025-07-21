@@ -60,12 +60,6 @@ const AdminSidebar = () => {
       roles: ['content_manager']
     },
     {
-      title: 'Prompts',
-      icon: MessageSquare,
-      path: '/admin/prompts',
-      roles: ['content_manager']
-    },
-    {
       title: 'Citizen Thoughts',
       icon: Heart,
       path: '/admin/thoughts',

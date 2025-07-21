@@ -12,22 +12,19 @@ const AdminDashboard = () => {
   } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
-      const [contributors, articles, events, prompts, users, featuredEvents, upcomingEvents, recentUsers] = await Promise.all([supabase.from('contributors').select('id', {
+      const [contributors, articles, events, users, featuredEvents, upcomingEvents, recentUsers] = await Promise.all([supabase.from('contributors').select('id', {
         count: 'exact',
         head: true
       }), supabase.from('articles').select('id, is_published', {
         count: 'exact'
-      }), supabase.from('meetups').select('id, date_time'), supabase.from('prompts').select('id, is_active'), supabase.from('profiles').select('id, created_at'), supabase.from('meetups').select('id').eq('homepage_featured', true), supabase.from('meetups').select('id').gte('date_time', new Date().toISOString()), supabase.from('profiles').select('id, created_at').gte('created_at', subDays(new Date(), 7).toISOString())]);
+      }), supabase.from('meetups').select('id, date_time'), supabase.from('profiles').select('id, created_at'), supabase.from('meetups').select('id').eq('homepage_featured', true), supabase.from('meetups').select('id').gte('date_time', new Date().toISOString()), supabase.from('profiles').select('id, created_at').gte('created_at', subDays(new Date(), 7).toISOString())]);
       const publishedArticles = articles.data?.filter(a => a.is_published).length || 0;
-      const activePrompts = prompts.data?.filter(p => p.is_active).length || 0;
       const todaysEvents = events.data?.filter(e => isAfter(new Date(e.date_time), new Date()) && format(new Date(e.date_time), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')).length || 0;
       return {
         contributors: contributors.count || 0,
         articles: articles.count || 0,
         publishedArticles,
         events: events.count || 0,
-        prompts: prompts.count || 0,
-        activePrompts,
         users: users.count || 0,
         featuredEvents: featuredEvents.data?.length || 0,
         upcomingEvents: upcomingEvents.data?.length || 0,
@@ -178,9 +175,9 @@ const AdminDashboard = () => {
                 <p className="text-sm text-gray-500">Start writing content</p>
               </button>
               <button className="p-4 border rounded-lg hover:bg-gray-50 text-left transition-colors">
-                <MessageSquare className="h-6 w-6 text-orange-600 mb-2" />
-                <h4 className="font-medium">Create Prompt</h4>
-                <p className="text-sm text-gray-500">Add discussion topic</p>
+                <TrendingUp className="h-6 w-6 text-orange-600 mb-2" />
+                <h4 className="font-medium">View Analytics</h4>
+                <p className="text-sm text-gray-500">Check engagement metrics</p>
               </button>
             </div>
           </CardContent>
