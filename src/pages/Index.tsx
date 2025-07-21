@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -104,7 +103,7 @@ const Index = () => {
           {/* Featured Events - show up to 3 featured events */}
           <div className="mb-8">
             <h3 className="text-xl font-semibold text-gray-900 mb-6">Featured Events</h3>
-            <EventbriteFeed showFeaturedOnly={true} />
+            <EventbriteFeed showFeaturedOnly={true} referrer="home" />
           </div>
 
           <div className="text-center mt-8">

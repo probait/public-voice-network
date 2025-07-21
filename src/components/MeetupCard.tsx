@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,9 +25,10 @@ interface Meetup {
 
 interface MeetupCardProps {
   meetup: Meetup;
+  referrer?: string;
 }
 
-const MeetupCard = ({ meetup }: MeetupCardProps) => {
+const MeetupCard = ({ meetup, referrer = "events" }: MeetupCardProps) => {
   const isPastEvent = new Date(meetup.date_time) < new Date();
 
   return (
@@ -84,7 +86,7 @@ const MeetupCard = ({ meetup }: MeetupCardProps) => {
           )}
           <div className="flex gap-2 mt-auto">
             <Button asChild className="flex-1 bg-red-600 hover:bg-red-700 text-white">
-              <Link to={`/events/${meetup.id}`}>
+              <Link to={`/events/${meetup.id}?from=${referrer}`}>
                 View Details
               </Link>
             </Button>

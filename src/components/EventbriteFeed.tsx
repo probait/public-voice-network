@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,7 +24,12 @@ interface Meetup {
   } | null;
 }
 
-const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boolean }) => {
+interface EventbriteFeedProps {
+  showFeaturedOnly?: boolean;
+  referrer?: string;
+}
+
+const EventbriteFeed = ({ showFeaturedOnly = false, referrer = "events" }: EventbriteFeedProps) => {
   const { data: meetups = [], isLoading, error } = useQuery({
     queryKey: ['external-events', showFeaturedOnly],
     queryFn: async (): Promise<Meetup[]> => {
@@ -219,7 +223,7 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
                 asChild 
                 className="w-full bg-red-600 hover:bg-red-700 text-white mt-auto"
               >
-                <Link to={`/events/${meetup.id}`}>
+                <Link to={`/events/${meetup.id}?from=${referrer}`}>
                   View event details
                 </Link>
               </Button>

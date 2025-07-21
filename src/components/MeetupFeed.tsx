@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import MeetupCard from "./MeetupCard";
@@ -20,7 +19,12 @@ interface Meetup {
   } | null;
 }
 
-const MeetupFeed = ({ limit }: { limit?: number }) => {
+interface MeetupFeedProps {
+  limit?: number;
+  referrer?: string;
+}
+
+const MeetupFeed = ({ limit, referrer = "events" }: MeetupFeedProps) => {
   const { data: meetups = [], isLoading, error } = useQuery({
     queryKey: ['meetups', limit],
     queryFn: async (): Promise<Meetup[]> => {
@@ -73,8 +77,6 @@ const MeetupFeed = ({ limit }: { limit?: number }) => {
     },
   });
 
-  
-
   if (isLoading) {
     return <MeetupLoadingSkeleton />;
   }
@@ -101,6 +103,7 @@ const MeetupFeed = ({ limit }: { limit?: number }) => {
         <MeetupCard
           key={meetup.id}
           meetup={meetup}
+          referrer={referrer}
         />
       ))}
     </div>

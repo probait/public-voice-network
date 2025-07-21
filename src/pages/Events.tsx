@@ -21,7 +21,7 @@ const Events = () => {
           {/* All Events Section - now unified */}
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Events</h2>
-            <EventbriteFeed />
+            <EventbriteFeed referrer="events" />
           </div>
         </div>
       </main>

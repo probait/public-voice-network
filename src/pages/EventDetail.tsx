@@ -1,4 +1,5 @@
-import { useParams, useNavigate } from "react-router-dom";
+
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
@@ -7,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatEventDetailDate } from "@/lib/dateUtils";
-import { Calendar, MapPin, Video, ExternalLink, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, Video, ExternalLink, ArrowLeft, List } from "lucide-react";
 import ResponsiveImage from "@/components/ResponsiveImage";
 
 interface EventDetail {
@@ -29,6 +30,13 @@ interface EventDetail {
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get('from');
+
+  // Determine navigation based on referrer
+  const isFromHome = from === 'home';
+  const backButtonText = isFromHome ? 'Back to Homepage' : 'Back to Events';
+  const backButtonPath = isFromHome ? '/' : '/events';
 
   const { data: event, isLoading, error } = useQuery({
     queryKey: ['event-detail', id],
@@ -144,16 +152,27 @@ const EventDetail = () => {
       
       <main className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <nav className="mb-8">
+          {/* Navigation */}
+          <nav className="mb-8 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
             <Button 
               variant="ghost" 
-              onClick={() => navigate('/events')}
-              className="p-0 h-auto font-normal text-gray-600 hover:text-gray-900"
+              onClick={() => navigate(backButtonPath)}
+              className="p-0 h-auto font-normal text-gray-600 hover:text-gray-900 w-fit"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
+              {backButtonText}
             </Button>
+            
+            {isFromHome && (
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/events')}
+                className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-fit"
+              >
+                <List className="h-4 w-4 mr-2" />
+                Show all events
+              </Button>
+            )}
           </nav>
 
           <Card className="overflow-hidden">
