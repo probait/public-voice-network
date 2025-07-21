@@ -5,15 +5,14 @@ export const useTotalThoughtsCount = () => {
   return useQuery({
     queryKey: ["totalThoughtsCount"],
     queryFn: async (): Promise<number> => {
-      const { count, error } = await supabase
-        .from("thoughts_submissions")
-        .select("*", { count: "exact", head: true });
+      const { data, error } = await supabase
+        .rpc("get_total_thoughts_count");
 
       if (error) {
         throw error;
       }
 
-      return count || 0;
+      return data || 0;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

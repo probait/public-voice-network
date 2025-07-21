@@ -525,6 +525,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_total_thoughts_count: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
