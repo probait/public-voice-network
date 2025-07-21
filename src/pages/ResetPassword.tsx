@@ -19,11 +19,11 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // Check if we have the necessary tokens from the URL
-    const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
+    // Check if we have the recovery type and token from the URL
+    const type = searchParams.get('type');
+    const token = searchParams.get('token');
     
-    if (!accessToken || !refreshToken) {
+    if (type !== 'recovery' || !token) {
       toast({
         title: "Invalid reset link",
         description: "This password reset link is invalid or has expired.",
