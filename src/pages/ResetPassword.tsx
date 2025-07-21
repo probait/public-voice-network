@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,25 +13,21 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { updatePassword } = useAuth();
+  const { user, loading, updatePassword } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    // Check if we have the recovery type and token from the URL
-    const type = searchParams.get('type');
-    const token = searchParams.get('token');
-    
-    if (type !== 'recovery' || !token) {
+    // If not loading and no user is authenticated, redirect to auth page
+    if (!loading && !user) {
       toast({
         title: "Invalid reset link",
-        description: "This password reset link is invalid or has expired.",
+        description: "This password reset link is invalid or has expired. Please request a new one.",
         variant: "destructive",
       });
       navigate('/auth');
     }
-  }, [searchParams, navigate, toast]);
+  }, [user, loading, navigate, toast]);
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +70,24 @@ const ResetPassword = () => {
     
     setIsLoading(false);
   };
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="flex items-center justify-center p-8">
+            <Loader2 className="h-8 w-8 animate-spin text-red-600" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // If user is not authenticated, the useEffect will handle redirect
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
