@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -19,9 +20,10 @@ interface ArticleCardProps {
       headshot_url: string | null;
     } | null;
   };
+  referrer?: "home" | "articles";
 }
 
-const ArticleCard = ({ article }: ArticleCardProps) => {
+const ArticleCard = ({ article, referrer }: ArticleCardProps) => {
   const getExcerpt = (content: string | null) => {
     if (!content) return "";
     const plainText = content.replace(/[#*`\[\]]/g, "");
@@ -37,10 +39,12 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
     });
   };
 
+  const articleUrl = referrer ? `/articles/${article.slug}?from=${referrer}` : `/articles/${article.slug}`;
+
   return (
     <Card className="group hover:shadow-lg transition-shadow duration-200">
       <CardContent className="p-0">
-        <Link to={`/articles/${article.slug}`}>
+        <Link to={articleUrl}>
           <div className="aspect-[16/9] overflow-hidden rounded-t-lg">
             <ResponsiveImage
               src={article.image_url || fallbackImage}

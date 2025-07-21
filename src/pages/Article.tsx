@@ -1,4 +1,5 @@
-import { useParams, Link } from "react-router-dom";
+
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { useArticle } from "@/hooks/useArticles";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -11,6 +12,8 @@ import fallbackImage from "@/assets/fallback-article-image.jpg";
 
 const Article = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get('from');
   const { data: article, isLoading, error } = useArticle(slug || "");
 
   const handleShare = () => {
@@ -29,6 +32,14 @@ const Article = () => {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const getBackButtonText = () => {
+    return from === 'home' ? 'Back to Homepage' : 'Back to Articles';
+  };
+
+  const getBackButtonDestination = () => {
+    return from === 'home' ? '/' : '/articles';
   };
 
   if (isLoading) {
@@ -76,12 +87,22 @@ const Article = () => {
       <Navigation />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <Button variant="ghost" asChild className="mb-6">
-            <Link to="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Link>
-          </Button>
+          <div className="flex items-center gap-4 mb-6">
+            <Button variant="ghost" asChild>
+              <Link to={getBackButtonDestination()}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {getBackButtonText()}
+              </Link>
+            </Button>
+            
+            {from === 'home' && (
+              <Button variant="outline" asChild>
+                <Link to="/articles">
+                  Show all articles
+                </Link>
+              </Button>
+            )}
+          </div>
 
           <div className="aspect-[16/9] overflow-hidden rounded-lg mb-8">
             <img

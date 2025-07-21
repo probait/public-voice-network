@@ -184,7 +184,7 @@ const Index = () => {
           ) : (
             <div className="grid md:grid-cols-3 gap-8">
               {articles?.slice(0, 3).map((article) => (
-                <ArticleCard key={article.id} article={article} />
+                <ArticleCard key={article.id} article={article} referrer="home" />
               ))}
             </div>
           )}
