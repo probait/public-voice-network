@@ -5,7 +5,7 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, User, Share2 } from "lucide-react";
+import { ArrowLeft, Calendar, User, Share2, List } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import ArticleContent from "@/components/ArticleContent";
 import fallbackImage from "@/assets/fallback-article-image.jpg";
@@ -87,8 +87,8 @@ const Article = () => {
       <Navigation />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-6">
-            <Button variant="ghost" asChild>
+          <nav className="mb-8 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+            <Button variant="ghost" asChild className="p-0 h-auto font-normal text-gray-600 hover:text-gray-900 w-fit">
               <Link to={getBackButtonDestination()}>
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {getBackButtonText()}
@@ -96,13 +96,14 @@ const Article = () => {
             </Button>
             
             {from === 'home' && (
-              <Button variant="outline" asChild className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
+              <Button variant="outline" asChild className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white w-fit">
                 <Link to="/articles">
+                  <List className="h-4 w-4 mr-2" />
                   Show all articles
                 </Link>
               </Button>
             )}
-          </div>
+          </nav>
 
           <div className="aspect-[16/9] overflow-hidden rounded-lg mb-8">
             <img
