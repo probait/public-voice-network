@@ -60,12 +60,6 @@ const AdminSidebar = () => {
       roles: ['content_manager']
     },
     {
-      title: 'Roundtables',
-      icon: Presentation,
-      path: '/admin/roundtables',
-      roles: ['content_manager']
-    },
-    {
       title: 'Prompts',
       icon: MessageSquare,
       path: '/admin/prompts',

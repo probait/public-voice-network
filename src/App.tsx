@@ -16,7 +16,6 @@ import Contributors from "./pages/Contributors";
 import ContributorProfile from "./pages/ContributorProfile";
 import Fellows from "./pages/Fellows";
 import Prompts from "./pages/Prompts";
-import Roundtables from "./pages/Roundtables";
 import Article from "./pages/Article";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
@@ -24,7 +23,6 @@ import AdminContributors from "./pages/admin/AdminContributors";
 import AdminFellows from "./pages/admin/AdminFellows";
 import AdminArticles from "./pages/admin/AdminArticles";
 import AdminEvents from "./pages/admin/AdminEvents";
-import AdminRoundtables from "./pages/admin/AdminRoundtables";
 import AdminPrompts from "./pages/admin/AdminPrompts";
 import AdminPartnerships from "./pages/admin/AdminPartnerships";
 import AdminThoughtsManagement from "./pages/admin/AdminThoughtsManagement";
@@ -63,7 +61,6 @@ const App = () => {
             <Route path="/contributors/:id" element={<ContributorProfile />} />
             <Route path="/fellows" element={<Fellows />} />
             <Route path="/prompts" element={<Prompts />} />
-            <Route path="/roundtables" element={<Roundtables />} />
             <Route path="/articles/:slug" element={<Article />} />
             
             {/* Admin Routes */}
@@ -74,7 +71,6 @@ const App = () => {
             <Route path="/admin/articles" element={<AdminArticles />} />
             <Route path="/admin/events" element={<AdminEvents />} />
             <Route path="/admin/newsletter" element={<AdminNewsletter />} />
-            <Route path="/admin/roundtables" element={<AdminRoundtables />} />
             <Route path="/admin/prompts" element={<AdminPrompts />} />
             <Route path="/admin/partnerships" element={<AdminPartnerships />} />
             <Route path="/admin/thoughts" element={<AdminThoughtsManagement />} />

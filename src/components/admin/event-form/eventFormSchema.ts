@@ -29,5 +29,6 @@ export const categories = [
   'Conference',
   'Workshop',
   'Panel Discussion',
+  'Roundtable',
   'General'
 ];
