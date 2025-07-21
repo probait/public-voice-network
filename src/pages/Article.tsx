@@ -96,7 +96,7 @@ const Article = () => {
             </Button>
             
             {from === 'home' && (
-              <Button variant="outline" asChild>
+              <Button variant="outline" asChild className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
                 <Link to="/articles">
                   Show all articles
                 </Link>
