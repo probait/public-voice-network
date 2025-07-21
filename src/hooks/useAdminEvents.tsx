@@ -22,7 +22,6 @@ export const useAdminEvents = () => {
           description,
           location,
           date_time,
-          max_attendees,
           category,
           is_virtual,
           meeting_link,
@@ -45,16 +44,6 @@ export const useAdminEvents = () => {
         return [];
       }
 
-      // Get attendees count for each meetup
-      const meetupIds = meetupsData.map(m => m.id);
-      const { data: attendeesData, error: attendeesError } = await supabase
-        .from('attendees')
-        .select('meetup_id')
-        .in('meetup_id', meetupIds);
-
-      if (attendeesError) {
-        console.error('Error fetching attendees:', attendeesError);
-      }
 
       // Get profiles for organizers
       const userIds = meetupsData.map(m => m.user_id).filter(Boolean);
@@ -73,7 +62,6 @@ export const useAdminEvents = () => {
 
       // Combine the data
       return meetupsData.map(meetup => {
-        const attendeeCount = attendeesData?.filter(a => a.meetup_id === meetup.id).length || 0;
         const profile = profilesData.find(p => p.id === meetup.user_id);
         
         return {
@@ -82,7 +70,6 @@ export const useAdminEvents = () => {
           description: meetup.description,
           location: meetup.location,
           date_time: meetup.date_time,
-          max_attendees: meetup.max_attendees,
           category: meetup.category,
           is_virtual: meetup.is_virtual,
           meeting_link: meetup.meeting_link,
@@ -90,7 +77,6 @@ export const useAdminEvents = () => {
           homepage_featured: meetup.homepage_featured,
           image_url: meetup.image_url,
           is_published: meetup.is_published,
-          attendee_count: attendeeCount,
           profiles: profile ? { full_name: profile.full_name } : null
         };
       });

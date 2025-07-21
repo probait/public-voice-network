@@ -83,35 +83,6 @@ export type Database = {
           },
         ]
       }
-      attendees: {
-        Row: {
-          created_at: string
-          id: string
-          meetup_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          meetup_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          meetup_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "attendees_meetup_id_fkey"
-            columns: ["meetup_id"]
-            isOneToOne: false
-            referencedRelation: "meetups"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       contributors: {
         Row: {
           bio: string | null
@@ -261,7 +232,6 @@ export type Database = {
           is_published: boolean | null
           is_virtual: boolean | null
           location: string
-          max_attendees: number | null
           meeting_link: string | null
           title: string
           updated_at: string
@@ -281,7 +251,6 @@ export type Database = {
           is_published?: boolean | null
           is_virtual?: boolean | null
           location: string
-          max_attendees?: number | null
           meeting_link?: string | null
           title: string
           updated_at?: string
@@ -301,7 +270,6 @@ export type Database = {
           is_published?: boolean | null
           is_virtual?: boolean | null
           location?: string
-          max_attendees?: number | null
           meeting_link?: string | null
           title?: string
           updated_at?: string

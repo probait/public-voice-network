@@ -15,7 +15,6 @@ interface Meetup {
   description: string;
   location: string;
   date_time: string;
-  max_attendees: number;
   category: string;
   is_virtual: boolean;
   meeting_link: string | null;
@@ -24,7 +23,6 @@ interface Meetup {
   profiles: {
     full_name: string;
   } | null;
-  attendee_count: number;
 }
 
 const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boolean }) => {
@@ -41,7 +39,6 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
           description,
           location,
           date_time,
-          max_attendees,
           category,
           is_virtual,
           meeting_link,
@@ -65,18 +62,10 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
 
       
 
-      // Get attendees count for each meetup
+      // Get profiles for organizers
       if (!meetupsData || meetupsData.length === 0) {
         return [];
       }
-
-      const meetupIds = meetupsData.map(m => m.id);
-      const { data: attendeesData } = await supabase
-        .from('attendees')
-        .select('meetup_id')
-        .in('meetup_id', meetupIds);
-
-      // Get profiles for organizers
       const userIds = meetupsData.map(m => m.user_id).filter(Boolean);
       let profilesData: any[] = [];
       
@@ -92,7 +81,6 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
       }
 
       return meetupsData.map(meetup => {
-        const attendeeCount = attendeesData?.filter(a => a.meetup_id === meetup.id).length || 0;
         const profile = profilesData.find(p => p.id === meetup.user_id);
         
         return {
@@ -101,13 +89,11 @@ const EventbriteFeed = ({ showFeaturedOnly = false }: { showFeaturedOnly?: boole
           description: meetup.description,
           location: meetup.location,
           date_time: meetup.date_time,
-          max_attendees: meetup.max_attendees,
           category: meetup.category,
           is_virtual: meetup.is_virtual,
           meeting_link: meetup.meeting_link,
           created_at: meetup.created_at,
           image_url: meetup.image_url,
-          attendee_count: attendeeCount,
           profiles: profile ? { full_name: profile.full_name } : null
         };
       });

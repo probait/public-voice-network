@@ -38,20 +38,17 @@ const AdminDashboard = () => {
   } = useQuery({
     queryKey: ['recent-activity'],
     queryFn: async () => {
-      const [recentContributors, recentArticles, recentEvents, recentMeetups] = await Promise.all([supabase.from('contributors').select('name, created_at, is_featured').order('created_at', {
+        const [recentContributors, recentArticles, recentEvents] = await Promise.all([supabase.from('contributors').select('name, created_at, is_featured').order('created_at', {
         ascending: false
       }).limit(5), supabase.from('articles').select('title, created_at, is_published').order('created_at', {
         ascending: false
       }).limit(5), supabase.from('meetups').select('title, created_at, date_time, homepage_featured').order('created_at', {
         ascending: false
-      }).limit(5), supabase.from('attendees').select('created_at, meetup_id, meetups(title)').order('created_at', {
-        ascending: false
-      }).limit(10)]);
+      }).limit(5)]);
       return {
         contributors: recentContributors.data || [],
         articles: recentArticles.data || [],
-        events: recentEvents.data || [],
-        attendees: recentMeetups.data || []
+        events: recentEvents.data || []
       };
     }
   });

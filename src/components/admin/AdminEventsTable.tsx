@@ -14,7 +14,6 @@ import { format } from 'date-fns';
 import { 
   Edit2, 
   Trash2, 
-  Users, 
   Calendar,
   MapPin,
   Video,

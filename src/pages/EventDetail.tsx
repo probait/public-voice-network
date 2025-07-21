@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatEventDetailDate } from "@/lib/dateUtils";
-import { Calendar, MapPin, Users, Video, ExternalLink, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, Video, ExternalLink, ArrowLeft } from "lucide-react";
 import ResponsiveImage from "@/components/ResponsiveImage";
 
 interface EventDetail {
@@ -16,7 +16,6 @@ interface EventDetail {
   description: string;
   location: string;
   date_time: string;
-  max_attendees: number;
   category: string;
   is_virtual: boolean;
   meeting_link: string | null;
@@ -25,7 +24,6 @@ interface EventDetail {
   profiles: {
     full_name: string;
   } | null;
-  attendee_count: number;
 }
 
 const EventDetail = () => {
@@ -45,7 +43,6 @@ const EventDetail = () => {
           description,
           location,
           date_time,
-          max_attendees,
           category,
           is_virtual,
           meeting_link,
@@ -61,11 +58,6 @@ const EventDetail = () => {
         throw error;
       }
 
-      // Get attendees count
-      const { data: attendeesData } = await supabase
-        .from('attendees')
-        .select('meetup_id')
-        .eq('meetup_id', id);
 
       // Get organizer profile
       let profile = null;
@@ -83,7 +75,6 @@ const EventDetail = () => {
 
       return {
         ...eventData,
-        attendee_count: attendeesData?.length || 0,
         profiles: profile
       };
     },
@@ -199,12 +190,6 @@ const EventDetail = () => {
                       </span>
                     </div>
                     
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Users className="h-5 w-5" />
-                      <span className="text-lg">
-                        {event.attendee_count} / {event.max_attendees} attendees
-                      </span>
-                    </div>
                   </div>
 
                   {/* Tags */}

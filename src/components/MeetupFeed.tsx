@@ -1,10 +1,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import MeetupCard from "./MeetupCard";
 import MeetupLoadingSkeleton from "./MeetupLoadingSkeleton";
-import { useMeetupAttendance } from "@/hooks/useMeetupAttendance";
 
 interface Meetup {
   id: string;
@@ -12,7 +10,6 @@ interface Meetup {
   description: string;
   location: string;
   date_time: string;
-  max_attendees: number;
   category: string;
   is_virtual: boolean;
   meeting_link: string | null;
@@ -21,15 +18,11 @@ interface Meetup {
     full_name: string;
     avatar_url: string;
   } | null;
-  attendee_count: number;
-  user_attending: boolean;
 }
 
 const MeetupFeed = ({ limit }: { limit?: number }) => {
-  const { user } = useAuth();
-
-  const { data: meetups = [], isLoading, error, refetch } = useQuery({
-    queryKey: ['meetups', limit, user?.id],
+  const { data: meetups = [], isLoading, error } = useQuery({
+    queryKey: ['meetups', limit],
     queryFn: async (): Promise<Meetup[]> => {
       let query = supabase
         .from('meetups')
@@ -39,14 +32,11 @@ const MeetupFeed = ({ limit }: { limit?: number }) => {
           description,
           location,
           date_time,
-          max_attendees,
           category,
           is_virtual,
           meeting_link,
           created_at,
-          user_id,
-          attendees(count),
-          attendees!inner(user_id)
+          user_id
         `)
         .order('date_time', { ascending: true });
 
@@ -78,14 +68,12 @@ const MeetupFeed = ({ limit }: { limit?: number }) => {
 
       return (meetupsData || []).map(meetup => ({
         ...meetup,
-        profiles: profilesData.find(profile => profile.id === meetup.user_id) || null,
-        attendee_count: meetup.attendees?.length || 0,
-        user_attending: user ? meetup.attendees?.some((a: any) => a.user_id === user.id) || false : false
+        profiles: profilesData.find(profile => profile.id === meetup.user_id) || null
       }));
     },
   });
 
-  const { attendingMeetups, handleAttendance } = useMeetupAttendance(refetch);
+  
 
   if (isLoading) {
     return <MeetupLoadingSkeleton />;
@@ -109,20 +97,12 @@ const MeetupFeed = ({ limit }: { limit?: number }) => {
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {meetups.map((meetup) => {
-        const isAttending = attendingMeetups.has(meetup.id) || meetup.user_attending;
-        
-        return (
-          <MeetupCard
-            key={meetup.id}
-            meetup={{
-              ...meetup,
-              user_attending: isAttending
-            }}
-            onAttendanceChange={handleAttendance}
-          />
-        );
-      })}
+      {meetups.map((meetup) => (
+        <MeetupCard
+          key={meetup.id}
+          meetup={meetup}
+        />
+      ))}
     </div>
   );
 };

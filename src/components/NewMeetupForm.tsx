@@ -15,7 +15,6 @@ interface MeetupData {
   description: string;
   location: string;
   dateTime: string;
-  maxAttendees: number;
   category: string;
   isVirtual: boolean;
   meetingLink: string;
@@ -28,7 +27,6 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
     description: '',
     location: '',
     dateTime: '',
-    maxAttendees: 20,
     category: 'general',
     isVirtual: false,
     meetingLink: '',
@@ -125,7 +123,7 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
         }
       }
 
-      const { error } = await supabase
+        const { error } = await supabase
         .from('meetups')
         .insert({
           user_id: user.id,
@@ -133,7 +131,6 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
           description: formData.description,
           location: formData.isVirtual ? 'Virtual' : formData.location,
           date_time: formData.dateTime,
-          max_attendees: formData.maxAttendees,
           category: formData.category,
           is_virtual: formData.isVirtual,
           meeting_link: formData.isVirtual ? formData.meetingLink : null,
@@ -152,7 +149,6 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
         description: '',
         location: '',
         dateTime: '',
-        maxAttendees: 20,
         category: 'general',
         isVirtual: false,
         meetingLink: '',
@@ -253,35 +249,18 @@ const NewMeetupForm = ({ onSubmit }: { onSubmit?: () => void }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="dateTime" className="text-base font-medium">
-                Date & Time *
-              </Label>
-              <Input
-                id="dateTime"
-                type="datetime-local"
-                value={formData.dateTime}
-                onChange={(e) => setFormData(prev => ({ ...prev, dateTime: e.target.value }))}
-                className="mt-2"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="maxAttendees" className="text-base font-medium">
-                Max Attendees
-              </Label>
-              <Input
-                id="maxAttendees"
-                type="number"
-                min="2"
-                max="100"
-                value={formData.maxAttendees}
-                onChange={(e) => setFormData(prev => ({ ...prev, maxAttendees: parseInt(e.target.value) || 20 }))}
-                className="mt-2"
-              />
-            </div>
+          <div>
+            <Label htmlFor="dateTime" className="text-base font-medium">
+              Date & Time *
+            </Label>
+            <Input
+              id="dateTime"
+              type="datetime-local"
+              value={formData.dateTime}
+              onChange={(e) => setFormData(prev => ({ ...prev, dateTime: e.target.value }))}
+              className="mt-2"
+              required
+            />
           </div>
 
           <div>
