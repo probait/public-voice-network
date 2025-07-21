@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -155,7 +156,8 @@ export default function AdminNewsletter() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <AdminLayout>
+      <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Newsletter Management</h1>
         <Button onClick={exportSubscribers} variant="outline">
@@ -303,6 +305,7 @@ export default function AdminNewsletter() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AdminLayout>
   );
 }
