@@ -189,6 +189,14 @@ const Index = () => {
               ))}
             </div>
           )}
+          
+          <div className="text-center mt-8">
+            <Link to="/articles">
+              <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
+                View all articles
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

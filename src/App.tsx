@@ -15,6 +15,7 @@ import Privacy from "./pages/Privacy";
 import Contributors from "./pages/Contributors";
 import ContributorProfile from "./pages/ContributorProfile";
 import Fellows from "./pages/Fellows";
+import Articles from "./pages/Articles";
 import Article from "./pages/Article";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
@@ -58,6 +59,7 @@ const App = () => {
             <Route path="/contributors" element={<Contributors />} />
             <Route path="/contributors/:id" element={<ContributorProfile />} />
             <Route path="/fellows" element={<Fellows />} />
+            <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:slug" element={<Article />} />
             
             {/* Admin Routes */}
