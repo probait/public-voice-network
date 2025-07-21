@@ -18,6 +18,7 @@ import Fellows from "./pages/Fellows";
 import Articles from "./pages/Articles";
 import Article from "./pages/Article";
 import ResetPassword from "./pages/ResetPassword";
+import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import AdminContributors from "./pages/admin/AdminContributors";
@@ -56,6 +57,7 @@ const App = () => {
             <Route path="/get-involved" element={<GetInvolved />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             
             <Route path="/contributors" element={<Contributors />} />
