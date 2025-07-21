@@ -187,68 +187,7 @@ const AdminDashboard = () => {
         </Card>
 
         {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Recent Contributors
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {recentActivity?.contributors.slice(0, 5).map((contributor, index) => <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                        {contributor.name.charAt(0)}
-                      </div>
-                      <div>
-                        <span className="font-medium text-sm">{contributor.name}</span>
-                        {contributor.is_featured && <Star className="h-3 w-3 text-yellow-500 inline ml-1" />}
-                      </div>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {format(new Date(contributor.created_at), 'MMM d')}
-                    </span>
-                  </div>)}
-                {!recentActivity?.contributors.length && <p className="text-gray-500 text-sm text-center py-4">No recent contributors</p>}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Recent Events
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {recentActivity?.events.slice(0, 5).map((event, index) => <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center">
-                        <Calendar className="h-4 w-4 text-white" />
-                      </div>
-                      <div>
-                        <span className="font-medium text-sm truncate max-w-[200px] block">{event.title}</span>
-                        <div className="flex items-center gap-1">
-                          {event.homepage_featured && <Star className="h-3 w-3 text-yellow-500" />}
-                          <span className="text-xs text-gray-500">
-                            {format(new Date(event.date_time), 'MMM d, h:mm a')}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <span className="text-xs text-gray-500">
-                      {format(new Date(event.created_at), 'MMM d')}
-                    </span>
-                  </div>)}
-                {!recentActivity?.events.length && <p className="text-gray-500 text-sm text-center py-4">No recent events</p>}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        
 
       </div>
     </AdminLayout>;
