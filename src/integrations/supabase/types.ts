@@ -582,6 +582,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_section_permission: {
+        Args: { _user_id: string; _section: string }
+        Returns: boolean
+      }
+      is_admin_or_has_section: {
+        Args: { _user_id: string; _section: string }
+        Returns: boolean
+      }
     }
     Enums: {
       admin_section:
