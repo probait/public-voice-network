@@ -142,7 +142,7 @@ const AdminContributors = () => {
   const totalPages = Math.ceil((contributorsData?.total || 0) / pageSize);
 
   return (
-    <AdminLayout>
+    <AdminLayout requiredRole="admin">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
