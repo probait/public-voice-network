@@ -18,7 +18,7 @@ import { Settings } from "lucide-react";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
-  const { isContentManager } = useUserRole();
+  const { isAdmin } = useUserRole();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -83,7 +83,7 @@ const Navigation = () => {
                       <div className="text-sm text-muted-foreground">{user.email}</div>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {isContentManager() && (
+                    {isAdmin() && (
                       <>
                         <DropdownMenuItem asChild>
                           <Link to="/admin" className="flex items-center">

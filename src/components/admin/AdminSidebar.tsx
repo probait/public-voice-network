@@ -1,6 +1,7 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, 
@@ -20,80 +21,71 @@ import PolicyNowLogo from '@/components/PolicyNowLogo';
 
 const AdminSidebar = () => {
   const location = useLocation();
-  const { isAdmin, isModerator, isContentManager } = useUserRole();
+  const { isAdmin } = useUserRole();
+  const { hasPermission } = useUserPermissions();
 
   const menuItems = [
     {
       title: 'Dashboard',
       icon: LayoutDashboard,
       path: '/admin',
-      roles: ['content_manager']
+      section: 'dashboard'
     },
     {
       title: 'Contributors',
       icon: Users,
       path: '/admin/contributors',
-      roles: ['content_manager']
+      section: 'contributors'
     },
-    // Temporarily hidden - Fellows section
-    // {
-    //   title: 'Fellows',
-    //   icon: GraduationCap,
-    //   path: '/admin/fellows',
-    //   roles: ['content_manager']
-    // },
     {
       title: 'Articles',
       icon: FileText,
       path: '/admin/articles',
-      roles: ['content_manager']
+      section: 'articles'
     },
     {
       title: 'Events & Meetups',
       icon: Calendar,
       path: '/admin/events',
-      roles: ['content_manager']
+      section: 'events'
     },
     {
       title: 'Newsletter',
       icon: Mail,
       path: '/admin/newsletter',
-      roles: ['content_manager']
+      section: 'newsletter'
     },
     {
       title: 'Citizen Thoughts',
       icon: Heart,
       path: '/admin/thoughts',
-      roles: ['content_manager']
+      section: 'thoughts'
     },
     {
       title: 'Partnerships',
       icon: Building2,
       path: '/admin/partnerships',
-      roles: ['moderator']
+      section: 'partnerships'
     },
     {
       title: 'User Management',
       icon: UserCheck,
       path: '/admin/users',
-      roles: ['moderator']
+      section: 'users'
     },
     {
       title: 'Settings',
       icon: Settings,
       path: '/admin/settings',
-      roles: ['admin']
+      section: 'settings'
     }
   ];
 
-  const hasAccess = (requiredRoles: string[]) => {
-    if (isAdmin()) return true;
-    if (isModerator() && requiredRoles.includes('moderator')) return true;
-    if (isContentManager() && requiredRoles.includes('content_manager')) return true;
-    return false;
+  const hasAccess = (section: string) => {
+    return isAdmin() || hasPermission(section as any);
   };
 
-  const filteredMenuItems = menuItems.filter(item => hasAccess(item.roles));
+  const filteredMenuItems = menuItems.filter(item => hasAccess(item.section));
 
   return (
     <div className="w-64 bg-white border-r border-gray-200 flex flex-col">

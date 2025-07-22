@@ -98,15 +98,14 @@ const UserManagement = () => {
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin': return 'bg-red-100 text-red-800';
-      case 'moderator': return 'bg-blue-100 text-blue-800';
-      case 'content_manager': return 'bg-green-100 text-green-800';
-      case 'viewer': return 'bg-gray-100 text-gray-800';
+      case 'employee': return 'bg-blue-100 text-blue-800';
+      case 'public': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   return (
-    <AdminLayout requiredRole="moderator">
+    <AdminLayout requiredRole="admin">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
@@ -174,9 +173,8 @@ const UserManagement = () => {
                               <SelectValue placeholder={user.current_role ? "Change role" : "Assign role"} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="viewer">Viewer</SelectItem>
-                              <SelectItem value="content_manager">Content Manager</SelectItem>
-                              <SelectItem value="moderator">Moderator</SelectItem>
+                              <SelectItem value="public">Public</SelectItem>
+                              <SelectItem value="employee">Employee</SelectItem>
                               <SelectItem value="admin">Admin</SelectItem>
                               {user.current_role && (
                                 <SelectItem value="remove" className="text-red-600">

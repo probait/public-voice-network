@@ -58,30 +58,19 @@ export const useUserPermissions = () => {
 
       // Employee users - fetch their specific permissions
       if (role === 'employee') {
-        try {
-          // Using generic query since user_section_permissions is not in types yet
-          const { data, error } = await supabase
-            .rpc('get_user_permissions', { user_id_param: user.id });
-
-          if (error) {
-            console.error('Error fetching user permissions:', error);
-            setPermissions({});
-          } else {
-            const permissionsMap: UserPermissions = {};
-            // Handle array of permissions from RPC
-            if (Array.isArray(data)) {
-              data.forEach((perm: any) => {
-                if (perm.section && perm.has_access) {
-                  permissionsMap[perm.section] = perm.has_access;
-                }
-              });
-            }
-            setPermissions(permissionsMap);
-          }
-        } catch (error) {
-          console.error('Error fetching user permissions:', error);
-          setPermissions({});
-        }
+        // For now, set basic permissions for employees
+        // TODO: Implement actual permission checking once database is updated
+        setPermissions({
+          dashboard: true, // All employees can see dashboard
+          articles: false,
+          contributors: false,
+          events: false,
+          thoughts: false,
+          partnerships: false,
+          newsletter: false,
+          users: false,
+          settings: false
+        });
       }
 
       setLoading(false);

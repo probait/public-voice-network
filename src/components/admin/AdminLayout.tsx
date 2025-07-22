@@ -3,19 +3,21 @@ import { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useUserPermissions } from '@/hooks/useUserPermissions';
 import AdminSidebar from './AdminSidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AdminLayoutProps {
   children: ReactNode;
-  requiredRole?: 'admin' | 'moderator' | 'content_manager' | 'viewer';
+  requiredRole?: 'admin' | 'employee' | 'public';
 }
 
-const AdminLayout = ({ children, requiredRole = 'content_manager' }: AdminLayoutProps) => {
+const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) => {
   const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading, hasRole } = useUserRole();
+  const { role, loading: roleLoading } = useUserRole();
+  const { canAccessAdminPortal, loading: permissionsLoading } = useUserPermissions();
 
-  if (authLoading || roleLoading) {
+  if (authLoading || roleLoading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex">
         <div className="w-64 bg-white border-r">
@@ -37,7 +39,7 @@ const AdminLayout = ({ children, requiredRole = 'content_manager' }: AdminLayout
     return <Navigate to="/" replace />;
   }
 
-  if (!hasRole(requiredRole)) {
+  if (!canAccessAdminPortal()) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
