@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
@@ -56,21 +57,27 @@ export const useUserPermissions = () => {
         return;
       }
 
-      // Employee users - fetch their specific permissions
+      // Employee users - fetch their specific permissions from the database
       if (role === 'employee') {
-        // For now, set basic permissions for employees
-        // TODO: Implement actual permission checking once database is updated
-        setPermissions({
-          dashboard: true, // All employees can see dashboard
-          articles: false,
-          contributors: false,
-          events: false,
-          thoughts: false,
-          partnerships: false,
-          newsletter: false,
-          users: false,
-          settings: false
-        });
+        try {
+          const { data, error } = await supabase.rpc('get_user_permissions', {
+            user_id_param: user.id
+          });
+
+          if (error) {
+            console.error('Error fetching user permissions:', error);
+            setPermissions({});
+          } else {
+            const userPermissions: UserPermissions = {};
+            data?.forEach((perm: { section: string; has_access: boolean }) => {
+              userPermissions[perm.section] = perm.has_access;
+            });
+            setPermissions(userPermissions);
+          }
+        } catch (error) {
+          console.error('Error fetching user permissions:', error);
+          setPermissions({});
+        }
       }
 
       setLoading(false);

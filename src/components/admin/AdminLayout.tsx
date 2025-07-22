@@ -15,7 +15,7 @@ interface AdminLayoutProps {
 const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) => {
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading } = useUserRole();
-  const { canAccessAdminPortal, loading: permissionsLoading } = useUserPermissions();
+  const { canAccessAdminPortal, hasAnyPermission, loading: permissionsLoading } = useUserPermissions();
 
   if (authLoading || roleLoading || permissionsLoading) {
     return (
@@ -45,6 +45,26 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
           <p className="text-gray-600 mb-6">You don't have permission to access this area.</p>
+          <button 
+            onClick={() => window.history.back()}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Special case: employee with no permissions
+  if (role === 'employee' && !hasAnyPermission()) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Pending</h1>
+          <p className="text-gray-600 mb-6">
+            Your admin access is being configured. Please contact an administrator.
+          </p>
           <button 
             onClick={() => window.history.back()}
             className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md"

@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { Search, UserPlus } from 'lucide-react';
+import { Search, Settings } from 'lucide-react';
+import { UserPermissionsModal } from '@/components/admin/UserPermissionsModal';
 
 interface UserWithRole {
   id: string;
@@ -18,18 +19,24 @@ interface UserWithRole {
   email: string;
   created_at: string;
   current_role: string | null;
+  permissions_count?: number;
 }
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [permissionsModal, setPermissionsModal] = useState<{
+    isOpen: boolean;
+    userId: string;
+    userName: string;
+  }>({ isOpen: false, userId: '', userName: '' });
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users', searchTerm],
     queryFn: async () => {
-      // Get profiles with their roles directly from the user_role column
+      // Get profiles with their roles and permission counts
       let query = supabase
         .from('profiles')
         .select(`
@@ -48,13 +55,33 @@ const UserManagement = () => {
       const { data: profiles, error } = await query;
       if (error) throw error;
 
+      // Get permission counts for employees
+      const employeeIds = profiles?.filter(p => p.user_role === 'employee').map(p => p.id) || [];
+      
+      let permissionCounts: { [userId: string]: number } = {};
+      if (employeeIds.length > 0) {
+        const { data: permissions, error: permError } = await supabase
+          .from('user_section_permissions')
+          .select('user_id')
+          .in('user_id', employeeIds)
+          .eq('has_access', true);
+
+        if (!permError) {
+          permissionCounts = permissions.reduce((acc, perm) => {
+            acc[perm.user_id] = (acc[perm.user_id] || 0) + 1;
+            return acc;
+          }, {} as { [userId: string]: number });
+        }
+      }
+
       // Transform the data to match our interface
       const usersWithRoles = (profiles || []).map((profile: any) => ({
         id: profile.id,
         full_name: profile.full_name,
         email: profile.email,
         created_at: profile.created_at,
-        current_role: profile.user_role || null
+        current_role: profile.user_role || null,
+        permissions_count: permissionCounts[profile.id] || 0
       }));
 
       return usersWithRoles as UserWithRole[];
@@ -63,22 +90,32 @@ const UserManagement = () => {
 
   const assignRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string | null }) => {
-      // Update the user_role directly in the profiles table
-      // The trigger will handle logging to user_role_history
       const { error } = await supabase
         .from('profiles')
         .update({ user_role: role as any })
         .eq('id', userId);
       
       if (error) throw error;
+      return { userId, role };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-      setSelectedRole('');
       toast({
         title: 'Success',
         description: 'User role updated successfully',
       });
+
+      // Auto-open permissions modal when assigning employee role
+      if (data.role === 'employee') {
+        const user = users?.find(u => u.id === data.userId);
+        if (user) {
+          setPermissionsModal({
+            isOpen: true,
+            userId: data.userId,
+            userName: user.full_name || user.email
+          });
+        }
+      }
     },
     onError: (error) => {
       toast({
@@ -95,6 +132,14 @@ const UserManagement = () => {
     assignRoleMutation.mutate({ userId, role: roleValue });
   };
 
+  const handleConfigurePermissions = (userId: string, userName: string) => {
+    setPermissionsModal({
+      isOpen: true,
+      userId,
+      userName
+    });
+  };
+
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin': return 'bg-red-100 text-red-800';
@@ -102,6 +147,19 @@ const UserManagement = () => {
       case 'public': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const getPermissionSummary = (user: UserWithRole) => {
+    if (user.current_role === 'admin') {
+      return <Badge className="bg-green-100 text-green-800">Full Access</Badge>;
+    }
+    if (user.current_role === 'employee') {
+      if (user.permissions_count === 0) {
+        return <Badge variant="outline" className="text-yellow-600">No Permissions</Badge>;
+      }
+      return <Badge variant="outline">{user.permissions_count} sections</Badge>;
+    }
+    return null;
   };
 
   return (
@@ -136,6 +194,7 @@ const UserManagement = () => {
                     <TableHead>User</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Current Role</TableHead>
+                    <TableHead>Permissions</TableHead>
                     <TableHead>Joined</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
@@ -157,6 +216,9 @@ const UserManagement = () => {
                         ) : (
                           <Badge variant="outline">No Role</Badge>
                         )}
+                      </TableCell>
+                      <TableCell>
+                        {getPermissionSummary(user)}
                       </TableCell>
                       <TableCell>
                         {new Date(user.created_at).toLocaleDateString()}
@@ -183,6 +245,16 @@ const UserManagement = () => {
                               )}
                             </SelectContent>
                           </Select>
+                          
+                          {user.current_role === 'employee' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleConfigurePermissions(user.id, user.full_name || user.email)}
+                            >
+                              <Settings className="h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -192,6 +264,13 @@ const UserManagement = () => {
             )}
           </CardContent>
         </Card>
+
+        <UserPermissionsModal
+          isOpen={permissionsModal.isOpen}
+          onClose={() => setPermissionsModal({ isOpen: false, userId: '', userName: '' })}
+          userId={permissionsModal.userId}
+          userName={permissionsModal.userName}
+        />
       </div>
     </AdminLayout>
   );
