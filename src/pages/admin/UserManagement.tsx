@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { Search, Settings } from 'lucide-react';
+import { Search, Settings, Loader2 } from 'lucide-react';
 import { UserPermissionsModal } from '@/components/admin/UserPermissionsModal';
 
 interface UserWithRole {
@@ -29,6 +29,7 @@ const UserManagement = () => {
     userId: string;
     userName: string;
   }>({ isOpen: false, userId: '', userName: '' });
+  const [loadingUserId, setLoadingUserId] = useState<string | null>(null);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -90,6 +91,8 @@ const UserManagement = () => {
 
   const assignRoleMutation = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string | null }) => {
+      setLoadingUserId(userId);
+      
       const { error } = await supabase
         .from('profiles')
         .update({ user_role: role as any })
@@ -99,10 +102,13 @@ const UserManagement = () => {
       return { userId, role };
     },
     onSuccess: (data) => {
+      setLoadingUserId(null);
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+      
+      const actionText = data.role === null ? 'removed' : `updated to ${data.role}`;
       toast({
         title: 'Success',
-        description: 'User role updated successfully',
+        description: `User role ${actionText} successfully`,
       });
 
       // Auto-open permissions modal when assigning employee role
@@ -118,6 +124,7 @@ const UserManagement = () => {
       }
     },
     onError: (error) => {
+      setLoadingUserId(null);
       toast({
         title: 'Error',
         description: 'Failed to update user role',
@@ -226,13 +233,21 @@ const UserManagement = () => {
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <Select
-                            value=""
+                            value={user.current_role || ""}
                             onValueChange={(role) => {
                               handleAssignRole(user.id, role);
                             }}
+                            disabled={loadingUserId === user.id}
                           >
                             <SelectTrigger className="w-44">
-                              <SelectValue placeholder={user.current_role ? "Change role" : "Assign role"} />
+                              {loadingUserId === user.id ? (
+                                <div className="flex items-center">
+                                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                  Updating...
+                                </div>
+                              ) : (
+                                <SelectValue placeholder="Assign role" />
+                              )}
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="public">Public</SelectItem>
@@ -251,6 +266,7 @@ const UserManagement = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => handleConfigurePermissions(user.id, user.full_name || user.email)}
+                              disabled={loadingUserId === user.id}
                             >
                               <Settings className="h-4 w-4" />
                             </Button>
