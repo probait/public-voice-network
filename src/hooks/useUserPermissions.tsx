@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { useUserRole } from './useUserRole';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 export type AdminSection = 
   | 'dashboard' 
@@ -22,20 +23,17 @@ interface UserPermissions {
 export const useUserPermissions = () => {
   const { user } = useAuth();
   const { role, isAdmin } = useUserRole();
-  const [permissions, setPermissions] = useState<UserPermissions>({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPermissions = async () => {
+  
+  const { data: permissions = {}, isLoading: loading } = useQuery({
+    queryKey: ['userPermissions', user?.id, role],
+    queryFn: async (): Promise<UserPermissions> => {
       if (!user || !role) {
-        setPermissions({});
-        setLoading(false);
-        return;
+        return {};
       }
 
       // Admins have access to everything
       if (role === 'admin') {
-        setPermissions({
+        return {
           dashboard: true,
           articles: true,
           contributors: true,
@@ -45,16 +43,12 @@ export const useUserPermissions = () => {
           newsletter: true,
           users: true,
           settings: true
-        });
-        setLoading(false);
-        return;
+        };
       }
 
       // Public users have no admin access
       if (role === 'public') {
-        setPermissions({});
-        setLoading(false);
-        return;
+        return {};
       }
 
       // Employee users - fetch their specific permissions from the database
@@ -67,25 +61,29 @@ export const useUserPermissions = () => {
 
           if (error) {
             console.error('Error fetching user permissions:', error);
-            setPermissions({});
+            return {};
           } else {
             const userPermissions: UserPermissions = {};
             data?.forEach((perm) => {
               userPermissions[perm.section] = perm.has_access;
             });
-            setPermissions(userPermissions);
+            return userPermissions;
           }
         } catch (error) {
           console.error('Error fetching user permissions:', error);
-          setPermissions({});
+          return {};
         }
       }
 
-      setLoading(false);
-    };
-
-    fetchPermissions();
-  }, [user, role]);
+      return {};
+    },
+    // Cache permissions for 5 minutes
+    staleTime: 5 * 60 * 1000,
+    // Don't refetch on window focus for permissions
+    refetchOnWindowFocus: false,
+    // Only fetch when we have both user and role
+    enabled: !!user && !!role,
+  });
 
   const hasPermission = (section: AdminSection) => {
     // Admins have access to everything

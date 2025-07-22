@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +22,61 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+
+  // Function to prefetch user role and permissions
+  const prefetchUserData = async (userId: string) => {
+    if (!userId) return;
+
+    try {
+      // Prefetch user role
+      const { data: role } = await supabase.rpc('get_user_role', {
+        _user_id: userId
+      });
+      
+      // Cache the role in React Query
+      queryClient.setQueryData(['userRole', userId], role);
+      
+      // If role is admin or employee, prefetch permissions
+      if (role === 'admin' || role === 'employee') {
+        let permissions = {};
+        
+        if (role === 'admin') {
+          // Admin has all permissions
+          permissions = {
+            dashboard: true,
+            articles: true,
+            contributors: true,
+            events: true,
+            thoughts: true,
+            partnerships: true,
+            newsletter: true,
+            users: true,
+            settings: true
+          };
+        } else if (role === 'employee') {
+          // Fetch employee permissions
+          const { data } = await supabase
+            .from('user_section_permissions')
+            .select('section, has_access')
+            .eq('user_id', userId);
+            
+          if (data) {
+            const userPermissions: Record<string, boolean> = {};
+            data.forEach((perm) => {
+              userPermissions[perm.section] = perm.has_access;
+            });
+            permissions = userPermissions;
+          }
+        }
+        
+        // Cache the permissions
+        queryClient.setQueryData(['userPermissions', userId, role], permissions);
+      }
+    } catch (err) {
+      console.error("Error prefetching user data:", err);
+    }
+  };
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -33,6 +89,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (event === 'SIGNED_IN' && session?.user) {
           // Use setTimeout to prevent auth state deadlock
           setTimeout(async () => {
+            // Prefetch user role and permissions
+            await prefetchUserData(session.user.id);
+            
             // Don't redirect if already on admin page
             if (window.location.pathname.startsWith('/admin')) {
               return;
@@ -45,12 +104,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               });
               
               if (role === 'admin' || role === 'employee') {
-                window.location.href = '/admin';
+                const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/admin';
+                sessionStorage.removeItem('redirectAfterLogin');
+                window.location.href = redirectPath;
               }
             } catch (err) {
               console.error("Error checking user role:", err);
             }
           }, 0);
+        } else if (event === 'SIGNED_OUT') {
+          // Clear cached auth data on sign out
+          queryClient.removeQueries({ queryKey: ['userRole'] });
+          queryClient.removeQueries({ queryKey: ['userPermissions'] });
         }
       }
     );
@@ -59,10 +124,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
+      
+      // Prefetch data if user is already logged in
+      if (session?.user) {
+        prefetchUserData(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   const signInWithEmail = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -107,7 +177,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
     return { error };
   };
-
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {

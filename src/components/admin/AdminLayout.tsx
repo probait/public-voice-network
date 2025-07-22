@@ -18,7 +18,18 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
   const { role, loading: roleLoading } = useUserRole();
   const { canAccessAdminPortal, hasAnyPermission, loading: permissionsLoading } = useUserPermissions();
 
-  if (authLoading || roleLoading || permissionsLoading) {
+  // Show loading state while any auth check is in progress
+  const isLoading = authLoading || roleLoading || permissionsLoading;
+
+  // Only redirect to login if we're certain the user isn't authenticated
+  if (!isLoading && !user) {
+    // Store the intended admin route for redirect after login
+    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+    return <Navigate to="/?showAuth=true" replace />;
+  }
+
+  // Show skeleton during loading to avoid flashing access denied
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="h-16 bg-white border-b">
@@ -41,12 +52,7 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
     );
   }
 
-  if (!user) {
-    // Store the intended admin route for redirect after login
-    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-    return <Navigate to="/?showAuth=true" replace />;
-  }
-
+  // Only check access after loading is complete
   if (!canAccessAdminPortal()) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -64,7 +70,7 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
     );
   }
 
-  // Special case: employee with no permissions
+  // Special case: employee with no permissions (only shown after loading is complete)
   if (role === 'employee' && !hasAnyPermission()) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -84,6 +90,7 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
     );
   }
 
+  // Access granted - show admin layout
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminHeader />
