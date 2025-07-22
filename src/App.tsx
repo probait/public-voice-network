@@ -6,7 +6,7 @@ import {
   Outlet,
 } from "react-router-dom";
 import Auth from "@/pages/Auth";
-import Home from "@/pages/Home";
+import Index from "@/pages/Index";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import AdminArticles from "@/pages/admin/AdminArticles";
 import AdminContributors from "@/pages/admin/AdminContributors";
@@ -14,15 +14,12 @@ import AdminEvents from "@/pages/admin/AdminEvents";
 import AdminThoughts from "@/pages/admin/AdminThoughts";
 import AdminPartnerships from "@/pages/admin/AdminPartnerships";
 import AdminNewsletter from "@/pages/admin/AdminNewsletter";
-import AdminUsers from "@/pages/admin/AdminUsers";
+import UserManagement from "@/pages/admin/UserManagement";
 import AdminSettings from "@/pages/admin/AdminSettings";
 import AdminLayout from "@/components/admin/AdminLayout";
-import ProtectedRoute from "@/components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ToastProvider } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 import ResetPassword from "@/pages/ResetPassword";
-import UpdatePassword from "@/pages/UpdatePassword";
-import VerifyEmail from "@/pages/VerifyEmail";
 import ProtectedAdminRoute from '@/components/ProtectedAdminRoute';
 
 const queryClient = new QueryClient();
@@ -30,12 +27,10 @@ const queryClient = new QueryClient();
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
-      <Route path="/" element={<ToastProvider><AppLayout /></ToastProvider>}>
-        <Route index element={<Home />} />
+      <Route path="/" element={<AppLayout />}>
+        <Route index element={<Index />} />
         <Route path="auth" element={<Auth />} />
         <Route path="reset-password" element={<ResetPassword />} />
-        <Route path="update-password" element={<UpdatePassword />} />
-        <Route path="verify-email" element={<VerifyEmail />} />
         <Route
           path="/admin"
           element={
@@ -99,7 +94,7 @@ const App = () => {
             path="users"
             element={
               <ProtectedAdminRoute requiredSection="users">
-                <AdminUsers />
+                <UserManagement />
               </ProtectedAdminRoute>
             }
           />
@@ -125,9 +120,10 @@ const App = () => {
 
 const AppLayout = () => {
   return (
-    
+    <>
       <Outlet />
-    
+      <Toaster />
+    </>
   );
 };
 

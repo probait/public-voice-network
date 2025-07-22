@@ -5,6 +5,7 @@ import AdminHeader from './AdminHeader';
 
 interface AdminLayoutProps {
   children: ReactNode;
+  requiredRole?: string;
 }
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {

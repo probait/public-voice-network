@@ -175,7 +175,7 @@ const AdminSettings = () => {
     };
   };
   const healthStatus = getSystemHealthStatus();
-  return <AdminLayout requiredRole="admin">
+  return <AdminLayout>
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
