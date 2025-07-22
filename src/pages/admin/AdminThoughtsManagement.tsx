@@ -342,7 +342,7 @@ const AdminThoughtsManagement = () => {
 
   if (loading) {
     return (
-      <AdminLayout requiredSection="thoughts">
+      <AdminLayout requiredRole="admin">
         <div className="space-y-6">
           <h1 className="text-3xl font-bold text-gray-900">Thoughts Management</h1>
           <div className="animate-pulse space-y-4">
@@ -355,7 +355,7 @@ const AdminThoughtsManagement = () => {
   }
 
   return (
-    <AdminLayout requiredSection="thoughts">
+    <AdminLayout requiredRole="admin">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

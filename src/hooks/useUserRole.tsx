@@ -1,5 +1,5 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -7,12 +7,15 @@ type UserRole = 'admin' | 'employee' | 'public' | null;
 
 export const useUserRole = () => {
   const { user } = useAuth();
+  const [role, setRole] = useState<UserRole>(null);
+  const [loading, setLoading] = useState(true);
 
-  const { data: role = null, isLoading: loading } = useQuery({
-    queryKey: ['userRole', user?.id],
-    queryFn: async (): Promise<UserRole> => {
+  useEffect(() => {
+    const fetchUserRole = async () => {
       if (!user) {
-        return null;
+        setRole(null);
+        setLoading(false);
+        return;
       }
 
       try {
@@ -22,22 +25,20 @@ export const useUserRole = () => {
 
         if (error) {
           console.error('Error fetching user role:', error);
-          return null;
+          setRole(null);
+        } else {
+          setRole(data as UserRole);
         }
-        
-        return data as UserRole;
       } catch (error) {
         console.error('Error fetching user role:', error);
-        return null;
+        setRole(null);
+      } finally {
+        setLoading(false);
       }
-    },
-    // Cache role for 5 minutes
-    staleTime: 5 * 60 * 1000,
-    // Don't refetch on window focus for roles
-    refetchOnWindowFocus: false,
-    // Only fetch when we have a user
-    enabled: !!user,
-  });
+    };
+
+    fetchUserRole();
+  }, [user]);
 
   const hasRole = (requiredRole: UserRole) => {
     if (!role || !requiredRole) return false;

@@ -220,7 +220,7 @@ const AdminPartnerships = () => {
 
   if (loading && inquiries.length === 0) {
     return (
-      <AdminLayout requiredSection="partnerships">
+      <AdminLayout requiredRole="admin">
         <div className="space-y-6">
           <h1 className="text-3xl font-bold text-gray-900">Partnership Inquiries</h1>
           <div className="animate-pulse space-y-4">
@@ -233,7 +233,7 @@ const AdminPartnerships = () => {
   }
 
   return (
-    <AdminLayout requiredSection="partnerships">
+    <AdminLayout requiredRole="admin">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
