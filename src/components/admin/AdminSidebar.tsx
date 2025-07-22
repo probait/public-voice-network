@@ -17,7 +17,6 @@ import {
   Heart,
   GraduationCap
 } from 'lucide-react';
-import PolicyNowLogo from '@/components/PolicyNowLogo';
 
 const AdminSidebar = () => {
   const location = useLocation();
@@ -88,14 +87,7 @@ const AdminSidebar = () => {
   const filteredMenuItems = menuItems.filter(item => hasAccess(item.section));
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-      <div className="p-6 border-b border-gray-200">
-        <Link to="/" className="flex items-center">
-          <PolicyNowLogo />
-        </Link>
-        <p className="text-sm text-gray-500 mt-2">Admin Portal</p>
-      </div>
-      
+    <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
       <nav className="flex-1 p-4">
         <ul className="space-y-2">
           {filteredMenuItems.map((item) => {

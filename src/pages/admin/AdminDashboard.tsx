@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, FileText, Calendar, MessageSquare, TrendingUp, Star, Clock, CheckCircle, AlertTriangle, BarChart3 } from 'lucide-react';
 import { format, subDays, isAfter } from 'date-fns';
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   
@@ -83,36 +84,44 @@ const AdminDashboard = () => {
       };
     }
   });
-  const statCards = [{
-    title: 'Total Contributors',
-    value: stats?.contributors || 0,
-    subtitle: `${stats?.recentUsers || 0} this week`,
-    icon: Users,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50'
-  }, {
-    title: 'Published Articles',
-    value: stats?.publishedArticles || 0,
-    subtitle: `${stats?.articles || 0} total drafts`,
-    icon: FileText,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50'
-  }, {
-    title: 'Events Today',
-    value: stats?.todaysEvents || 0,
-    subtitle: `${stats?.upcomingEvents || 0} upcoming`,
-    icon: Calendar,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50'
-  }, {
-    title: 'Featured Events',
-    value: stats?.featuredEvents || 0,
-    subtitle: '3 max allowed',
-    icon: Star,
-    color: 'text-yellow-600',
-    bgColor: 'bg-yellow-50'
-  }];
-  return <AdminLayout>
+
+  const statCards = [
+    {
+      title: 'Total Contributors',
+      value: stats?.contributors || 0,
+      subtitle: `${stats?.recentUsers || 0} this week`,
+      icon: Users,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
+    },
+    {
+      title: 'Published Articles',
+      value: stats?.publishedArticles || 0,
+      subtitle: `${stats?.articles || 0} total drafts`,
+      icon: FileText,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    },
+    {
+      title: 'Events Today',
+      value: stats?.todaysEvents || 0,
+      subtitle: `${stats?.upcomingEvents || 0} upcoming`,
+      icon: Calendar,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50'
+    },
+    {
+      title: 'Featured Events',
+      value: stats?.featuredEvents || 0,
+      subtitle: '3 max allowed',
+      icon: Star,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-50'
+    }
+  ];
+
+  return (
+    <AdminLayout>
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
@@ -121,14 +130,14 @@ const AdminDashboard = () => {
               Welcome back! Here's what's happening with AI Canada Voice.
             </p>
           </div>
-          
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-          {statCards.map(stat => {
-          const Icon = stat.icon;
-          return <Card key={stat.title} className="hover:shadow-md transition-shadow">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {statCards.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={stat.title} className="hover:shadow-md transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium text-gray-600">
                     {stat.title}
@@ -145,8 +154,9 @@ const AdminDashboard = () => {
                     {stat.subtitle}
                   </p>
                 </CardContent>
-              </Card>;
-        })}
+              </Card>
+            );
+          })}
         </div>
 
         {/* Quick Actions */}
@@ -186,11 +196,9 @@ const AdminDashboard = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Recent Activity */}
-        
-
       </div>
-    </AdminLayout>;
+    </AdminLayout>
+  );
 };
+
 export default AdminDashboard;

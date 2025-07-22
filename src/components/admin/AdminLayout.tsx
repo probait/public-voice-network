@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
 import AdminSidebar from './AdminSidebar';
-import Navigation from '../Navigation';
+import AdminHeader from './AdminHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AdminLayoutProps {
@@ -20,16 +20,21 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
 
   if (authLoading || roleLoading || permissionsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex">
-        <div className="w-64 bg-white border-r">
+      <div className="min-h-screen bg-gray-50">
+        <div className="h-16 bg-white border-b">
           <Skeleton className="h-full" />
         </div>
-        <div className="flex-1 p-8">
-          <Skeleton className="h-8 w-64 mb-6" />
-          <div className="space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
+        <div className="flex h-[calc(100vh-4rem)]">
+          <div className="w-64 bg-white border-r">
+            <Skeleton className="h-full" />
+          </div>
+          <div className="flex-1 p-8">
+            <Skeleton className="h-8 w-64 mb-6" />
+            <div className="space-y-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
           </div>
         </div>
       </div>
@@ -79,12 +84,14 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      <div className="flex">
+      <AdminHeader />
+      <div className="flex h-[calc(100vh-4rem)]">
         <AdminSidebar />
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-auto">
           <main className="p-8">
-            {children}
+            <div className="max-w-7xl mx-auto">
+              {children}
+            </div>
           </main>
         </div>
       </div>
