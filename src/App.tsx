@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import ScrollToTop from "@/components/ScrollToTop";
+import ProtectedAdminRoute from "@/components/admin/ProtectedAdminRoute";
 import Index from "./pages/Index";
 import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
@@ -51,6 +52,7 @@ const App = () => {
           <BrowserRouter>
           <ScrollToTop />
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/events" element={<Events />} />
             <Route path="/events/:id" element={<EventDetail />} />
@@ -59,7 +61,6 @@ const App = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            
             <Route path="/contributors" element={<Contributors />} />
             <Route path="/contributors/:id" element={<ContributorProfile />} />
             {/* Temporarily hidden - Fellows route */}
@@ -67,19 +68,58 @@ const App = () => {
             <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:slug" element={<Article />} />
             
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<UserManagement />} />
-            <Route path="/admin/contributors" element={<AdminContributors />} />
+            {/* Admin Routes - Each with required section permission */}
+            <Route path="/admin" element={
+              <ProtectedAdminRoute requiredSection="dashboard">
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/admin/users" element={
+              <ProtectedAdminRoute requiredSection="users">
+                <UserManagement />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/admin/contributors" element={
+              <ProtectedAdminRoute requiredSection="contributors">
+                <AdminContributors />
+              </ProtectedAdminRoute>
+            } />
             {/* Temporarily hidden - Admin Fellows route */}
-            {/* <Route path="/admin/fellows" element={<AdminFellows />} /> */}
-            <Route path="/admin/articles" element={<AdminArticles />} />
-            <Route path="/admin/events" element={<AdminEvents />} />
-            <Route path="/admin/newsletter" element={<AdminNewsletter />} />
-            <Route path="/admin/partnerships" element={<AdminPartnerships />} />
-            <Route path="/admin/thoughts" element={<AdminThoughtsManagement />} />
-            
-            <Route path="/admin/settings" element={<AdminSettings />} />
+            {/* <Route path="/admin/fellows" element={
+              <ProtectedAdminRoute requiredSection="contributors">
+                <AdminFellows />
+              </ProtectedAdminRoute>
+            } /> */}
+            <Route path="/admin/articles" element={
+              <ProtectedAdminRoute requiredSection="articles">
+                <AdminArticles />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/admin/events" element={
+              <ProtectedAdminRoute requiredSection="events">
+                <AdminEvents />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/admin/newsletter" element={
+              <ProtectedAdminRoute requiredSection="newsletter">
+                <AdminNewsletter />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/admin/partnerships" element={
+              <ProtectedAdminRoute requiredSection="partnerships">
+                <AdminPartnerships />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/admin/thoughts" element={
+              <ProtectedAdminRoute requiredSection="thoughts">
+                <AdminThoughtsManagement />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/admin/settings" element={
+              <ProtectedAdminRoute requiredSection="settings">
+                <AdminSettings />
+              </ProtectedAdminRoute>
+            } />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
