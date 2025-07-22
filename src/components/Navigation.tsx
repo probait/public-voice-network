@@ -10,6 +10,7 @@ import UserAvatarDropdown from "@/components/UserAvatarDropdown";
 const Navigation = () => {
   const { user } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <>
@@ -59,13 +60,60 @@ const Navigation = () => {
               )}
               
               <div className="md:hidden">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
                   Menu
                 </Button>
               </div>
             </div>
           </div>
         </div>
+        
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-200 bg-white">
+            <div className="px-4 py-2 space-y-1">
+              <Link 
+                to="/" 
+                className="block text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </Link>
+              <Link 
+                to="/contributors" 
+                className="block text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Contributors
+              </Link>
+              <Link 
+                to="/events" 
+                className="block text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Events
+              </Link>
+              <Link 
+                to="/get-involved" 
+                className="block text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Get Involved
+              </Link>
+              <Link 
+                to="/about" 
+                className="block text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
       <AuthModal 

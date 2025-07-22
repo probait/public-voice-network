@@ -26,9 +26,9 @@ const GetInvolved = () => {
 
           {/* Organization Partnership Section */}
           <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-lg p-6 mb-8">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Building2 className="w-6 h-6 text-red-600" />
+                <Building2 className="w-6 h-6 text-red-600 flex-shrink-0" />
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Organizations & Partners</h3>
                   <p className="text-gray-600 text-sm">
@@ -39,7 +39,7 @@ const GetInvolved = () => {
               <Button
                 onClick={() => setShowOrgForm(!showOrgForm)}
                 variant="outline"
-                className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white flex items-center gap-2"
+                className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white flex items-center gap-2 whitespace-nowrap flex-shrink-0"
               >
                 Partner with Us
                 {showOrgForm ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
