@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
 import AdminSidebar from './AdminSidebar';
+import Navigation from '../Navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface AdminLayoutProps {
@@ -77,12 +78,15 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <AdminSidebar />
-      <div className="flex-1 overflow-hidden">
-        <main className="p-8">
-          {children}
-        </main>
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      <div className="flex">
+        <AdminSidebar />
+        <div className="flex-1 overflow-hidden">
+          <main className="p-8">
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   );
