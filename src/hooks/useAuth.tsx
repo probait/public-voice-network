@@ -1,6 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -28,29 +30,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // Check if this is a sign-in event and not an initial page load
+
         if (event === 'SIGNED_IN' && session?.user) {
-          // Use setTimeout to prevent auth state deadlock
-          setTimeout(async () => {
-            // Don't redirect if already on admin page
-            if (window.location.pathname.startsWith('/admin')) {
-              return;
-            }
-            
-            try {
-              // Check if user has admin access
+          // Prefetch permissions immediately after sign in
+          await queryClient.prefetchQuery({
+            queryKey: ["userPermissions", session.user.id],
+            queryFn: async () => {
               const { data: role } = await supabase.rpc('get_user_role', {
                 _user_id: session.user.id
               });
-              
-              if (role === 'admin' || role === 'employee') {
-                window.location.href = '/admin';
-              }
-            } catch (err) {
-              console.error("Error checking user role:", err);
+              return role === 'admin' || role === 'employee' 
+                ? window.location.href = '/admin'
+                : window.location.href = '/';
             }
-          }, 0);
+          });
         }
       }
     );
@@ -62,7 +55,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   const signInWithEmail = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -107,7 +100,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
     return { error };
   };
-
 
   const resetPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {

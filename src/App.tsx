@@ -1,93 +1,133 @@
-
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Route,
+  createRoutesFromElements,
+  Outlet,
+} from "react-router-dom";
+import Auth from "@/pages/Auth";
+import Home from "@/pages/Home";
+import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminArticles from "@/pages/admin/AdminArticles";
+import AdminContributors from "@/pages/admin/AdminContributors";
+import AdminEvents from "@/pages/admin/AdminEvents";
+import AdminThoughts from "@/pages/admin/AdminThoughts";
+import AdminPartnerships from "@/pages/admin/AdminPartnerships";
+import AdminNewsletter from "@/pages/admin/AdminNewsletter";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminSettings from "@/pages/admin/AdminSettings";
+import AdminLayout from "@/components/admin/AdminLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
-import ScrollToTop from "@/components/ScrollToTop";
-import Index from "./pages/Index";
-import Events from "./pages/Events";
-import EventDetail from "./pages/EventDetail";
-import GetInvolved from "./pages/GetInvolved";
-import About from "./pages/About";
-import Privacy from "./pages/Privacy";
-import Contributors from "./pages/Contributors";
-import ContributorProfile from "./pages/ContributorProfile";
-import Fellows from "./pages/Fellows";
-import Articles from "./pages/Articles";
-import Article from "./pages/Article";
-import ResetPassword from "./pages/ResetPassword";
-import Auth from "./pages/Auth";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import UserManagement from "./pages/admin/UserManagement";
-import AdminContributors from "./pages/admin/AdminContributors";
-import AdminFellows from "./pages/admin/AdminFellows";
-import AdminArticles from "./pages/admin/AdminArticles";
-import AdminEvents from "./pages/admin/AdminEvents";
-import AdminPartnerships from "./pages/admin/AdminPartnerships";
-import AdminThoughtsManagement from "./pages/admin/AdminThoughtsManagement";
-import AdminNewsletter from "./pages/admin/AdminNewsletter";
-import AdminSettings from "./pages/admin/AdminSettings";
-import NotFound from "./pages/NotFound";
-import MaintenanceMode from "./components/MaintenanceMode";
+import { ToastProvider } from "@/hooks/use-toast";
+import ResetPassword from "@/pages/ResetPassword";
+import UpdatePassword from "@/pages/UpdatePassword";
+import VerifyEmail from "@/pages/VerifyEmail";
+import ProtectedAdminRoute from '@/components/ProtectedAdminRoute';
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Check for maintenance mode
-  const isMaintenanceMode = localStorage.getItem('maintenance_mode') === 'true';
-  
-  if (isMaintenanceMode) {
-    return <MaintenanceMode />;
-  }
+  const router = createBrowserRouter(
+    createRoutesFromElements(
+      <Route path="/" element={<ToastProvider><AppLayout /></ToastProvider>}>
+        <Route index element={<Home />} />
+        <Route path="auth" element={<Auth />} />
+        <Route path="reset-password" element={<ResetPassword />} />
+        <Route path="update-password" element={<UpdatePassword />} />
+        <Route path="verify-email" element={<VerifyEmail />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedAdminRoute>
+              <AdminLayout>
+                <Outlet />
+              </AdminLayout>
+            </ProtectedAdminRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route
+            path="articles"
+            element={
+              <ProtectedAdminRoute requiredSection="articles">
+                <AdminArticles />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="contributors"
+            element={
+              <ProtectedAdminRoute requiredSection="contributors">
+                <AdminContributors />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="events"
+            element={
+              <ProtectedAdminRoute requiredSection="events">
+                <AdminEvents />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="thoughts"
+            element={
+              <ProtectedAdminRoute requiredSection="thoughts">
+                <AdminThoughts />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="partnerships"
+            element={
+              <ProtectedAdminRoute requiredSection="partnerships">
+                <AdminPartnerships />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="newsletter"
+            element={
+              <ProtectedAdminRoute requiredSection="newsletter">
+                <AdminNewsletter />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="users"
+            element={
+              <ProtectedAdminRoute requiredSection="users">
+                <AdminUsers />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              <ProtectedAdminRoute requiredSection="settings">
+                <AdminSettings />
+              </ProtectedAdminRoute>
+            }
+          />
+        </Route>
+      </Route>
+    )
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/events/:id" element={<EventDetail />} />
-            <Route path="/get-involved" element={<GetInvolved />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            
-            <Route path="/contributors" element={<Contributors />} />
-            <Route path="/contributors/:id" element={<ContributorProfile />} />
-            {/* Temporarily hidden - Fellows route */}
-            {/* <Route path="/fellows" element={<Fellows />} /> */}
-            <Route path="/articles" element={<Articles />} />
-            <Route path="/articles/:slug" element={<Article />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<UserManagement />} />
-            <Route path="/admin/contributors" element={<AdminContributors />} />
-            {/* Temporarily hidden - Admin Fellows route */}
-            {/* <Route path="/admin/fellows" element={<AdminFellows />} /> */}
-            <Route path="/admin/articles" element={<AdminArticles />} />
-            <Route path="/admin/events" element={<AdminEvents />} />
-            <Route path="/admin/newsletter" element={<AdminNewsletter />} />
-            <Route path="/admin/partnerships" element={<AdminPartnerships />} />
-            <Route path="/admin/thoughts" element={<AdminThoughtsManagement />} />
-            
-            <Route path="/admin/settings" element={<AdminSettings />} />
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
+      <RouterProvider router={router} />
     </QueryClientProvider>
+  );
+};
+
+const AppLayout = () => {
+  return (
+    
+      <Outlet />
+    
   );
 };
 
