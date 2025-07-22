@@ -68,9 +68,9 @@ const App = () => {
             <Route path="/articles" element={<Articles />} />
             <Route path="/articles/:slug" element={<Article />} />
             
-            {/* Admin Routes - Each with required section permission */}
+            {/* Admin Routes - Dashboard doesn't require specific section permission */}
             <Route path="/admin" element={
-              <ProtectedAdminRoute requiredSection="dashboard">
+              <ProtectedAdminRoute>
                 <AdminDashboard />
               </ProtectedAdminRoute>
             } />

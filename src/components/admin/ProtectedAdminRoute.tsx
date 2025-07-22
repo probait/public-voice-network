@@ -1,5 +1,5 @@
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserPermissions, AdminSection } from '@/hooks/useUserPermissions';
@@ -18,6 +18,7 @@ const ProtectedAdminRoute = ({
   const { user, loading: authLoading } = useAuth();
   const { hasPermission, canAccessAdminPortal, loading: permissionsLoading } = useUserPermissions();
   const location = useLocation();
+  const toastShownRef = useRef(false);
 
   // Show loading state while authentication and permissions are being checked
   const isLoading = authLoading || permissionsLoading;
@@ -55,13 +56,19 @@ const ProtectedAdminRoute = ({
 
   // Check if user can access admin portal at all
   if (!canAccessAdminPortal()) {
-    toast.error("You don't have permission to access the admin area");
+    if (!toastShownRef.current) {
+      toast.error("You don't have permission to access the admin area");
+      toastShownRef.current = true;
+    }
     return <Navigate to="/" replace />;
   }
 
   // If a specific section is required, check that permission
   if (requiredSection && !hasPermission(requiredSection)) {
-    toast.error(`You don't have permission to access the ${requiredSection} section`);
+    if (!toastShownRef.current) {
+      toast.error(`You don't have permission to access the ${requiredSection} section`);
+      toastShownRef.current = true;
+    }
     return <Navigate to="/admin" replace />;
   }
 
