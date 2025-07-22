@@ -117,9 +117,9 @@ const ContributorProfile = () => {
       <main className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="mb-8">
-            <CardContent className="p-8">
+            <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex flex-col lg:flex-row items-start gap-6">
-                <div className="w-32 h-32 rounded-full overflow-hidden bg-red-100 mx-auto lg:mx-0 flex-shrink-0">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden bg-red-100 mx-auto lg:mx-0 flex-shrink-0">
                   {contributor.headshot_url ? (
                     <img
                       src={contributor.headshot_url}
@@ -127,18 +127,18 @@ const ContributorProfile = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-red-600 text-3xl font-semibold">
+                    <div className="w-full h-full flex items-center justify-center text-red-600 text-2xl sm:text-3xl font-semibold">
                       {contributor.name.split(' ').map(n => n[0]).join('')}
                     </div>
                   )}
                 </div>
                 
-                <div className="flex-1 text-center lg:text-left">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                    <div>
-                      <h1 className="text-3xl font-bold text-gray-900 mb-2">{contributor.name}</h1>
+                <div className="flex-1 text-center lg:text-left min-w-0">
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4 gap-4">
+                    <div className="min-w-0 flex-1">
+                      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 break-words">{contributor.name}</h1>
                       {(contributor.organization || contributor.institution) && (
-                        <p className="text-lg text-gray-600 mb-3">
+                        <p className="text-base sm:text-lg text-gray-600 mb-3 break-words">
                           {contributor.organization && contributor.institution 
                             ? `${contributor.organization}, ${contributor.institution}`
                             : contributor.organization || contributor.institution}
@@ -146,9 +146,9 @@ const ContributorProfile = () => {
                       )}
                     </div>
                     
-                    <div className="flex gap-2 justify-center lg:justify-start">
+                    <div className="flex flex-wrap gap-2 justify-center lg:justify-start flex-shrink-0">
                       {contributor.is_featured && (
-                        <Badge className="bg-red-100 text-red-800">Featured Contributor</Badge>
+                        <Badge className="bg-red-100 text-red-800 whitespace-nowrap">Featured Contributor</Badge>
                       )}
                       {/* Temporarily hidden - Fellowship badge */}
                       {/* {fellowship && (
@@ -158,12 +158,12 @@ const ContributorProfile = () => {
                   </div>
                   
                   {contributor.bio && (
-                    <p className="text-gray-700 leading-relaxed mb-6">{contributor.bio}</p>
+                    <p className="text-gray-700 leading-relaxed mb-6 break-words">{contributor.bio}</p>
                   )}
                   
-                  <div className="flex gap-3 justify-center lg:justify-start">
+                  <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start">
                     {contributor.website_url && (
-                      <Button variant="outline" asChild>
+                      <Button variant="outline" size="sm" asChild className="flex-shrink-0">
                         <a href={contributor.website_url} target="_blank" rel="noopener noreferrer">
                           <Globe className="w-4 h-4 mr-2" />
                           Website
@@ -171,7 +171,7 @@ const ContributorProfile = () => {
                       </Button>
                     )}
                     {contributor.linkedin_url && (
-                      <Button variant="outline" asChild>
+                      <Button variant="outline" size="sm" asChild className="flex-shrink-0">
                         <a href={contributor.linkedin_url} target="_blank" rel="noopener noreferrer">
                           <Linkedin className="w-4 h-4 mr-2" />
                           LinkedIn
@@ -179,7 +179,7 @@ const ContributorProfile = () => {
                       </Button>
                     )}
                     {contributor.twitter_url && (
-                      <Button variant="outline" asChild>
+                      <Button variant="outline" size="sm" asChild className="flex-shrink-0">
                         <a href={contributor.twitter_url} target="_blank" rel="noopener noreferrer">
                           <Twitter className="w-4 h-4 mr-2" />
                           Twitter
@@ -187,7 +187,7 @@ const ContributorProfile = () => {
                       </Button>
                     )}
                     {contributor.email && (
-                      <Button variant="outline" asChild>
+                      <Button variant="outline" size="sm" asChild className="flex-shrink-0">
                         <a href={`mailto:${contributor.email}`}>
                           <Mail className="w-4 h-4 mr-2" />
                           Contact
@@ -236,7 +236,7 @@ const ContributorProfile = () => {
                 <div className="space-y-4">
                   {articles.map((article) => (
                     <div key={article.id} className="border-l-4 border-red-200 pl-4">
-                      <h3 className="font-semibold text-gray-900 mb-1">{article.title}</h3>
+                      <h3 className="font-semibold text-gray-900 mb-1 break-words">{article.title}</h3>
                       {article.published_at && (
                         <p className="text-sm text-gray-600">
                           Published {new Date(article.published_at).toLocaleDateString()}
