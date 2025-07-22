@@ -59,9 +59,10 @@ const Footer = () => {
         
         <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
           <div className="flex justify-center items-center gap-4 mb-4">
-            <p>
+            <div className="flex items-center gap-2">
               <a href="https://www.neocarbone.ca/" target="_blank" rel="noopener noreferrer" className="text-destructive hover:text-destructive/80 transition-colors">Made with love in Canada by Neo Carbone</a>
-            </p>
+              <img src="/lovable-uploads/e4d3b9de-d473-4bd2-bdcb-fa51b1299e02.png" alt="Neo Carbone logo" className="w-6 h-6" />
+            </div>
             <span>•</span>
             <button onClick={handleAdminPortalClick} className="text-muted-foreground hover:text-primary transition-colors cursor-pointer underline">
               Admin Portal
