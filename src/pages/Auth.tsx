@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -31,15 +32,31 @@ const Auth = () => {
         description: error.message,
         variant: "destructive",
       });
+      setIsLoading(false);
     } else {
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
-      navigate('/');
+      
+      // Check if user can access admin portal
+      try {
+        const { data: role } = await supabase.rpc('get_user_role', {
+          _user_id: (await supabase.auth.getUser()).data.user?.id
+        });
+        
+        if (role === 'admin' || role === 'employee') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+      } catch (err) {
+        console.error("Error checking user role:", err);
+        navigate('/');
+      } finally {
+        setIsLoading(false);
+      }
     }
-    
-    setIsLoading(false);
   };
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
@@ -75,9 +92,10 @@ const Auth = () => {
         description: error.message,
         variant: "destructive",
       });
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
+    // For Google sign-in, the redirect happens automatically through OAuth
+    // The auth state listener in the useEffect will handle the redirection
   };
 
   const handleMagicLink = async (e: React.FormEvent) => {
