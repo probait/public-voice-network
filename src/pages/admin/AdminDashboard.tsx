@@ -9,11 +9,13 @@ import { useUserPermissions } from '@/hooks/useUserPermissions';
 import { useUserRole } from '@/hooks/useUserRole';
 import { Users, FileText, Calendar, MessageSquare, TrendingUp, Star, Clock, CheckCircle, AlertTriangle, BarChart3 } from 'lucide-react';
 import { format, subDays, isAfter } from 'date-fns';
+import { Skeleton } from '@/components/ui/skeleton';
+import MeetupLoadingSkeleton from '@/components/MeetupLoadingSkeleton';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const { isAdmin } = useUserRole();
-  const { hasPermission: hasUserPermission } = useUserPermissions();
+  const { hasPermission } = useUserPermissions();
   
   const {
     data: stats,
@@ -21,67 +23,44 @@ const AdminDashboard = () => {
   } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
-      const queries = [];
+      // Always fetch all stats in parallel, regardless of permissions
+      const [
+        contributorsResponse,
+        articlesResponse, 
+        eventsResponse,
+        usersResponse,
+        featuredEventsResponse,
+        upcomingEventsResponse,
+        recentUsersResponse
+      ] = await Promise.all([
+        supabase.from('contributors').select('id', { count: 'exact', head: true }),
+        supabase.from('articles').select('id, is_published', { count: 'exact' }),
+        supabase.from('meetups').select('id, date_time'),
+        supabase.from('profiles').select('id, created_at'),
+        supabase.from('meetups').select('id').eq('homepage_featured', true),
+        supabase.from('meetups').select('id').gte('date_time', new Date().toISOString()),
+        supabase.from('profiles').select('id, created_at').gte('created_at', subDays(new Date(), 7).toISOString())
+      ]);
       
-      // Only fetch data for sections the user has access to
-      if (hasUserPermission('contributors')) {
-        queries.push(supabase.from('contributors').select('id', { count: 'exact', head: true }));
-      } else {
-        queries.push(Promise.resolve({ count: 0 }));
-      }
-      
-      if (hasUserPermission('articles')) {
-        queries.push(supabase.from('articles').select('id, is_published', { count: 'exact' }));
-      } else {
-        queries.push(Promise.resolve({ data: [], count: 0 }));
-      }
-      
-      if (hasUserPermission('events')) {
-        queries.push(supabase.from('meetups').select('id, date_time'));
-      } else {
-        queries.push(Promise.resolve({ data: [] }));
-      }
-      
-      if (hasUserPermission('users')) {
-        queries.push(supabase.from('profiles').select('id, created_at'));
-      } else {
-        queries.push(Promise.resolve({ data: [], count: 0 }));
-      }
-      
-      if (hasUserPermission('events')) {
-        queries.push(supabase.from('meetups').select('id').eq('homepage_featured', true));
-        queries.push(supabase.from('meetups').select('id').gte('date_time', new Date().toISOString()));
-      } else {
-        queries.push(Promise.resolve({ data: [] }));
-        queries.push(Promise.resolve({ data: [] }));
-      }
-      
-      if (hasUserPermission('users')) {
-        queries.push(supabase.from('profiles').select('id, created_at').gte('created_at', subDays(new Date(), 7).toISOString()));
-      } else {
-        queries.push(Promise.resolve({ data: [] }));
-      }
-
-      const [contributors, articles, events, users, featuredEvents, upcomingEvents, recentUsers] = await Promise.all(queries);
-      
-      const publishedArticles = articles.data?.filter(a => a.is_published).length || 0;
-      const todaysEvents = events.data?.filter(e => 
+      const publishedArticles = articlesResponse.data?.filter(a => a.is_published).length || 0;
+      const todaysEvents = eventsResponse.data?.filter(e => 
         isAfter(new Date(e.date_time), new Date()) && 
         format(new Date(e.date_time), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
       ).length || 0;
       
       return {
-        contributors: contributors.count || 0,
-        articles: articles.count || 0,
+        contributors: contributorsResponse.count || 0,
+        articles: articlesResponse.count || 0,
         publishedArticles,
-        events: events.count || 0,
-        users: users.count || 0,
-        featuredEvents: featuredEvents.data?.length || 0,
-        upcomingEvents: upcomingEvents.data?.length || 0,
-        recentUsers: recentUsers.data?.length || 0,
+        events: eventsResponse.data?.length || 0,
+        users: usersResponse.data?.length || 0,
+        featuredEvents: featuredEventsResponse.data?.length || 0,
+        upcomingEvents: upcomingEventsResponse.data?.length || 0,
+        recentUsers: recentUsersResponse.data?.length || 0,
         todaysEvents
       };
-    }
+    },
+    staleTime: 5 * 60 * 1000 // Cache for 5 minutes
   });
 
   const statCards = [
@@ -150,6 +129,53 @@ const AdminDashboard = () => {
     }
   ];
 
+  // Render loading skeleton while data is being fetched
+  const renderStatCard = (stat: typeof statCards[0]) => {
+    const Icon = stat.icon;
+    
+    if (isLoading) {
+      return (
+        <Card key={stat.title} className="hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              {stat.title}
+            </CardTitle>
+            <div className={`p-2 rounded-md ${stat.bgColor}`}>
+              <Icon className={`h-4 w-4 ${stat.color}`} />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-12" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+    
+    return (
+      <Card key={stat.title} className="hover:shadow-md transition-shadow">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium text-gray-600">
+            {stat.title}
+          </CardTitle>
+          <div className={`p-2 rounded-md ${stat.bgColor}`}>
+            <Icon className={`h-4 w-4 ${stat.color}`} />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold mb-1">
+            {stat.value}
+          </div>
+          <p className="text-xs text-gray-500">
+            {stat.subtitle}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
     <ProtectedAdminRoute>
       <div className="space-y-8">
@@ -165,30 +191,8 @@ const AdminDashboard = () => {
         {/* Stats Grid - Only show cards for sections user has access to */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards
-            .filter(stat => hasUserPermission(stat.section))
-            .map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <Card key={stat.title} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-600">
-                      {stat.title}
-                    </CardTitle>
-                    <div className={`p-2 rounded-md ${stat.bgColor}`}>
-                      <Icon className={`h-4 w-4 ${stat.color}`} />
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold mb-1">
-                      {isLoading ? '...' : stat.value}
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      {stat.subtitle}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            .filter(stat => hasPermission(stat.section))
+            .map(renderStatCard)}
         </div>
 
         {/* Quick Actions - Only show actions for sections user has access to */}
@@ -202,7 +206,7 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {quickActions
-                .filter(action => hasUserPermission(action.section))
+                .filter(action => hasPermission(action.section))
                 .map((action) => {
                   const Icon = action.icon;
                   return (
@@ -218,7 +222,7 @@ const AdminDashboard = () => {
                   );
                 })}
             </div>
-            {quickActions.filter(action => hasUserPermission(action.section)).length === 0 && (
+            {quickActions.filter(action => hasPermission(action.section)).length === 0 && (
               <div className="text-center py-8">
                 <p className="text-gray-500">
                   No quick actions available. Contact your administrator for section access.
