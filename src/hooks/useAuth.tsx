@@ -104,9 +104,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               });
               
               if (role === 'admin' || role === 'employee') {
-                const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/admin';
-                sessionStorage.removeItem('redirectAfterLogin');
-                window.location.href = redirectPath;
+                // Check if we have a redirect stored
+                const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+                // Only redirect if we have a path AND it's to an admin route
+                if (redirectPath && redirectPath.startsWith('/admin')) {
+                  // Add a safety check to prevent redirect loops
+                  const hasRedirectParam = new URL(window.location.href).searchParams.has('noRedirect');
+                  
+                  if (!hasRedirectParam) {
+                    sessionStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectPath;
+                  }
+                }
               }
             } catch (err) {
               console.error("Error checking user role:", err);
@@ -133,6 +142,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => subscription.unsubscribe();
   }, [queryClient]);
+
+  // Let's add a debugging function to help diagnose issues
+  const logAuthState = () => {
+    console.log("Auth state:", { 
+      user: user?.id,
+      role: queryClient.getQueryData(['userRole', user?.id]),
+      redirectPath: sessionStorage.getItem('redirectAfterLogin')
+    });
+  };
+  
+  // Log auth state changes for debugging
+  useEffect(() => {
+    if (!loading) {
+      logAuthState();
+    }
+  }, [loading, user]);
 
   const signInWithEmail = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({

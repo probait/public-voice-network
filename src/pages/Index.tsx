@@ -6,6 +6,7 @@ import EventbriteFeed from "@/components/EventbriteFeed";
 import FeaturedContributor from "@/components/FeaturedContributor";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { Link } from "react-router-dom";
 import SubmissionsFeed from "@/components/SubmissionsFeed";
 import MeetupFeed from "@/components/MeetupFeed";
@@ -19,11 +20,13 @@ import AuthModal from "@/components/AuthModal";
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const { canAccessAdminPortal, loading: permissionsLoading } = useUserPermissions();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { showPopup, hidePopup, showPopupManually } = useNewsletterPopup();
   const { data: articles, isLoading: articlesLoading } = useArticles();
+  const [redirectAttempted, setRedirectAttempted] = useState(false);
 
   useEffect(() => {
     // Check if we should show auth modal on load
@@ -37,18 +40,36 @@ const Index = () => {
   }, [searchParams, setSearchParams]);
 
   useEffect(() => {
-    if (!loading && user) {
-      // User is authenticated, check for redirect
+    // Only process redirects if:
+    // 1. User is authenticated
+    // 2. Not currently loading permissions
+    // 3. We haven't already attempted a redirect (to prevent loops)
+    // 4. We're not already preventing redirects via URL param
+    if (!loading && !permissionsLoading && user && !redirectAttempted && !searchParams.has('noRedirect')) {
       const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+      
+      // Only redirect to admin paths if user has permission
       if (redirectPath && redirectPath.startsWith('/admin')) {
-        sessionStorage.removeItem('redirectAfterLogin');
-        navigate(redirectPath);
+        // Double-check that this user can access the admin portal
+        if (canAccessAdminPortal()) {
+          console.log("Redirecting to admin path:", redirectPath);
+          // Mark that we've attempted a redirect to prevent loops
+          setRedirectAttempted(true);
+          // Clear the redirect path to prevent future attempts
+          sessionStorage.removeItem('redirectAfterLogin');
+          // Navigate to the stored path
+          navigate(redirectPath);
+        } else {
+          // User doesn't have admin access - clear the redirect to prevent loops
+          console.log("User lacks admin permissions, clearing redirect");
+          sessionStorage.removeItem('redirectAfterLogin');
+        }
       }
       
       // Close auth modal if open
       setShowAuthModal(false);
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, permissionsLoading, navigate, canAccessAdminPortal, redirectAttempted, searchParams]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">

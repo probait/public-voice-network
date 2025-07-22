@@ -60,6 +60,8 @@ const ProtectedAdminRoute = ({
       toast.error("You don't have permission to access the admin area");
       toastShownRef.current = true;
     }
+    // Clear any redirect to prevent infinite loops
+    sessionStorage.removeItem('redirectAfterLogin');
     return <Navigate to="/" replace />;
   }
 
@@ -69,6 +71,7 @@ const ProtectedAdminRoute = ({
       toast.error(`You don't have permission to access the ${requiredSection} section`);
       toastShownRef.current = true;
     }
+    // Don't set redirect here - we're still in admin area
     return <Navigate to="/admin" replace />;
   }
 
