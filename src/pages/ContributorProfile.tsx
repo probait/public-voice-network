@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Globe, Linkedin, Twitter, Mail, FileText } from "lucide-react";
+import { Globe, Linkedin, Twitter, Mail, FileText, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ContributorProfile = () => {
@@ -116,6 +116,16 @@ const ContributorProfile = () => {
       
       <main className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back Button */}
+          <div className="mb-6">
+            <Link to="/contributors">
+              <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Contributors
+              </Button>
+            </Link>
+          </div>
+          
           <Card className="mb-8">
             <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex flex-col lg:flex-row items-start gap-6">

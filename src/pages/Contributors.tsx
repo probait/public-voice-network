@@ -68,12 +68,19 @@ const Contributors = () => {
                 <Card key={contributor.id} className="hover:shadow-lg transition-shadow h-full">
                   <CardContent className="p-6 h-full flex flex-col">
                     <div className="flex items-start gap-4 mb-4">
-                      <Avatar className="w-16 h-16 flex-shrink-0">
-                        <AvatarImage src={contributor.headshot_url || ''} alt={contributor.name} />
-                        <AvatarFallback className="bg-red-100 text-red-600 text-lg font-semibold">
-                          {contributor.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="w-16 h-16 rounded-full overflow-hidden bg-red-100 flex-shrink-0">
+                        {contributor.headshot_url ? (
+                          <img
+                            src={contributor.headshot_url}
+                            alt={contributor.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-red-600 text-lg font-semibold">
+                            {contributor.name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                        )}
+                      </div>
                       
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-gray-900 mb-1">{contributor.name}</h3>
