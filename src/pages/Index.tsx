@@ -1,269 +1,161 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import EventbriteFeed from "@/components/EventbriteFeed";
-import FeaturedContributor from "@/components/FeaturedContributor";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import { useUserPermissions } from "@/hooks/useUserPermissions";
-import { Link } from "react-router-dom";
-import SubmissionsFeed from "@/components/SubmissionsFeed";
-import MeetupFeed from "@/components/MeetupFeed";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
-import { NewsletterPopup } from "@/components/NewsletterPopup";
-import { useNewsletterPopup } from "@/hooks/useNewsletterPopup";
-import { useArticles } from "@/hooks/useArticles";
-import ArticleCard from "@/components/ArticleCard";
-import AuthModal from "@/components/AuthModal";
+
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import Navigation from '@/components/Navigation';
+import FeaturedContributor from '@/components/FeaturedContributor';
+import MeetupFeed from '@/components/MeetupFeed';
+import SubmissionsFeed from '@/components/SubmissionsFeed';
+import CommunityFeed from '@/components/CommunityFeed';
+import EventInsights from '@/components/EventInsights';
+import ThoughtsSubmissionForm from '@/components/ThoughtsSubmissionForm';
+import OrganizationContactForm from '@/components/OrganizationContactForm';
+import AuthModal from '@/components/AuthModal';
+import NewsletterPopup from '@/components/NewsletterPopup';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserPermissions } from '@/hooks/useUserPermissions';
 
 const Index = () => {
-  const { user, loading } = useAuth();
-  const { canAccessAdminPortal, loading: permissionsLoading } = useUserPermissions();
+  const [showAuth, setShowAuth] = useState(false);
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const { showPopup, hidePopup, showPopupManually } = useNewsletterPopup();
-  const { data: articles, isLoading: articlesLoading } = useArticles();
-  const [redirectAttempted, setRedirectAttempted] = useState(false);
+  const { user, loading: authLoading } = useAuth();
+  const { canAccessAdminPortal, loading: permissionsLoading } = useUserPermissions();
 
+  // Handle auth modal from URL params
   useEffect(() => {
-    // Check if we should show auth modal on load
     if (searchParams.get('showAuth') === 'true') {
-      setShowAuthModal(true);
-      // Clean up the URL parameter
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete('showAuth');
-      setSearchParams(newSearchParams, { replace: true });
+      setShowAuth(true);
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams]);
 
+  // Handle redirect after login - only attempt once and with proper checks
   useEffect(() => {
-    // Only process redirects if:
-    // 1. User is authenticated
-    // 2. Not currently loading permissions
-    // 3. We haven't already attempted a redirect (to prevent loops)
-    // 4. We're not already preventing redirects via URL param
-    if (!loading && !permissionsLoading && user && !redirectAttempted && !searchParams.has('noRedirect')) {
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin');
-      
-      // Only redirect to admin paths if user has permission
-      if (redirectPath && redirectPath.startsWith('/admin')) {
-        // Double-check that this user can access the admin portal
-        if (canAccessAdminPortal()) {
-          console.log("Redirecting to admin path:", redirectPath);
-          // Mark that we've attempted a redirect to prevent loops
-          setRedirectAttempted(true);
-          // Clear the redirect path to prevent future attempts
-          sessionStorage.removeItem('redirectAfterLogin');
-          // Navigate to the stored path
-          navigate(redirectPath);
-        } else {
-          // User doesn't have admin access - clear the redirect to prevent loops
-          console.log("User lacks admin permissions, clearing redirect");
-          sessionStorage.removeItem('redirectAfterLogin');
-        }
-      }
-      
-      // Close auth modal if open
-      setShowAuthModal(false);
+    // Don't attempt redirect if still loading or if noRedirect param is present
+    if (authLoading || permissionsLoading || searchParams.has('noRedirect')) {
+      return;
     }
-  }, [user, loading, permissionsLoading, navigate, canAccessAdminPortal, redirectAttempted, searchParams]);
+
+    // Only proceed if user is authenticated
+    if (!user) {
+      return;
+    }
+
+    const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+    console.log('🏠 [Index] Checking redirect:', { user: user.id, redirectPath, canAccess: canAccessAdminPortal() });
+    
+    if (redirectPath && redirectPath.startsWith('/admin')) {
+      // Check if user can actually access admin portal
+      if (canAccessAdminPortal()) {
+        console.log('🏠 [Index] User can access admin, redirecting to:', redirectPath);
+        sessionStorage.removeItem('redirectAfterLogin');
+        navigate(redirectPath, { replace: true });
+      } else {
+        console.log('🏠 [Index] User cannot access admin portal, clearing redirect');
+        // User can't access admin portal, clear the redirect
+        sessionStorage.removeItem('redirectAfterLogin');
+      }
+    }
+  }, [user, authLoading, permissionsLoading, navigate, canAccessAdminPortal, searchParams]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-blue-50">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative text-white py-20 overflow-hidden">
-        {/* House of Commons background image with overlay */}
-        <div className="absolute inset-0">
-          <img 
-            src="/lovable-uploads/d2c84baf-534d-4715-9e32-2deda000aca7.png" 
-            alt="Canada House of Commons"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-red-600/85 to-red-800/85"></div>
-        </div>
-        
-        {/* Content */}
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            <div>
-              <h1 className="text-4xl sm:text-6xl font-bold mb-6">
-                AI's Impact on Canada
-              </h1>
-              <p className="text-xl sm:text-2xl mb-8 opacity-90">
-                Exploring the challenges, opportunities, and policy implications of artificial intelligence for Canadian communities.
-              </p>
-              <Link to="/get-involved">
-                <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3">
-                  Get Involved
-                </Button>
-              </Link>
-              <div className="mt-4">
-                <Button 
-                  variant="ghost" 
-                  onClick={showPopupManually}
-                  className="text-white hover:text-white hover:bg-white/10 text-sm px-4 py-2 h-8 border border-white/20 backdrop-blur-sm"
-                >
-                  Join our Newsletter
-                </Button>
-              </div>
-            </div>
-            <div className="hidden lg:block">
-              <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                <h3 className="text-xl font-semibold mb-4 text-white">Voices from Across Canada</h3>
-                <div className="max-h-96 overflow-hidden">
-                  <SubmissionsFeed />
-                </div>
-              </div>
+      <section className="pt-20 pb-16 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Shaping Canada's <span className="text-red-600">Policy Future</span>
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+              Connecting citizens, policymakers, and thought leaders to drive evidence-based policy solutions across Canada.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button 
+                onClick={() => setShowAuth(true)}
+                className="bg-red-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors"
+              >
+                Join the Movement
+              </button>
+              <a 
+                href="#get-involved" 
+                className="bg-white text-red-600 px-8 py-3 rounded-lg font-medium border border-red-600 hover:bg-red-50 transition-colors"
+              >
+                Get Involved
+              </a>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Contributor Section */}
-      <section className="py-8 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FeaturedContributor />
-        </div>
-      </section>
+      <FeaturedContributor />
 
-      {/* Upcoming Events Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Upcoming AI Events & AMAs
-            </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Join conversations, ask questions, and connect with experts discussing AI's impact on Canada
-            </p>
-          </div>
-          
-          {/* Featured Events - show up to 3 featured events */}
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Featured Events</h3>
-            <EventbriteFeed showFeaturedOnly={true} referrer="home" />
-          </div>
+      {/* Event Insights Section */}
+      <EventInsights />
 
-          <div className="text-center mt-8">
-            <Link to="/events">
-              <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
-                View all events
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Editorial Introduction */}
+      {/* Meetups Section */}
       <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="prose prose-lg mx-auto text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              The Future of AI in Canada
-            </h2>
-            <p className="text-gray-600 text-lg leading-relaxed">
-              As artificial intelligence rapidly transforms our economy, healthcare, education, and daily lives, 
-              Canadians deserve a voice in shaping how this technology impacts our communities. From coast to coast, 
-              we're witnessing both the incredible potential and concerning challenges that AI brings to our nation.
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Upcoming Policy Events</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Join our community at policy discussions, workshops, and networking events across Canada.
+            </p>
+          </div>
+          <MeetupFeed />
+        </div>
+      </section>
+
+      {/* Community Submissions Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Citizen Thoughts</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Real insights from Canadians on policy issues that matter to our communities.
+            </p>
+          </div>
+          <SubmissionsFeed />
+        </div>
+      </section>
+
+      {/* Get Involved Section */}
+      <section id="get-involved" className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Involved</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Share your thoughts on policy issues or connect with us about partnership opportunities.
             </p>
           </div>
           
-          {/* YouTube Video Section */}
-          <div className="mt-12 max-w-4xl mx-auto">
-            <div className="bg-gray-100 rounded-lg overflow-hidden shadow-lg">
-              <div className="aspect-video">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  src="https://www.youtube.com/embed/di25i8z0Tn4?si=M0VqjFfNU7HPoKza"
-                  title="Understanding AI's Impact on Canada"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                  className="w-full h-full"
-                ></iframe>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Understanding AI's Impact on Canada
-                </h3>
-                <p className="text-gray-600">
-                  Watch this introduction to learn about the key challenges and opportunities 
-                  that artificial intelligence presents for Canadian communities.
-                </p>
-              </div>
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* Thoughts Submission Form */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Share Your Policy Thoughts</h3>
+              <ThoughtsSubmissionForm />
+            </div>
+            
+            {/* Partnership Form */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Partnership Opportunities</h3>
+              <OrganizationContactForm />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Articles */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-            Featured Articles
-          </h2>
-          {articlesLoading ? (
-            <div className="grid md:grid-cols-3 gap-8">
-              {[...Array(3)].map((_, i) => (
-                <Card key={i} className="h-full animate-pulse bg-white border-0 shadow-md">
-                  <CardContent className="p-0">
-                    <div className="aspect-video bg-gray-200 rounded-t-lg"></div>
-                    <div className="p-6 space-y-4">
-                      <div className="h-6 bg-gray-200 rounded w-3/4"></div>
-                      <div className="h-16 bg-gray-200 rounded"></div>
-                      <div className="h-4 bg-gray-200 rounded w-32"></div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-8">
-              {articles?.slice(0, 3).map((article) => (
-                <ArticleCard key={article.id} article={article} referrer="home" />
-              ))}
-            </div>
-          )}
-          
-          <div className="text-center mt-8">
-            <Link to="/articles">
-              <Button variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
-                View all articles
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Community Feed Section */}
+      <CommunityFeed />
 
-      {/* Call to Action */}
-      <section className="py-20 bg-red-600 text-white text-center">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            Your Voice Matters
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Share your thoughts, concerns, and ideas about how AI is affecting your community. 
-            Together, we can shape a future that works for all Canadians.
-          </p>
-          <Link to="/get-involved">
-            <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3">
-              Share Your Thoughts
-            </Button>
-          </Link>
-        </div>
-      </section>
-
-      <Footer />
+      <AuthModal 
+        isOpen={showAuth} 
+        onClose={() => setShowAuth(false)} 
+      />
       
-      <NewsletterPopup isOpen={showPopup} onClose={hidePopup} />
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      <NewsletterPopup />
     </div>
   );
 };
