@@ -494,7 +494,7 @@ export type Database = {
           change_reason: string | null
           change_type: string
           id: string
-          new_role: Database["public"]["Enums"]["app_role"]
+          new_role: Database["public"]["Enums"]["app_role"] | null
           previous_role: Database["public"]["Enums"]["app_role"] | null
           user_id: string
         }
@@ -504,7 +504,7 @@ export type Database = {
           change_reason?: string | null
           change_type: string
           id?: string
-          new_role: Database["public"]["Enums"]["app_role"]
+          new_role?: Database["public"]["Enums"]["app_role"] | null
           previous_role?: Database["public"]["Enums"]["app_role"] | null
           user_id: string
         }
@@ -514,7 +514,7 @@ export type Database = {
           change_reason?: string | null
           change_type?: string
           id?: string
-          new_role?: Database["public"]["Enums"]["app_role"]
+          new_role?: Database["public"]["Enums"]["app_role"] | null
           previous_role?: Database["public"]["Enums"]["app_role"] | null
           user_id?: string
         }
@@ -594,7 +594,7 @@ export type Database = {
         | "newsletter"
         | "users"
         | "settings"
-      app_role: "admin" | "moderator" | "content_manager" | "viewer"
+      app_role: "public" | "employee" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -733,7 +733,7 @@ export const Constants = {
         "users",
         "settings",
       ],
-      app_role: ["admin", "moderator", "content_manager", "viewer"],
+      app_role: ["public", "employee", "admin"],
     },
   },
 } as const
