@@ -70,7 +70,7 @@ const Footer = () => {
               Admin Portal
             </button>
           </div>
-          <p>&copy; 2024 AI Canada Voice. All rights reserved.</p>
+          <p>© 2025 AI Canada Voice. All rights reserved.</p>
         </div>
       </div>
 
