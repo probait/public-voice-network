@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -7,6 +8,15 @@ interface NewsletterSettings {
   popup_frequency_days: number;
 }
 
+/**
+ * Checks if the current domain is the production domain
+ * @returns boolean indicating if we're on production domain
+ */
+const isProductionDomain = (): boolean => {
+  const hostname = window.location.hostname;
+  return hostname === "policynow.ca" || hostname === "www.policynow.ca";
+};
+
 export function useNewsletterPopup() {
   const [showPopup, setShowPopup] = useState(false);
   const [settings, setSettings] = useState<NewsletterSettings | null>(null);
@@ -14,6 +24,12 @@ export function useNewsletterPopup() {
   useEffect(() => {
     const checkPopupSettings = async () => {
       try {
+        // Skip showing popup automatically if not on production domain
+        if (!isProductionDomain()) {
+          console.log("Newsletter popup disabled: not on production domain");
+          return;
+        }
+
         // Get newsletter settings
         const { data: settingsData, error } = await supabase
           .from("newsletter_settings")

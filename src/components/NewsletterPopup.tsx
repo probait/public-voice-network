@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -69,9 +69,9 @@ export function NewsletterPopup({ isOpen, onClose }: NewsletterPopupProps) {
   };
 
   const handleDismiss = () => {
-    // Set localStorage to prevent showing popup again for 7 days
-    const dismissedUntil = Date.now() + (7 * 24 * 60 * 60 * 1000);
-    localStorage.setItem("newsletter-popup-dismissed", dismissedUntil.toString());
+    // Set localStorage to prevent showing popup again for specified days in settings
+    // Using 7 days as fallback
+    localStorage.setItem("newsletter-popup-dismissed", Date.now().toString());
     onClose();
   };
 
