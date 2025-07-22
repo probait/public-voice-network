@@ -1,13 +1,12 @@
-
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import AuthModal from "@/components/AuthModal";
-
 const Footer = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
   const handleAdminPortalClick = () => {
     if (user) {
       // User is signed in, redirect to admin portal
@@ -17,8 +16,7 @@ const Footer = () => {
       setIsAuthModalOpen(true);
     }
   };
-  return (
-    <footer className="bg-muted/50 border-t border-border mt-16">
+  return <footer className="bg-muted/50 border-t border-border mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
@@ -62,20 +60,10 @@ const Footer = () => {
         <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
           <div className="flex justify-center items-center gap-4 mb-4">
             <p>
-              <a 
-                href="https://www.neocarbone.ca/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-destructive hover:text-destructive/80 transition-colors"
-              >
-                Made with love in Canada
-              </a>
+              <a href="https://www.neocarbone.ca/" target="_blank" rel="noopener noreferrer" className="text-destructive hover:text-destructive/80 transition-colors">Made with love in Canada by Neo Carbone</a>
             </p>
             <span>•</span>
-            <button
-              onClick={handleAdminPortalClick}
-              className="text-muted-foreground hover:text-primary transition-colors cursor-pointer underline"
-            >
+            <button onClick={handleAdminPortalClick} className="text-muted-foreground hover:text-primary transition-colors cursor-pointer underline">
               Admin Portal
             </button>
           </div>
@@ -83,12 +71,7 @@ const Footer = () => {
         </div>
       </div>
 
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-      />
-    </footer>
-  );
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+    </footer>;
 };
-
 export default Footer;
