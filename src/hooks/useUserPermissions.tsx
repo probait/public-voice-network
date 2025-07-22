@@ -60,16 +60,17 @@ export const useUserPermissions = () => {
       // Employee users - fetch their specific permissions from the database
       if (role === 'employee') {
         try {
-          const { data, error } = await supabase.rpc('get_user_permissions', {
-            user_id_param: user.id
-          });
+          const { data, error } = await supabase
+            .from('user_section_permissions')
+            .select('section, has_access')
+            .eq('user_id', user.id);
 
           if (error) {
             console.error('Error fetching user permissions:', error);
             setPermissions({});
           } else {
             const userPermissions: UserPermissions = {};
-            data?.forEach((perm: { section: string; has_access: boolean }) => {
+            data?.forEach((perm) => {
               userPermissions[perm.section] = perm.has_access;
             });
             setPermissions(userPermissions);

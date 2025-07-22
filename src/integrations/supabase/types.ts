@@ -520,6 +520,41 @@ export type Database = {
         }
         Relationships: []
       }
+      user_section_permissions: {
+        Row: {
+          created_at: string | null
+          has_access: boolean
+          id: string
+          section: Database["public"]["Enums"]["admin_section"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          has_access?: boolean
+          id?: string
+          section: Database["public"]["Enums"]["admin_section"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          has_access?: boolean
+          id?: string
+          section?: Database["public"]["Enums"]["admin_section"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_section_permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -528,6 +563,13 @@ export type Database = {
       get_total_thoughts_count: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      get_user_permissions: {
+        Args: { user_id_param: string }
+        Returns: {
+          section: string
+          has_access: boolean
+        }[]
       }
       get_user_role: {
         Args: { _user_id: string }
@@ -542,6 +584,16 @@ export type Database = {
       }
     }
     Enums: {
+      admin_section:
+        | "dashboard"
+        | "articles"
+        | "contributors"
+        | "events"
+        | "thoughts"
+        | "partnerships"
+        | "newsletter"
+        | "users"
+        | "settings"
       app_role: "admin" | "moderator" | "content_manager" | "viewer"
     }
     CompositeTypes: {
@@ -670,6 +722,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admin_section: [
+        "dashboard",
+        "articles",
+        "contributors",
+        "events",
+        "thoughts",
+        "partnerships",
+        "newsletter",
+        "users",
+        "settings",
+      ],
       app_role: ["admin", "moderator", "content_manager", "viewer"],
     },
   },

@@ -55,8 +55,8 @@ const UserManagement = () => {
       const { data: profiles, error } = await query;
       if (error) throw error;
 
-      // Get permission counts for employees
-      const employeeIds = profiles?.filter(p => p.user_role === 'employee').map(p => p.id) || [];
+      // Get permission counts for employees  
+      const employeeIds = profiles?.filter(p => (p.user_role as any) === 'employee').map(p => p.id) || [];
       
       let permissionCounts: { [userId: string]: number } = {};
       if (employeeIds.length > 0) {
@@ -66,7 +66,7 @@ const UserManagement = () => {
           .in('user_id', employeeIds)
           .eq('has_access', true);
 
-        if (!permError) {
+        if (!permError && permissions) {
           permissionCounts = permissions.reduce((acc, perm) => {
             acc[perm.user_id] = (acc[perm.user_id] || 0) + 1;
             return acc;

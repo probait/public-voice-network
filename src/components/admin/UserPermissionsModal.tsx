@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -36,14 +36,15 @@ export const UserPermissionsModal = ({ isOpen, onClose, userId, userName }: User
   const { data: currentPermissions, isLoading } = useQuery({
     queryKey: ['user-permissions', userId],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_user_permissions', {
-        user_id_param: userId
-      });
+      const { data, error } = await supabase
+        .from('user_section_permissions')
+        .select('section, has_access')
+        .eq('user_id', userId);
       
       if (error) throw error;
       
       const permissions = new Set<AdminSection>();
-      data?.forEach((perm: { section: string; has_access: boolean }) => {
+      data?.forEach((perm) => {
         if (perm.has_access) {
           permissions.add(perm.section as AdminSection);
         }
@@ -55,7 +56,7 @@ export const UserPermissionsModal = ({ isOpen, onClose, userId, userName }: User
   });
 
   // Set selected permissions when data loads
-  useState(() => {
+  useEffect(() => {
     if (currentPermissions) {
       setSelectedPermissions(new Set(currentPermissions));
     }
@@ -73,7 +74,7 @@ export const UserPermissionsModal = ({ isOpen, onClose, userId, userName }: User
       if (permissions.size > 0) {
         const permissionRows = Array.from(permissions).map(section => ({
           user_id: userId,
-          section,
+          section: section as any,
           has_access: true
         }));
 
