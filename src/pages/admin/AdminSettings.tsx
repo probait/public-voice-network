@@ -1,76 +1,13 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import ProtectedAdminRoute from '@/components/admin/ProtectedAdminRoute';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 
 const AdminSettings = () => {
   const [siteName, setSiteName] = useState('');
   const [siteDescription, setSiteDescription] = useState('');
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Fetch site settings
-  const { data: settings, isLoading } = useQuery({
-    queryKey: ['site-settings'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('*')
-        .single();
-
-      if (error) {
-        console.error('Error fetching site settings:', error);
-        throw error;
-      }
-
-      return data;
-    },
-    onSuccess: (data) => {
-      setSiteName(data?.site_name || '');
-      setSiteDescription(data?.site_description || '');
-    },
-  });
-
-  // Update site settings mutation
-  const updateSettingsMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from('site_settings')
-        .update({
-          site_name: siteName,
-          site_description: siteDescription,
-        })
-        .eq('id', settings?.id);
-
-      if (error) {
-        console.error('Error updating site settings:', error);
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      toast({
-        title: 'Success',
-        description: 'Site settings updated successfully.',
-      });
-      queryClient.invalidateQueries({ queryKey: ['site-settings'] });
-    },
-    onError: () => {
-      toast({
-        title: 'Error',
-        description: 'Failed to update site settings.',
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const handleSaveSettings = async () => {
-    updateSettingsMutation.mutate();
-  };
 
   return (
     <ProtectedAdminRoute adminOnly={true}>
@@ -99,9 +36,12 @@ const AdminSettings = () => {
                 placeholder="Connecting AI enthusiasts and concerned citizens..."
               />
             </div>
-            <Button onClick={handleSaveSettings} disabled={updateSettingsMutation.isPending}>
-              {updateSettingsMutation.isPending ? 'Saving...' : 'Save Settings'}
+            <Button>
+              Save Settings
             </Button>
+            <div className="text-center p-8 text-gray-500">
+              Settings management coming soon...
+            </div>
           </CardContent>
         </Card>
       </div>

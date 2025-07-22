@@ -34,19 +34,18 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
-import AdminArticleForm from '@/components/admin/AdminArticleForm';
+// import AdminArticleForm from '@/components/admin/AdminArticleForm';
 
 interface Article {
   id: string;
   title: string;
   content: string;
-  excerpt: string;
   is_published: boolean;
   created_at: string;
   updated_at: string;
   author_id: string;
-  profiles: {
-    full_name: string;
+  contributors: {
+    name: string;
   };
 }
 
@@ -65,14 +64,14 @@ const AdminArticles = () => {
         .from('articles')
         .select(`
           *,
-          profiles:author_id (
-            full_name
+          contributors:author_id (
+            name
           )
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data as Article[];
+      return data;
     },
   });
 
@@ -158,7 +157,7 @@ const AdminArticles = () => {
   const filteredArticles = articles.filter(article =>
     article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     article.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    article.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    article.contributors?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSelectArticle = (articleId: string) => {
@@ -241,13 +240,9 @@ const AdminArticles = () => {
                   {editingArticle ? 'Edit Article' : 'Create New Article'}
                 </DialogTitle>
               </DialogHeader>
-              <AdminArticleForm 
-                article={editingArticle}
-                onClose={() => {
-                  setIsFormOpen(false);
-                  setEditingArticle(null);
-                }}
-              />
+              <div className="text-center p-8 text-gray-500">
+                Article form coming soon...
+              </div>
             </DialogContent>
           </Dialog>
         </div>
@@ -361,17 +356,15 @@ const AdminArticles = () => {
                       <TableCell className="font-medium">
                         <div>
                           <div className="font-semibold">{article.title}</div>
-                          {article.excerpt && (
-                            <div className="text-sm text-gray-500 mt-1 line-clamp-2">
-                              {article.excerpt}
-                            </div>
-                          )}
+                          <div className="text-sm text-gray-500 mt-1 line-clamp-2">
+                            {article.content?.substring(0, 100)}...
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center">
                           <User className="h-4 w-4 mr-2 text-gray-400" />
-                          {article.profiles?.full_name || 'Unknown'}
+                          {article.contributors?.name || 'Unknown'}
                         </div>
                       </TableCell>
                       <TableCell>

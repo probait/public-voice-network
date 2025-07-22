@@ -36,14 +36,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface Fellow {
   id: string;
-  name: string;
-  title: string;
-  bio: string;
-  image_url: string;
-  linkedin_url: string;
-  twitter_url: string;
-  website_url: string;
-  is_featured: boolean;
+  contributor_id: string;
+  program_description: string;
+  start_date: string;
+  end_date: string;
+  is_current: boolean;
   created_at: string;
 }
 
@@ -58,14 +55,21 @@ const AdminFellows = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('fellows')
-        .select('*')
+        .select(`
+          *,
+          contributors:contributor_id (
+            id,
+            name,
+            headshot_url
+          )
+        `)
         .order('created_at', { ascending: false });
 
       if (error) {
         throw new Error(error.message);
       }
 
-      return data as Fellow[];
+      return data;
     },
   });
 
@@ -270,16 +274,24 @@ const AdminFellows = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[200px]">Name</TableHead>
-                  <TableHead>Title</TableHead>
+                  <TableHead className="w-[200px]">Contributor</TableHead>
+                  <TableHead>Program Description</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {fellows?.map((fellow) => (
+                {fellows?.map((fellow: any) => (
                   <TableRow key={fellow.id}>
-                    <TableCell className="font-medium">{fellow.name}</TableCell>
-                    <TableCell>{fellow.title}</TableCell>
+                    <TableCell className="font-medium">
+                      {fellow.contributors?.name || 'Unknown Contributor'}
+                    </TableCell>
+                    <TableCell>{fellow.program_description}</TableCell>
+                    <TableCell>
+                      <span className={fellow.is_current ? "text-green-600" : "text-gray-500"}>
+                        {fellow.is_current ? 'Active' : 'Completed'}
+                      </span>
+                    </TableCell>
                     <TableCell className="flex justify-end gap-4">
                       <Button
                         variant="ghost"
@@ -323,27 +335,21 @@ interface FellowFormProps {
 }
 
 const FellowForm = ({ fellow, onCreate, onUpdate, onClose }: FellowFormProps) => {
-  const [name, setName] = useState(fellow?.name || '');
-  const [title, setTitle] = useState(fellow?.title || '');
-  const [bio, setBio] = useState(fellow?.bio || '');
-  const [image_url, setImageUrl] = useState(fellow?.image_url || '');
-  const [linkedin_url, setLinkedinUrl] = useState(fellow?.linkedin_url || '');
-  const [twitter_url, setTwitterUrl] = useState(fellow?.twitter_url || '');
-  const [website_url, setWebsiteUrl] = useState(fellow?.website_url || '');
-  const [is_featured, setIsFeatured] = useState(fellow?.is_featured || false);
+  const [contributor_id, setContributorId] = useState(fellow?.contributor_id || '');
+  const [program_description, setProgramDescription] = useState(fellow?.program_description || '');
+  const [start_date, setStartDate] = useState(fellow?.start_date || '');
+  const [end_date, setEndDate] = useState(fellow?.end_date || '');
+  const [is_current, setIsCurrent] = useState(fellow?.is_current || false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     const fellowData = {
-      name,
-      title,
-      bio,
-      image_url,
-      linkedin_url,
-      twitter_url,
-      website_url,
-      is_featured,
+      contributor_id,
+      program_description,
+      start_date,
+      end_date,
+      is_current,
     };
 
     if (fellow) {
@@ -356,82 +362,54 @@ const FellowForm = ({ fellow, onCreate, onUpdate, onClose }: FellowFormProps) =>
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="contributor_id">Contributor ID</Label>
         <Input
           type="text"
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          id="contributor_id"
+          value={contributor_id}
+          onChange={(e) => setContributorId(e.target.value)}
           required
         />
       </div>
       <div>
-        <Label htmlFor="title">Title</Label>
+        <Label htmlFor="program_description">Program Description</Label>
         <Input
           type="text"
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          id="program_description"
+          value={program_description}
+          onChange={(e) => setProgramDescription(e.target.value)}
           required
         />
       </div>
       <div>
-        <Label htmlFor="bio">Bio</Label>
+        <Label htmlFor="start_date">Start Date</Label>
         <Input
-          type="textarea"
-          id="bio"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
+          type="date"
+          id="start_date"
+          value={start_date}
+          onChange={(e) => setStartDate(e.target.value)}
           required
         />
       </div>
       <div>
-        <Label htmlFor="image_url">Image URL</Label>
+        <Label htmlFor="end_date">End Date</Label>
         <Input
-          type="text"
-          id="image_url"
-          value={image_url}
-          onChange={(e) => setImageUrl(e.target.value)}
-          required
+          type="date"
+          id="end_date"
+          value={end_date}
+          onChange={(e) => setEndDate(e.target.value)}
         />
       </div>
       <div>
-        <Label htmlFor="linkedin_url">LinkedIn URL</Label>
-        <Input
-          type="text"
-          id="linkedin_url"
-          value={linkedin_url}
-          onChange={(e) => setLinkedinUrl(e.target.value)}
-        />
-      </div>
-      <div>
-        <Label htmlFor="twitter_url">Twitter URL</Label>
-        <Input
-          type="text"
-          id="twitter_url"
-          value={twitter_url}
-          onChange={(e) => setTwitterUrl(e.target.value)}
-        />
-      </div>
-      <div>
-        <Label htmlFor="website_url">Website URL</Label>
-        <Input
-          type="text"
-          id="website_url"
-          value={website_url}
-          onChange={(e) => setWebsiteUrl(e.target.value)}
-        />
-      </div>
-      <div>
-        <Label htmlFor="is_featured">
+        <Label htmlFor="is_current">
           <Input
             type="checkbox"
-            id="is_featured"
-            checked={is_featured}
-            onChange={(e) => setIsFeatured(e.target.checked)}
+            id="is_current"
+            checked={is_current}
+            onChange={(e) => setIsCurrent(e.target.checked)}
             className="mr-2"
           />
-          Is Featured
+          Currently Active
         </Label>
       </div>
       <div className="flex justify-end space-x-2">

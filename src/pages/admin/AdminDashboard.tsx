@@ -12,7 +12,7 @@ import { format, subDays, isAfter } from 'date-fns';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const { hasPermission, isAdmin } = useUserRole();
+  const { isAdmin } = useUserRole();
   const { hasPermission: hasUserPermission } = useUserPermissions();
   
   const {
