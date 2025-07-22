@@ -2,14 +2,12 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import AuthModal from "@/components/AuthModal";
 import PolicyNowLogo from "@/components/PolicyNowLogo";
 import UserAvatarDropdown from "@/components/UserAvatarDropdown";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
   const { user } = useAuth();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -48,16 +46,7 @@ const Navigation = () => {
             </div>
 
             <div className="flex items-center space-x-4">
-              {user ? (
-                <UserAvatarDropdown />
-              ) : (
-                <Button 
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                  onClick={() => setIsAuthModalOpen(true)}
-                >
-                  Sign In
-                </Button>
-              )}
+              {user && <UserAvatarDropdown />}
               
               <div className="md:hidden">
                 <Button 
@@ -115,11 +104,6 @@ const Navigation = () => {
           </div>
         )}
       </nav>
-
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
-      />
     </>
   );
 };
