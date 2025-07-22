@@ -1,5 +1,5 @@
-
 import { useState } from 'react';
+import ProtectedAdminRoute from '@/components/admin/ProtectedAdminRoute';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -102,7 +102,7 @@ const AdminEvents = () => {
   }
 
   return (
-    <AdminLayout requiredRole="admin">
+    <ProtectedAdminRoute requiredSection="events">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-gray-900">Events Management</h1>
@@ -183,7 +183,7 @@ const AdminEvents = () => {
           </CardContent>
         </Card>
       </div>
-    </AdminLayout>
+    </ProtectedAdminRoute>
   );
 };
 

@@ -1,169 +1,184 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
-
-interface ThoughtsSubmission {
-  id: string;
-  name: string;
-  email: string;
-  province: string;
-  category: string;
-  subject: string;
-  message: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-}
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import ProtectedAdminRoute from '@/components/admin/ProtectedAdminRoute';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { 
+  Plus, 
+  Search
+} from 'lucide-react';
+import AdminThoughtForm from '@/components/admin/AdminThoughtForm';
+import BulkActions from '@/components/admin/BulkActions';
+import AdminThoughtsStats from '@/components/admin/AdminThoughtsStats';
+import AdminThoughtsTable from '@/components/admin/AdminThoughtsTable';
+import { useAdminThoughts } from '@/hooks/useAdminThoughts';
+import { ThoughtSubmission } from '@/types/admin-thoughts';
 
 const AdminThoughts = () => {
-  const [submissions, setSubmissions] = useState<ThoughtsSubmission[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedThoughts, setSelectedThoughts] = useState<Set<string>>(new Set());
+  const [editingThought, setEditingThought] = useState<ThoughtSubmission | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const fetchSubmissions = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('thoughts_submissions')
-        .select('*')
-        .order('created_at', { ascending: false });
+  const { 
+    thoughts, 
+    isLoading, 
+    deleteMutation, 
+    bulkDeleteMutation, 
+    toggleFeaturedMutation
+  } = useAdminThoughts();
 
-      if (error) throw error;
-      setSubmissions(data || []);
-    } catch (error) {
-      console.error('Error fetching submissions:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch submissions",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+  const filteredThoughts = thoughts.filter(thought =>
+    thought.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    thought.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    thought.author.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSelectThought = (thoughtId: string) => {
+    const newSelected = new Set(selectedThoughts);
+    if (newSelected.has(thoughtId)) {
+      newSelected.delete(thoughtId);
+    } else {
+      newSelected.add(thoughtId);
+    }
+    setSelectedThoughts(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedThoughts.size === filteredThoughts.length) {
+      setSelectedThoughts(new Set());
+    } else {
+      setSelectedThoughts(new Set(filteredThoughts.map(thought => thought.id)));
     }
   };
 
-  const updateStatus = async (id: string, newStatus: string) => {
-    try {
-      const { error } = await supabase
-        .from('thoughts_submissions')
-        .update({ status: newStatus })
-        .eq('id', id);
+  const handleEdit = (thought: ThoughtSubmission) => {
+    setEditingThought(thought);
+    setIsFormOpen(true);
+  };
 
-      if (error) throw error;
-
-      setSubmissions(prev => 
-        prev.map(sub => 
-          sub.id === id ? { ...sub, status: newStatus } : sub
-        )
-      );
-
-      toast({
-        title: "Status updated",
-        description: "Submission status has been updated successfully",
-      });
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update status",
-        variant: "destructive",
-      });
+  const handleDelete = (thoughtId: string) => {
+    if (confirm('Are you sure you want to delete this thought submission?')) {
+      deleteMutation.mutate(thoughtId);
     }
   };
 
-  useEffect(() => {
-    fetchSubmissions();
-  }, []);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'new':
-        return 'bg-blue-500';
-      case 'reviewed':
-        return 'bg-yellow-500';
-      case 'responded':
-        return 'bg-green-500';
-      case 'archived':
-        return 'bg-gray-500';
-      default:
-        return 'bg-gray-500';
+  const handleBulkDelete = () => {
+    if (confirm(`Are you sure you want to delete ${selectedThoughts.size} thought submissions?`)) {
+      bulkDeleteMutation.mutate([...selectedThoughts]);
+      setSelectedThoughts(new Set());
     }
   };
 
-  if (loading) {
-    return <div className="p-6">Loading submissions...</div>;
+  const handleToggleFeatured = (thoughtId: string, featured: boolean) => {
+    toggleFeaturedMutation.mutate({ thoughtId, featured });
+  };
+
+  if (isLoading) {
+    return (
+      <ProtectedAdminRoute requiredSection="thoughts">
+        <div className="space-y-6">
+          <h1 className="text-3xl font-bold text-gray-900">Citizen Thoughts Management</h1>
+          <div className="animate-pulse space-y-4">
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </ProtectedAdminRoute>
+    );
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Thoughts Submissions</h1>
-        <Badge variant="outline">{submissions.length} total submissions</Badge>
-      </div>
+    <ProtectedAdminRoute requiredSection="thoughts">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900">Citizen Thoughts Management</h1>
+          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                onClick={() => {
+                  setEditingThought(null);
+                  setIsFormOpen(true);
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Thought
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingThought ? 'Edit Thought Submission' : 'Create New Thought Submission'}
+                </DialogTitle>
+              </DialogHeader>
+              <AdminThoughtForm 
+                thought={editingThought}
+                onClose={() => {
+                  setIsFormOpen(false);
+                  setEditingThought(null);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      <div className="grid gap-4">
-        {submissions.map((submission) => (
-          <Card key={submission.id}>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{submission.subject}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    From: {submission.name} ({submission.email}) • {submission.province}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Category: {submission.category} • Submitted: {format(new Date(submission.created_at), 'PPP')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge className={getStatusColor(submission.status)}>
-                    {submission.status}
-                  </Badge>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Message:</h4>
-                  <p className="text-sm bg-muted p-3 rounded">{submission.message}</p>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Status:</span>
-                  <Select
-                    value={submission.status}
-                    onValueChange={(value) => updateStatus(submission.id, value)}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="new">New</SelectItem>
-                      <SelectItem value="reviewed">Reviewed</SelectItem>
-                      <SelectItem value="responded">Responded</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        <AdminThoughtsStats thoughts={thoughts} />
 
-      {submissions.length === 0 && (
         <Card>
-          <CardContent className="text-center py-8">
-            <p className="text-muted-foreground">No submissions yet.</p>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>All Thought Submissions</CardTitle>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search thoughts..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {selectedThoughts.size > 0 && (
+              <BulkActions
+                selectedCount={selectedThoughts.size}
+                onBulkDelete={handleBulkDelete}
+                onClearSelection={() => setSelectedThoughts(new Set())}
+              />
+            )}
+
+            <AdminThoughtsTable
+              thoughts={filteredThoughts}
+              selectedThoughts={selectedThoughts}
+              onSelectThought={handleSelectThought}
+              onSelectAll={handleSelectAll}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onToggleFeatured={handleToggleFeatured}
+            />
+
+            {filteredThoughts.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-500">
+                  {searchTerm ? 'No thoughts found matching your search.' : 'No thoughts created yet.'}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
-    </div>
+      </div>
+    </ProtectedAdminRoute>
   );
 };
 

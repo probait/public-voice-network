@@ -1,311 +1,181 @@
-import { useState, useEffect } from "react";
-import AdminLayout from '@/components/admin/AdminLayout';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mail, Users, Settings, Download, Search, Trash2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import ProtectedAdminRoute from '@/components/admin/ProtectedAdminRoute';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { 
+  Plus, 
+  Search,
+  Mail,
+  Settings
+} from 'lucide-react';
+import AdminNewsletterForm from '@/components/admin/AdminNewsletterForm';
+import BulkActions from '@/components/admin/BulkActions';
+import AdminNewsletterStats from '@/components/admin/AdminNewsletterStats';
+import AdminNewsletterTable from '@/components/admin/AdminNewsletterTable';
+import { useAdminNewsletter } from '@/hooks/useAdminNewsletter';
+import { NewsletterSubscriber } from '@/types/admin-newsletter';
 
-interface NewsletterSubscriber {
-  id: string;
-  email: string;
-  status: string;
-  source: string;
-  subscribed_at: string;
-  unsubscribed_at: string | null;
-}
+const AdminNewsletter = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSubscribers, setSelectedSubscribers] = useState<Set<string>>(new Set());
+  const [editingSubscriber, setEditingSubscriber] = useState<NewsletterSubscriber | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
-interface NewsletterSettings {
-  id: string;
-  popup_enabled: boolean;
-  popup_delay_seconds: number;
-  popup_frequency_days: number;
-  beehiv_publication_id: string | null;
-}
-
-export default function AdminNewsletter() {
-  const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
-  const [settings, setSettings] = useState<NewsletterSettings | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      // Load subscribers
-      const { data: subscribersData, error: subscribersError } = await supabase
-        .from("newsletter_subscribers")
-        .select("*")
-        .order("subscribed_at", { ascending: false });
-
-      if (subscribersError) throw subscribersError;
-
-      // Load settings
-      const { data: settingsData, error: settingsError } = await supabase
-        .from("newsletter_settings")
-        .select("*")
-        .limit(1)
-        .single();
-
-      if (settingsError) throw settingsError;
-
-      setSubscribers(subscribersData || []);
-      setSettings(settingsData);
-    } catch (error) {
-      console.error("Error loading newsletter data:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load newsletter data",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateSettings = async (newSettings: Partial<NewsletterSettings>) => {
-    if (!settings) return;
-
-    try {
-      const { error } = await supabase
-        .from("newsletter_settings")
-        .update(newSettings)
-        .eq("id", settings.id);
-
-      if (error) throw error;
-
-      setSettings({ ...settings, ...newSettings });
-      toast({
-        title: "Settings updated",
-        description: "Newsletter settings have been updated successfully.",
-      });
-    } catch (error) {
-      console.error("Error updating settings:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update settings",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const deleteSubscriber = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from("newsletter_subscribers")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-
-      setSubscribers(subscribers.filter(sub => sub.id !== id));
-      toast({
-        title: "Subscriber deleted",
-        description: "The subscriber has been removed from the list.",
-      });
-    } catch (error) {
-      console.error("Error deleting subscriber:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete subscriber",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const exportSubscribers = () => {
-    const csv = [
-      "Email,Status,Source,Subscribed At",
-      ...subscribers.map(sub => 
-        `${sub.email},${sub.status},${sub.source},${format(new Date(sub.subscribed_at), 'yyyy-MM-dd HH:mm:ss')}`
-      )
-    ].join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `newsletter-subscribers-${format(new Date(), 'yyyy-MM-dd')}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const { 
+    subscribers, 
+    isLoading, 
+    deleteMutation, 
+    bulkDeleteMutation,
+  } = useAdminNewsletter();
 
   const filteredSubscribers = subscribers.filter(subscriber =>
-    subscriber.email.toLowerCase().includes(searchTerm.toLowerCase())
+    subscriber.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    subscriber.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    subscriber.source?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const stats = {
-    total: subscribers.length,
-    active: subscribers.filter(sub => sub.status === "pending" || sub.status === "active").length,
-    unsubscribed: subscribers.filter(sub => sub.status === "unsubscribed").length,
+  const handleSelectSubscriber = (subscriberId: string) => {
+    const newSelected = new Set(selectedSubscribers);
+    if (newSelected.has(subscriberId)) {
+      newSelected.delete(subscriberId);
+    } else {
+      newSelected.add(subscriberId);
+    }
+    setSelectedSubscribers(newSelected);
   };
 
-  if (loading) {
-    return <div className="p-6">Loading newsletter data...</div>;
+  const handleSelectAll = () => {
+    if (selectedSubscribers.size === filteredSubscribers.length) {
+      setSelectedSubscribers(new Set());
+    } else {
+      setSelectedSubscribers(new Set(filteredSubscribers.map(subscriber => subscriber.id)));
+    }
+  };
+
+  const handleEdit = (subscriber: NewsletterSubscriber) => {
+    setEditingSubscriber(subscriber);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (subscriberId: string) => {
+    if (confirm('Are you sure you want to delete this subscriber?')) {
+      deleteMutation.mutate(subscriberId);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (confirm(`Are you sure you want to delete ${selectedSubscribers.size} subscribers?`)) {
+      bulkDeleteMutation.mutate([...selectedSubscribers]);
+      setSelectedSubscribers(new Set());
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <ProtectedAdminRoute requiredSection="newsletter">
+        <div className="space-y-6">
+          <h1 className="text-3xl font-bold text-gray-900">Newsletter Management</h1>
+          <div className="animate-pulse space-y-4">
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </ProtectedAdminRoute>
+    );
   }
 
   return (
-    <AdminLayout>
-      <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Newsletter Management</h1>
-        <Button onClick={exportSubscribers} variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Export Subscribers
-        </Button>
-      </div>
+    <ProtectedAdminRoute requiredSection="newsletter">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900">Newsletter Management</h1>
+          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+            <DialogTrigger asChild>
+              <Button 
+                onClick={() => {
+                  setEditingSubscriber(null);
+                  setIsFormOpen(true);
+                }}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Subscriber
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingSubscriber ? 'Edit Subscriber' : 'Add New Subscriber'}
+                </DialogTitle>
+              </DialogHeader>
+              <AdminNewsletterForm 
+                subscriber={editingSubscriber}
+                onClose={() => {
+                  setIsFormOpen(false);
+                  setEditingSubscriber(null);
+                }}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Subscribers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Subscribers</CardTitle>
-            <Mail className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.active}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Unsubscribed</CardTitle>
-            <Settings className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.unsubscribed}</div>
-          </CardContent>
-        </Card>
-      </div>
+        <AdminNewsletterStats subscribers={subscribers} />
 
-      <Tabs defaultValue="subscribers" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="subscribers" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Subscribers List</CardTitle>
-              <div className="flex items-center space-x-2">
-                <Search className="h-4 w-4 text-muted-foreground" />
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>All Subscribers</CardTitle>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   placeholder="Search subscribers..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-sm"
+                  className="pl-10 w-64"
                 />
               </div>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Source</TableHead>
-                    <TableHead>Subscribed At</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredSubscribers.map((subscriber) => (
-                    <TableRow key={subscriber.id}>
-                      <TableCell className="font-medium">{subscriber.email}</TableCell>
-                      <TableCell>
-                        <Badge variant={subscriber.status === "active" || subscriber.status === "pending" ? "default" : "secondary"}>
-                          {subscriber.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{subscriber.source}</TableCell>
-                      <TableCell>{format(new Date(subscriber.subscribed_at), 'MMM d, yyyy')}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteSubscriber(subscriber.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {selectedSubscribers.size > 0 && (
+              <BulkActions
+                selectedCount={selectedSubscribers.size}
+                onBulkDelete={handleBulkDelete}
+                onClearSelection={() => setSelectedSubscribers(new Set())}
+              />
+            )}
 
-        <TabsContent value="settings" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Newsletter Popup Settings</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="popup-enabled"
-                  checked={settings?.popup_enabled || false}
-                  onCheckedChange={(checked) => updateSettings({ popup_enabled: checked })}
-                />
-                <Label htmlFor="popup-enabled">Enable newsletter popup</Label>
-              </div>
+            <AdminNewsletterTable
+              subscribers={filteredSubscribers}
+              selectedSubscribers={selectedSubscribers}
+              onSelectSubscriber={handleSelectSubscriber}
+              onSelectAll={handleSelectAll}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="popup-delay">Popup delay (seconds)</Label>
-                  <Input
-                    id="popup-delay"
-                    type="number"
-                    value={settings?.popup_delay_seconds || 5}
-                    onChange={(e) => updateSettings({ popup_delay_seconds: parseInt(e.target.value) })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="popup-frequency">Show again after (days)</Label>
-                  <Input
-                    id="popup-frequency"
-                    type="number"
-                    value={settings?.popup_frequency_days || 7}
-                    onChange={(e) => updateSettings({ popup_frequency_days: parseInt(e.target.value) })}
-                  />
-                </div>
+            {filteredSubscribers.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-500">
+                  {searchTerm ? 'No subscribers found matching your search.' : 'No subscribers added yet.'}
+                </p>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="beehiv-id">Beehiv Publication ID</Label>
-                <Input
-                  id="beehiv-id"
-                  placeholder="Enter your Beehiv publication ID"
-                  value={settings?.beehiv_publication_id || ""}
-                  onChange={(e) => updateSettings({ beehiv_publication_id: e.target.value })}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </AdminLayout>
+    </ProtectedAdminRoute>
   );
-}
+};
+
+export default AdminNewsletter;
