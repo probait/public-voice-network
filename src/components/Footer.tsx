@@ -45,6 +45,16 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
+          <p className="mb-2">
+            <a 
+              href="https://www.neocarbone.ca/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-destructive hover:text-destructive/80 transition-colors"
+            >
+              Made with love in Canada
+            </a>
+          </p>
           <p>&copy; 2024 AI Canada Voice. All rights reserved.</p>
         </div>
       </div>
