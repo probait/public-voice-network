@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import EventbriteFeed from "@/components/EventbriteFeed";
@@ -15,16 +15,38 @@ import { NewsletterPopup } from "@/components/NewsletterPopup";
 import { useNewsletterPopup } from "@/hooks/useNewsletterPopup";
 import { useArticles } from "@/hooks/useArticles";
 import ArticleCard from "@/components/ArticleCard";
+import AuthModal from "@/components/AuthModal";
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { showPopup, hidePopup, showPopupManually } = useNewsletterPopup();
   const { data: articles, isLoading: articlesLoading } = useArticles();
 
   useEffect(() => {
+    // Check if we should show auth modal on load
+    if (searchParams.get('showAuth') === 'true') {
+      setShowAuthModal(true);
+      // Clean up the URL parameter
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete('showAuth');
+      setSearchParams(newSearchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
     if (!loading && user) {
-      // User is authenticated, stay on homepage
+      // User is authenticated, check for redirect
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+      if (redirectPath && redirectPath.startsWith('/admin')) {
+        sessionStorage.removeItem('redirectAfterLogin');
+        navigate(redirectPath);
+      }
+      
+      // Close auth modal if open
+      setShowAuthModal(false);
     }
   }, [user, loading, navigate]);
 
@@ -220,6 +242,7 @@ const Index = () => {
       <Footer />
       
       <NewsletterPopup isOpen={showPopup} onClose={hidePopup} />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   );
 };

@@ -42,7 +42,9 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    // Store the intended admin route for redirect after login
+    sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+    return <Navigate to="/?showAuth=true" replace />;
   }
 
   if (!canAccessAdminPortal()) {
