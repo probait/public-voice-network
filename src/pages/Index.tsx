@@ -10,9 +10,10 @@ import EventInsights from '@/components/EventInsights';
 import ThoughtsSubmissionForm from '@/components/ThoughtsSubmissionForm';
 import OrganizationContactForm from '@/components/OrganizationContactForm';
 import AuthModal from '@/components/AuthModal';
-import NewsletterPopup from '@/components/NewsletterPopup';
+import { NewsletterPopup } from '@/components/NewsletterPopup';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserPermissions } from '@/hooks/useUserPermissions';
+import { useNewsletterPopup } from '@/hooks/useNewsletterPopup';
 
 const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
@@ -20,6 +21,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { canAccessAdminPortal, loading: permissionsLoading } = useUserPermissions();
+  const { showPopup: showNewsletterPopup, hidePopup: hideNewsletterPopup } = useNewsletterPopup();
 
   // Handle auth modal from URL params
   useEffect(() => {
@@ -155,7 +157,10 @@ const Index = () => {
         onClose={() => setShowAuth(false)} 
       />
       
-      <NewsletterPopup />
+      <NewsletterPopup 
+        isOpen={showNewsletterPopup} 
+        onClose={hideNewsletterPopup} 
+      />
     </div>
   );
 };
