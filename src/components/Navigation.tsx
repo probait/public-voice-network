@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useUserPermissions } from "@/hooks/useUserPermissions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,7 +18,7 @@ import { Settings } from "lucide-react";
 
 const Navigation = () => {
   const { user, signOut } = useAuth();
-  const { isAdmin } = useUserRole();
+  const { canAccessAdminPortal } = useUserPermissions();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -83,7 +83,7 @@ const Navigation = () => {
                       <div className="text-sm text-muted-foreground">{user.email}</div>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {isAdmin() && (
+                    {canAccessAdminPortal() && (
                       <>
                         <DropdownMenuItem asChild>
                           <Link to="/admin" className="flex items-center">
