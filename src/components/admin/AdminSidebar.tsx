@@ -72,12 +72,6 @@ const AdminSidebar = () => {
       path: '/admin/users',
       section: 'users'
     },
-    {
-      title: 'Settings',
-      icon: Settings,
-      path: '/admin/settings',
-      section: 'settings'
-    }
   ];
 
   const hasAccess = (section: string) => {
