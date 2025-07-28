@@ -60,9 +60,9 @@ const Footer = () => {
         <div className="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
           <div className="flex justify-center items-center gap-4 mb-4">
             <div className="flex items-center gap-2">
-              <a href="https://www.neocarbone.ca/" target="_blank" rel="noopener noreferrer" className="text-destructive hover:text-destructive/80 transition-colors">Made with ❤️ in Canada by Neo Carbone</a>
+              <a href="https://www.neocarbone.ca/" target="_blank" rel="noopener noreferrer" className="text-destructive hover:text-destructive/80 transition-colors">Made with ❤️ in Canada</a>
               <a href="https://www.neocarbone.ca/" target="_blank" rel="noopener noreferrer">
-                <img src="/lovable-uploads/e4d3b9de-d473-4bd2-bdcb-fa51b1299e02.png" alt="Neo Carbone logo" className="w-12 h-12 hover:opacity-80 transition-opacity cursor-pointer" />
+                
               </a>
             </div>
             <span>•</span>
