@@ -12,7 +12,8 @@ const Footer = () => {
       // User is signed in, redirect to admin portal
       window.location.href = '/admin';
     } else {
-      // User is not signed in, show auth modal
+      // User is not signed in, store intended destination and show auth modal
+      sessionStorage.setItem('redirectAfterLogin', '/admin');
       setIsAuthModalOpen(true);
     }
   };

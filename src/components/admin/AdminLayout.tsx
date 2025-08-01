@@ -44,7 +44,7 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
   if (!user) {
     // Store the intended admin route for redirect after login
     sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
-    return <Navigate to="/?showAuth=true" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (!canAccessAdminPortal()) {

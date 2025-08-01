@@ -25,16 +25,7 @@ const Index = () => {
   const { showPopup, hidePopup, showPopupManually } = useNewsletterPopup();
   const { data: articles, isLoading: articlesLoading } = useArticles();
 
-  useEffect(() => {
-    // Check if we should show auth modal on load
-    if (searchParams.get('showAuth') === 'true') {
-      setShowAuthModal(true);
-      // Clean up the URL parameter
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete('showAuth');
-      setSearchParams(newSearchParams, { replace: true });
-    }
-  }, [searchParams, setSearchParams]);
+  // Removed automatic auth modal popup - only show when user clicks Admin Portal button
 
   useEffect(() => {
     if (!loading && user) {
