@@ -24,34 +24,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // Check if this is a sign-in event and not an initial page load
-        if (event === 'SIGNED_IN' && session?.user) {
-          // Use setTimeout to prevent auth state deadlock
-          setTimeout(async () => {
-            // Don't redirect if already on admin page
-            if (window.location.pathname.startsWith('/admin')) {
-              return;
-            }
-            
-            try {
-              // Check if user has admin access
-              const { data: role } = await supabase.rpc('get_user_role', {
-                _user_id: session.user.id
-              });
-              
-              if (role === 'admin' || role === 'employee') {
-                window.location.href = '/admin';
-              }
-            } catch (err) {
-              console.error("Error checking user role:", err);
-            }
-          }, 0);
-        }
       }
     );
 

@@ -40,6 +40,15 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         description: "You have successfully signed in.",
       });
       onClose();
+      
+      // Handle redirect after successful login
+      setTimeout(() => {
+        const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+        if (redirectPath) {
+          sessionStorage.removeItem('redirectAfterLogin');
+          window.location.href = redirectPath;
+        }
+      }, 100);
     }
     
     setIsLoading(false);
@@ -81,6 +90,15 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       });
     } else {
       onClose();
+      
+      // Handle redirect after successful login
+      setTimeout(() => {
+        const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+        if (redirectPath) {
+          sessionStorage.removeItem('redirectAfterLogin');
+          window.location.href = redirectPath;
+        }
+      }, 100);
     }
     
     setIsLoading(false);
