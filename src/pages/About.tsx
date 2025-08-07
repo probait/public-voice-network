@@ -76,19 +76,6 @@ const About = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
-                <p className="text-muted-foreground mb-4">
-                  Have questions, suggestions, or want to partner with us? We'd love to hear from you.
-                </p>
-                <div className="space-y-2 text-muted-foreground">
-                  <p><strong>Email:</strong> <a href="mailto:contact@policynow.org" className="text-primary hover:underline">contact@policynow.org</a></p>
-                  <p><strong>For partnerships:</strong> <a href="mailto:partnerships@policynow.org" className="text-primary hover:underline">partnerships@policynow.org</a></p>
-                  <p><strong>Privacy concerns:</strong> <a href="mailto:privacy@policynow.org" className="text-primary hover:underline">privacy@policynow.org</a></p>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </main>
