@@ -11,10 +11,10 @@ const Events = () => {
       <main className="py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">AI Events Across Canada</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Emerging Tech Events Across Canada</h1>
             <p className="text-gray-600">
-              Discover conferences, workshops, and discussions about artificial intelligence happening across the country. 
-              These carefully selected events offer opportunities to learn, network, and engage with Canada's AI community.
+              Discover conferences, workshops, and discussions about emerging technologies happening across the country. 
+              These carefully selected events offer opportunities to learn, network, and engage with Canada's tech innovation community.
             </p>
           </div>
 

@@ -32,7 +32,7 @@ const Navigation = () => {
                 </Link>
 
                 <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Events
+                  Tech Events
                 </Link>
 
                 <Link to="/get-involved" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
@@ -84,7 +84,7 @@ const Navigation = () => {
                 className="block text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Events
+                Tech Events
               </Link>
               <Link 
                 to="/get-involved" 

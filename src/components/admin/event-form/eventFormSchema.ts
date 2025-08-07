@@ -20,6 +20,12 @@ export type EventFormData = z.infer<typeof eventSchema>;
 export const categories = [
   'AI Research',
   'Machine Learning',
+  'Quantum Computing',
+  'Blockchain & Web3',
+  'Biotechnology',
+  'Clean Technology',
+  'Cybersecurity',
+  'Robotics',
   'Ethics & Policy',
   'Industry Applications',
   'Startups & Innovation',

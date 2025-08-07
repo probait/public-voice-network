@@ -62,10 +62,10 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
               <h1 className="text-4xl sm:text-6xl font-bold mb-6">
-                AI's Impact on Canada
+                Emerging Tech's Impact on Canada
               </h1>
               <p className="text-xl sm:text-2xl mb-8 opacity-90">
-                Exploring the challenges, opportunities, and policy implications of artificial intelligence for Canadian communities.
+                Exploring the challenges, opportunities, and policy implications of emerging technologies — including AI, quantum computing, and biotech — for Canadian communities.
               </p>
               <Link to="/get-involved">
                 <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3">
@@ -106,10 +106,10 @@ const Index = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Upcoming AI Events & AMAs
+              Upcoming Tech Events & AMAs
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Join conversations, ask questions, and connect with experts discussing AI's impact on Canada
+              Join conversations, ask questions, and connect with experts discussing emerging technology's impact on Canada
             </p>
           </div>
           
@@ -134,12 +134,12 @@ const Index = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose prose-lg mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              The Future of AI in Canada
+              The Future of Emerging Technology in Canada
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed">
-              As artificial intelligence rapidly transforms our economy, healthcare, education, and daily lives, 
-              Canadians deserve a voice in shaping how this technology impacts our communities. From coast to coast, 
-              we're witnessing both the incredible potential and concerning challenges that AI brings to our nation.
+              As emerging technologies — artificial intelligence, quantum computing, biotech, and more — rapidly transform our economy, healthcare, education, and daily lives, 
+              Canadians deserve a voice in shaping how these innovations impact our communities. From coast to coast, 
+              we're witnessing both the incredible potential and concerning challenges that these technologies bring to our nation.
             </p>
           </div>
           
@@ -161,11 +161,11 @@ const Index = () => {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Understanding AI's Impact on Canada
+                  Understanding Emerging Technology's Impact on Canada
                 </h3>
                 <p className="text-gray-600">
                   Watch this introduction to learn about the key challenges and opportunities 
-                  that artificial intelligence presents for Canadian communities.
+                  that emerging technologies present for Canadian communities.
                 </p>
               </div>
             </div>
@@ -219,7 +219,7 @@ const Index = () => {
             Your Voice Matters
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Share your thoughts, concerns, and ideas about how AI is affecting your community. 
+            Share your thoughts, concerns, and ideas about how emerging technologies are affecting your community. 
             Together, we can shape a future that works for all Canadians.
           </p>
           <Link to="/get-involved">
