@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
+import MDEditor from '@uiw/react-md-editor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Table, 
@@ -363,12 +363,20 @@ const AdminArticles = () => {
 
                 <div>
                   <label className="block text-sm font-medium mb-2">Content</label>
-                  <Textarea
-                    {...register('content')}
-                    placeholder="Write your article content here..."
-                    rows={12}
-                    className="font-mono text-sm"
-                  />
+                  <div data-color-mode="light">
+                    <MDEditor
+                      value={watch('content') || ''}
+                      onChange={(value) => setValue('content', value || '')}
+                      preview="edit"
+                      hideToolbar={false}
+                      visibleDragbar={false}
+                      height={400}
+                      data-color-mode="light"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Use Markdown syntax for formatting. Toggle preview to see how your content will appear.
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-4">
