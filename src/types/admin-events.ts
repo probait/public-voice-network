@@ -12,6 +12,8 @@ export interface Meetup {
   homepage_featured?: boolean;
   image_url?: string;
   is_published?: boolean;
+  external_url?: string;
+  external_link_text?: string;
   profiles: {
     full_name: string | null;
   } | null;

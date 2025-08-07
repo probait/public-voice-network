@@ -22,6 +22,8 @@ interface EventDetail {
   meeting_link: string | null;
   created_at: string;
   image_url?: string;
+  external_url?: string;
+  external_link_text?: string;
   profiles: {
     full_name: string;
   } | null;
@@ -56,7 +58,9 @@ const EventDetail = () => {
           meeting_link,
           created_at,
           user_id,
-          image_url
+          image_url,
+          external_url,
+          external_link_text
         `)
         .eq('id', id)
         .single();
@@ -222,26 +226,42 @@ const EventDetail = () => {
                   </div>
                 </div>
 
-                {/* Action Button */}
-                <div className="md:ml-8">
-                  {event.meeting_link ? (
+                {/* Action Buttons */}
+                <div className="md:ml-8 flex flex-col gap-2">
+                  {event.external_url && (
                     <Button 
                       asChild 
                       size="lg"
                       className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white"
                     >
-                      <a href={event.meeting_link} target="_blank" rel="noopener noreferrer">
+                      <a href={event.external_url} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4 mr-2" />
-                        Join Event
+                        {event.external_link_text || 'View Event Details'}
                       </a>
                     </Button>
-                  ) : (
+                  )}
+                  
+                  {event.meeting_link && (
+                    <Button 
+                      asChild 
+                      size="lg"
+                      variant={event.external_url ? "outline" : "default"}
+                      className={`w-full md:w-auto ${!event.external_url ? 'bg-red-600 hover:bg-red-700 text-white' : 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white'}`}
+                    >
+                      <a href={event.meeting_link} target="_blank" rel="noopener noreferrer">
+                        <Video className="h-4 w-4 mr-2" />
+                        Join Virtual Event
+                      </a>
+                    </Button>
+                  )}
+                  
+                  {!event.external_url && !event.meeting_link && (
                     <Button 
                       disabled 
                       size="lg"
                       className="w-full md:w-auto"
                     >
-                      Event Link Not Available
+                      Event Links Not Available
                     </Button>
                   )}
                 </div>

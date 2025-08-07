@@ -13,6 +13,8 @@ export const eventSchema = z.object({
     (val) => val === 'pending_upload' || val.startsWith('http') || val.startsWith('data:'),
     'Invalid image URL'
   ),
+  external_url: z.string().url('Invalid URL').optional().or(z.literal('')),
+  external_link_text: z.string().optional(),
 });
 
 export type EventFormData = z.infer<typeof eventSchema>;

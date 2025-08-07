@@ -13,6 +13,8 @@ interface Meetup {
   is_virtual: boolean;
   meeting_link: string | null;
   created_at: string;
+  external_url?: string;
+  external_link_text?: string;
   profiles: {
     full_name: string;
     avatar_url: string;
@@ -40,7 +42,9 @@ const MeetupFeed = ({ limit, referrer = "events" }: MeetupFeedProps) => {
           is_virtual,
           meeting_link,
           created_at,
-          user_id
+          user_id,
+          external_url,
+          external_link_text
         `)
         .order('date_time', { ascending: true });
 

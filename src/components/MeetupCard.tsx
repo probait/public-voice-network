@@ -17,6 +17,8 @@ interface Meetup {
   is_virtual: boolean;
   meeting_link: string | null;
   created_at: string;
+  external_url?: string;
+  external_link_text?: string;
   profiles: {
     full_name: string;
     avatar_url: string;
@@ -85,11 +87,27 @@ const MeetupCard = ({ meetup, referrer = "events" }: MeetupCardProps) => {
             </div>
           )}
           <div className="flex gap-2 mt-auto">
-            <Button asChild className="flex-1 bg-red-600 hover:bg-red-700 text-white">
-              <Link to={`/events/${meetup.id}?from=${referrer}`}>
-                View Details
-              </Link>
-            </Button>
+            {meetup.external_url ? (
+              <>
+                <Button asChild className="flex-1 bg-red-600 hover:bg-red-700 text-white">
+                  <a href={meetup.external_url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    {meetup.external_link_text || 'Register'}
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
+                  <Link to={`/events/${meetup.id}?from=${referrer}`}>
+                    Details
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <Button asChild className="flex-1 bg-red-600 hover:bg-red-700 text-white">
+                <Link to={`/events/${meetup.id}?from=${referrer}`}>
+                  View Details
+                </Link>
+              </Button>
+            )}
           </div>
         </CardContent>
       </div>

@@ -81,6 +81,46 @@ const EventLocationFields = ({ control, watchIsVirtual }: EventLocationFieldsPro
           )}
         />
       )}
+
+      <FormField
+        control={control}
+        name="external_url"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>External Event Link (optional)</FormLabel>
+            <FormControl>
+              <Input 
+                placeholder="https://eventbrite.com/event/123" 
+                {...field} 
+              />
+            </FormControl>
+            <div className="text-sm text-gray-500">
+              Link to external registration or ticket page
+            </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="external_link_text"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>External Link Button Text (optional)</FormLabel>
+            <FormControl>
+              <Input 
+                placeholder="Register Now" 
+                {...field} 
+              />
+            </FormControl>
+            <div className="text-sm text-gray-500">
+              Custom text for the external link button (default: "View Event Details")
+            </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   );
 };

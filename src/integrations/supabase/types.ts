@@ -223,6 +223,8 @@ export type Database = {
           created_at: string
           date_time: string
           description: string
+          external_link_text: string | null
+          external_url: string | null
           homepage_featured: boolean | null
           id: string
           image_file_size: number | null
@@ -242,6 +244,8 @@ export type Database = {
           created_at?: string
           date_time: string
           description: string
+          external_link_text?: string | null
+          external_url?: string | null
           homepage_featured?: boolean | null
           id?: string
           image_file_size?: number | null
@@ -261,6 +265,8 @@ export type Database = {
           created_at?: string
           date_time?: string
           description?: string
+          external_link_text?: string | null
+          external_url?: string | null
           homepage_featured?: boolean | null
           id?: string
           image_file_size?: number | null
