@@ -31,7 +31,7 @@ const Footer = () => {
             <h4 className="text-md font-semibold mb-4">Quick Links</h4>
             <div className="space-y-2">
               <Link to="/events" className="block text-muted-foreground hover:text-primary transition-colors">
-                AI Events
+                Events
               </Link>
               <Link to="/get-involved" className="block text-muted-foreground hover:text-primary transition-colors">
                 Get Involved
