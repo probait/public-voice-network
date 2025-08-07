@@ -62,10 +62,10 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <div>
               <h1 className="text-4xl sm:text-6xl font-bold mb-6">
-                Emerging Tech's Impact on Canada
+                AI's Impact on Canada
               </h1>
               <p className="text-xl sm:text-2xl mb-8 opacity-90">
-                Exploring the challenges, opportunities, and policy implications of emerging technologies — including AI, quantum computing, and biotech — for Canadian communities.
+                Exploring the challenges, opportunities, and policy implications of artificial intelligence for Canadian communities.
               </p>
               <Link to="/get-involved">
                 <Button size="lg" className="bg-white text-red-600 hover:bg-gray-100 text-lg px-8 py-3">
