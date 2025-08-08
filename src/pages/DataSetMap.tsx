@@ -53,6 +53,10 @@ const REGION_CENTROIDS: Record<string, [number, number]> = {
   "Prince George": [-122.7497, 53.9171],
   "Chilliwack": [-121.958, 49.157],
   "Maple Ridge": [-122.573, 49.219],
+  // Additional sub-areas for creative spreading around Vancouver
+  "West Vancouver": [-123.165, 49.327],
+  "North Vancouver": [-123.072, 49.320],
+  "Port Moody": [-122.852, 49.284],
 };
 
 // Heuristic helpers
@@ -157,6 +161,80 @@ const lookUpCoord = (loc: string): [number, number] | null => {
   return found ? found[1] : null;
 };
 
+// Deterministic small spatial separation for overlapping points
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
+const kmToDegrees = (lat: number, km: number): [number, number] => {
+  const dLat = km / 111; // ~km per degree latitude
+  const dLon = km / (111 * Math.cos((lat * Math.PI) / 180));
+  return [dLon, dLat];
+};
+
+const applySpatialSeparation = (features: GeoFeature[]) => {
+  const SEP_KM = 2; // target separation at closest zoom
+  // Group indices by their exact coordinate pair
+  const groups = new Map<string, number[]>();
+  features.forEach((f, i) => {
+    const [lon, lat] = (f.geometry as GeoJSON.Point).coordinates as [number, number];
+    const key = `${lon.toFixed(6)},${lat.toFixed(6)}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(i);
+  });
+
+  const VAN_ANCHORS: [number, number][] = [
+    REGION_CENTROIDS["Vancouver"],
+    REGION_CENTROIDS["Burnaby"],
+    REGION_CENTROIDS["North Vancouver"],
+    REGION_CENTROIDS["West Vancouver"],
+    REGION_CENTROIDS["Port Moody"],
+  ].filter(Boolean) as [number, number][];
+
+  groups.forEach((idxs) => {
+    if (idxs.length <= 1) return;
+    const [lon0, lat0] = (features[idxs[0]].geometry as GeoJSON.Point).coordinates as [number, number];
+    const isVancouverCenter =
+      Math.abs(lon0 - REGION_CENTROIDS["Vancouver"][0]) < 1e-3 &&
+      Math.abs(lat0 - REGION_CENTROIDS["Vancouver"][1]) < 1e-3;
+
+    if (isVancouverCenter) {
+      // Distribute across anchors with weights; keep most in Vancouver
+      const weights = [0.55, 0.15, 0.12, 0.10, 0.08];
+      const counts = weights.map((w) => Math.floor(w * idxs.length));
+      let remainder = idxs.length - counts.reduce((a, b) => a + b, 0);
+      for (let i = 0; remainder > 0; i = (i + 1) % counts.length) {
+        counts[i]++;
+        remainder--;
+      }
+      let offset = 0;
+      VAN_ANCHORS.forEach((anchor, aIdx) => {
+        const count = counts[aIdx] ?? 0;
+        for (let j = 0; j < count; j++) {
+          const idx = idxs[offset + j];
+          const angle = GOLDEN_ANGLE * j;
+          const frac = count <= 1 ? 0 : j / (count - 1);
+          const rKm = frac * SEP_KM;
+          const [dLon, dLat] = kmToDegrees(anchor[1], rKm);
+          const newLon = anchor[0] + Math.cos(angle) * dLon;
+          const newLat = anchor[1] + Math.sin(angle) * dLat;
+          (features[idx].geometry as GeoJSON.Point).coordinates = [newLon, newLat];
+        }
+        offset += count;
+      });
+    } else {
+      // Generic spiral jitter around the original coordinate
+      for (let j = 0; j < idxs.length; j++) {
+        const idx = idxs[j];
+        const angle = GOLDEN_ANGLE * j;
+        const frac = idxs.length <= 1 ? 0 : j / (idxs.length - 1);
+        const rKm = frac * SEP_KM;
+        const [dLon, dLat] = kmToDegrees(lat0, rKm);
+        const newLon = lon0 + Math.cos(angle) * dLon;
+        const newLat = lat0 + Math.sin(angle) * dLat;
+        (features[idx].geometry as GeoJSON.Point).coordinates = [newLon, newLat];
+      }
+    }
+  });
+};
+
 const toGeoJSON = (rows: Record<string, any>[]): GeoJSON.FeatureCollection<GeoJSON.Point, Thought> => {
   const features: GeoFeature[] = [];
   rows.forEach((row, idx) => {
@@ -178,6 +256,8 @@ const toGeoJSON = (rows: Record<string, any>[]): GeoJSON.FeatureCollection<GeoJS
       },
     });
   });
+  // Apply separation after creating all features
+  applySpatialSeparation(features);
   return { type: "FeatureCollection", features };
 };
 
