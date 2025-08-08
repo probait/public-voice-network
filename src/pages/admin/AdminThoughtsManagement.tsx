@@ -55,6 +55,7 @@ const AdminThoughtsManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
+  const [batching, setBatching] = useState(false);
 
   const fetchSubmissions = async () => {
     try {
@@ -135,6 +136,47 @@ const AdminThoughtsManagement = () => {
     }
   };
 
+  const featureNextBatch = async () => {
+    try {
+      setBatching(true);
+      // Fetch a larger pool to filter, then take first 100 eligible
+      const { data, error } = await supabase
+        .from('thoughts_submissions')
+        .select('id, message, created_at')
+        .eq('source', 'bc_ai_survey_2025')
+        .eq('featured', false)
+        .order('created_at', { ascending: true })
+        .limit(500);
+      if (error) throw error;
+
+      const pool = (data || []).filter(r => {
+        const m = (r.message || '').trim();
+        if (!m) return false;
+        if (m.startsWith('Voice imported from the BC AI Survey')) return false;
+        return m.length >= 60; // basic quality gate
+      });
+
+      if (pool.length === 0) {
+        toast({ title: 'No eligible voices', description: 'No more dataset entries meet curation criteria.' });
+        return;
+      }
+
+      const ids = pool.slice(0, 100).map(r => r.id);
+      const { error: updErr } = await supabase
+        .from('thoughts_submissions')
+        .update({ featured: true })
+        .in('id', ids);
+      if (updErr) throw updErr;
+
+      toast({ title: 'Curated 100 voices', description: `Featured ${ids.length} new voices from the dataset.` });
+      await fetchSubmissions();
+    } catch (err) {
+      console.error('Error featuring next 100:', err);
+      toast({ title: 'Curation failed', description: 'Could not feature the next batch.', variant: 'destructive' });
+    } finally {
+      setBatching(false);
+    }
+  };
   const exportToCSV = async () => {
     try {
       // Fetch ALL submissions for export (not just current page)
@@ -357,6 +399,10 @@ const AdminThoughtsManagement = () => {
             <p className="text-gray-600 mt-2">Manage citizen submissions and feature them on the homepage</p>
           </div>
           <div className="flex items-center gap-2">
+            <Button onClick={featureNextBatch} disabled={batching} className="flex items-center gap-2">
+              <Star className="h-4 w-4" />
+              {batching ? 'Featuring…' : 'Feature next 100'}
+            </Button>
             <Button onClick={exportToCSV} className="flex items-center gap-2">
               <Download className="h-4 w-4" />
               Export CSV
