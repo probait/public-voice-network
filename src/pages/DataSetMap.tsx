@@ -324,8 +324,8 @@ const DataSetMap: React.FC = () => {
 
   useEffect(() => {
     // SEO basics
-    document.title = "Voices Across Canada – Sentiment Map";
-    const desc = "Interactive sentiment map: explore perspectives from across Canada with clustering, filters, and summaries.";
+    document.title = "Dataset Map – Voices Across Canada | Community Voices";
+    const desc = "Explore who is speaking and what they feel: interactive map with filters, clusters, and demographic insights.";
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) {
       meta = document.createElement("meta");

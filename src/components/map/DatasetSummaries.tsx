@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { PieChart, Pie, Cell } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
+import { CalendarClock, Users, GraduationCap, Wallet, MapPin, Globe } from "lucide-react";
 
 interface DatasetSummariesProps {
   rows: Record<string, any>[];
@@ -34,6 +36,42 @@ const tally = (list: string[]) => {
 };
 
 const pct = (n: number, d: number) => (d ? Math.round((n / d) * 100) : 0);
+
+// Chart helpers for visual storytelling
+const COLOR_PALETTE = [
+  "hsl(var(--primary))",
+  "hsl(var(--positive))",
+  "hsl(var(--neutral))",
+  "hsl(var(--negative))",
+  "hsl(var(--foreground))",
+  "hsl(var(--accent))",
+];
+
+type Segment = { name: string; value: number; fill: string };
+
+const makeSegments = (items: Array<[string, number]>, max = 5): Segment[] => {
+  const top = items.slice(0, max);
+  const rest = items.slice(max);
+  const restSum = rest.reduce((a, [, n]) => a + n, 0);
+  const segs: Segment[] = top.map(([name, value], i) => ({
+    name,
+    value,
+    fill: COLOR_PALETTE[i % COLOR_PALETTE.length],
+  }));
+  if (restSum > 0) {
+    segs.push({ name: "Other", value: restSum, fill: COLOR_PALETTE[segs.length % COLOR_PALETTE.length] });
+  }
+  return segs;
+};
+
+const categoryIcon: Record<string, React.ComponentType<any>> = {
+  "Age groups": CalendarClock,
+  "Gender": Users,
+  "Education": GraduationCap,
+  "Household income": Wallet,
+  "Urban/Rural": MapPin,
+  "Ethnicity": Globe,
+};
 
 const List: React.FC<{ items: Array<[string, number]>, total: number, max?: number }> = ({ items, total, max = 6 }) => (
   <ul className="space-y-2 text-sm" role="list">
@@ -127,13 +165,56 @@ const DatasetSummaries: React.FC<DatasetSummariesProps> = ({ rows }) => {
           <CardTitle>Demographic breakdown</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {demographics.data.map(({ label, items }) => (
-              <div key={label} className="rounded-md border p-3">
-                <h4 className="font-medium mb-2">{label}</h4>
-                <List items={items} total={total} />
-              </div>
-            ))}
+          <p className="text-sm text-muted-foreground mb-4">Who is speaking: a snapshot of the people behind these voices.</p>
+
+          {/* Headline stat cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {demographics.data.map(({ label, items }) => {
+              const [topLabel, topCount] = items[0] || ["Unknown", 0];
+              const percent = pct(topCount, total);
+              const Icon = categoryIcon[label] || Users;
+              return (
+                <div key={label} className="flex items-center gap-3 rounded-md border p-3">
+                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
+                    <Icon size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs text-muted-foreground">{label}</div>
+                    <div className="font-medium truncate" title={String(topLabel)}>{String(topLabel)}</div>
+                    <div className="text-xs text-muted-foreground">{percent}% of responses</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Visual charts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {demographics.data.map(({ label, items }) => {
+              const data = makeSegments(items, 5);
+              const chartConfig = Object.fromEntries(
+                data.map((d) => [d.name, { label: d.name }])
+              );
+              return (
+                <div key={`${label}-chart`} className="rounded-md border p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium">{label}</h4>
+                    <span className="text-xs text-muted-foreground">Top {Math.min(5, items.length)} + other</span>
+                  </div>
+                  <ChartContainer config={chartConfig}>
+                    <PieChart>
+                      <Pie data={data} dataKey="value" nameKey="name" innerRadius={36} outerRadius={64} stroke="hsl(var(--background))" strokeWidth={2}>
+                        {data.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartLegend content={<ChartLegendContent />} />
+                    </PieChart>
+                  </ChartContainer>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
