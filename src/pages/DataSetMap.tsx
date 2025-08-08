@@ -514,6 +514,22 @@ const DataSetMap: React.FC = () => {
         });
         grow = !grow;
       }, 1200);
+
+      // Fit map to data extent on initial load so cluster numbers are in view
+      if (filteredData && filteredData.features.length > 0) {
+        try {
+          let minLon = 180, minLat = 90, maxLon = -180, maxLat = -90;
+          filteredData.features.forEach((f) => {
+            const [lon, lat] = (f.geometry as any).coordinates as [number, number];
+            if (lon < minLon) minLon = lon;
+            if (lat < minLat) minLat = lat;
+            if (lon > maxLon) maxLon = lon;
+            if (lat > maxLat) maxLat = lat;
+          });
+          const bounds = new maplibregl.LngLatBounds([minLon, minLat], [maxLon, maxLat]);
+          map.fitBounds(bounds, { padding: 64, maxZoom: 5, duration: 0 });
+        } catch {}
+      }
     });
 
     return () => {
