@@ -23,8 +23,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 
-import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2, Eye, EyeOff, Filter } from 'lucide-react';
+import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2, Eye, EyeOff, Filter, Upload } from 'lucide-react';
 import BulkActions from '@/components/admin/BulkActions';
+import Papa from 'papaparse';
 
 interface ThoughtsSubmission {
   id: string;
@@ -52,8 +53,9 @@ const AdminThoughtsManagement = () => {
   const [selectedSubmissions, setSelectedSubmissions] = useState<string[]>([]);
   const [viewingSubmission, setViewingSubmission] = useState<ThoughtsSubmission | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
-  const { toast } = useToast();
+const pageSize = 10;
+const [importing, setImporting] = useState(false);
+const { toast } = useToast();
 
   const fetchSubmissions = async () => {
     try {
@@ -135,7 +137,118 @@ const AdminThoughtsManagement = () => {
     }
   };
 
-  const exportToCSV = async () => {
+const importVoicesFromDataset = async () => {
+  setImporting(true);
+  try {
+    const res = await fetch('/data/voices.csv');
+    if (!res.ok) throw new Error('Failed to fetch dataset');
+    const csvText = await res.text();
+    const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+    const rows: any[] = parsed.data as any[];
+
+    const cleanText = (txt: string) => String(txt)
+      .replace(/📲/g, '')
+      .replace(/[“”]/g, '"')
+      .replace(/^\s+|\s+$/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const chooseText = (row: any) => {
+      const candidates = [
+        row['Q13_AI_impact_worries_text_OE'],
+        row['Q8_AI_helping_BC_community_text_OE'],
+        row['Q17_Advice_BC_Leaders_text_OE'],
+        row['Q16_Indigenous_communities_involvement_AI_text_OE'],
+        row['Q8_AI_helping_BC_community_video_OE_transcription'],
+        row['Q13_AI_impact_worries_videos_OE_transcription'],
+      ];
+      for (const t of candidates) {
+        if (t && typeof t === 'string') {
+          const cleaned = cleanText(t);
+          if (cleaned.length >= 20 && !/i'll type my answer/i.test(cleaned)) return cleaned;
+        }
+      }
+      return '';
+    };
+
+    const subjectFrom = (txt: string) => {
+      const firstSentence = txt.split(/(?<=[.!?])\s+/)[0] || txt;
+      const short = firstSentence.trim().slice(0, 80);
+      if (short.length >= 80) return short.replace(/[.,;:!?]$/, '') + '…';
+      return short;
+    };
+
+    const detectCategory = (txt: string) => {
+      const t = txt.toLowerCase();
+      if (/(job|employment|work|layoff|career)/.test(t)) return 'employment';
+      if (/(health|doctor|hospital|care)/.test(t)) return 'healthcare';
+      if (/(school|education|student|teacher|university)/.test(t)) return 'education';
+      if (/(privacy|data|surveillance|rights)/.test(t)) return 'privacy';
+      if (/(ethic|bias|fair|safety)/.test(t)) return 'ethics';
+      if (/(econom|cost|price|afford|salary|wage)/.test(t)) return 'economy';
+      if (/(regulat|government|policy|law|rule)/.test(t)) return 'regulation';
+      if (/(environment|climate|emission|pollution)/.test(t)) return 'environment';
+      if (/(transport|traffic)/.test(t)) return 'transportation';
+      return 'other';
+    };
+
+    const toName = (loc: string) => {
+      if (!loc) return 'BC Resident';
+      const city = String(loc).split('/')?.[0]?.trim();
+      return city ? `Resident, ${city}` : 'BC Resident';
+    };
+
+    const inserts = rows.map((row, idx) => {
+      const msg = chooseText(row);
+      if (!msg) return null;
+      const subject = subjectFrom(msg);
+      return {
+        name: toName(row['Q1_Location_in_BC']),
+        email: `voice-${row['participant_id'] || row['engagement_id'] || idx}@example.com`,
+        province: 'BC',
+        category: detectCategory(msg),
+        subject,
+        message: msg,
+        featured: true,
+      } as const;
+    }).filter(Boolean) as any[];
+
+    if (inserts.length === 0) {
+      toast({
+        title: 'No importable voices',
+        description: 'The dataset did not contain usable responses.',
+      });
+      return;
+    }
+
+    const chunkSize = 100;
+    for (let i = 0; i < inserts.length; i += chunkSize) {
+      const chunk = inserts.slice(i, i + chunkSize);
+      const { error } = await supabase
+        .from('thoughts_submissions')
+        .insert(chunk);
+      if (error) throw error;
+    }
+
+    toast({
+      title: 'Import complete',
+      description: `Imported ${inserts.length} voices and featured them.`,
+    });
+
+    await fetchSubmissions();
+  } catch (err) {
+    console.error('Import error:', err);
+    toast({
+      title: 'Import failed',
+      description: 'There was an error importing voices.',
+      variant: 'destructive',
+    });
+  } finally {
+    setImporting(false);
+  }
+};
+
+const exportToCSV = async () => {
     try {
       // Fetch ALL submissions for export (not just current page)
       let query = supabase
@@ -362,10 +475,16 @@ const AdminThoughtsManagement = () => {
             <h1 className="text-3xl font-bold text-gray-900">Thoughts Management</h1>
             <p className="text-gray-600 mt-2">Manage citizen submissions and feature them on the homepage</p>
           </div>
-          <Button onClick={exportToCSV} className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            Export CSV
-          </Button>
+<div className="flex items-center gap-2">
+  <Button onClick={importVoicesFromDataset} disabled={importing} className="flex items-center gap-2">
+    <Upload className="h-4 w-4" />
+    {importing ? 'Importing…' : 'Import Voices'}
+  </Button>
+  <Button onClick={exportToCSV} className="flex items-center gap-2">
+    <Download className="h-4 w-4" />
+    Export CSV
+  </Button>
+</div>
         </div>
 
         <Card>
