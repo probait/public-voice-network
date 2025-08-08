@@ -12,7 +12,8 @@ export const useTotalThoughtsCount = () => {
         throw error;
       }
 
-      return data || 0;
+      const n = typeof data === "number" ? data : Number(data ?? 0);
+      return Number.isFinite(n) ? n : 0;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

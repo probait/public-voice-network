@@ -1,13 +1,14 @@
 import { useEffect, useRef } from "react";
 import Papa from "papaparse";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 // One-time hidden importer that runs automatically on app load
 // It will import public/data/voices.csv into thoughts_submissions
 // Only runs if no previous bc_ai_survey_2025 rows exist
 const VoicesAutoImport = () => {
   const startedRef = useRef(false);
-
+  const queryClient = useQueryClient();
   useEffect(() => {
     if (startedRef.current) return;
     startedRef.current = true;
@@ -164,6 +165,8 @@ const VoicesAutoImport = () => {
 
         console.info(`[VoicesAutoImport] Done. Inserted: ${inserted}, Updated: ${updated}`);
         sessionStorage.setItem("voices_import_done", "1");
+        try { queryClient.invalidateQueries({ queryKey: ["totalThoughtsCount"] }); } catch {}
+
       } catch (e) {
         console.error("[VoicesAutoImport] Error:", e);
         // Do not block the UI
