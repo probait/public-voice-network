@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import mapboxgl, { Map, MapLayerMouseEvent, Popup } from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import maplibregl, { Map as MapLibreMap, MapLayerMouseEvent, Popup } from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import Papa from "papaparse";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
@@ -145,11 +145,11 @@ const toGeoJSON = (rows: Record<string, any>[]): GeoJSON.FeatureCollection<GeoJS
 };
 
 const CANONICAL_URL = "/dataset-map";
-const MAPBOX_TOKEN = "pk.eyJ1IjoiY2hhc2V3aWxzb24iLCJhIjoiY2s4Y3VqZ2xxMDBmaDNzbXdvdXk2ZHE5YyJ9.YmWh-rTZ9JD_oH2tG7GHyw"; // Public token for demo
+ // Public token for demo
 
 const DataSetMap: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<Map | null>(null);
+  const mapRef = useRef<MapLibreMap | null>(null);
   const popupRef = useRef<Popup | null>(null);
   const pulseRef = useRef<number>(0);
 
@@ -219,25 +219,18 @@ const DataSetMap: React.FC = () => {
 
   useEffect(() => {
     if (!mapContainer.current || mapRef.current || loading || !geoData) return;
-    mapboxgl.accessToken = MAPBOX_TOKEN;
+    
 
-    const map = new Map({
+    const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
-      center: [-123.5, 54.0],
-      zoom: 5.5,
-      projection: "globe",
+      style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
+      center: [-96.8, 56.1],
+      zoom: 3.2,
       pitch: 35,
     });
     mapRef.current = map;
 
     map.on("style.load", () => {
-      // Atmosphere
-      map.setFog({
-        color: "rgb(255,255,255)",
-        "high-color": "rgb(200,200,225)",
-        "horizon-blend": 0.2,
-      });
 
       // Add data source
       map.addSource("thoughts", {
@@ -320,7 +313,7 @@ const DataSetMap: React.FC = () => {
       });
 
       // Hover tooltip
-      popupRef.current = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+      popupRef.current = new maplibregl.Popup({ closeButton: false, closeOnClick: false });
       map.on("mousemove", "unclustered-point", (e: MapLayerMouseEvent) => {
         const f = e.features?.[0] as unknown as GeoFeature | undefined;
         if (!f) return;
