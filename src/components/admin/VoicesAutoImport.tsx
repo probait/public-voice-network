@@ -125,7 +125,15 @@ const VoicesAutoImport = () => {
           };
         });
 
-        // 3) Upsert in batches
+        // Deduplicate by (source, source_participant_id)
+        const uniqueMap = new Map<string, typeof payload[0]>();
+        for (const p of payload) {
+          const key = `${p.source}:${p.source_participant_id ?? ''}`;
+          if (!uniqueMap.has(key)) uniqueMap.set(key, p);
+        }
+        const uniquePayload = Array.from(uniqueMap.values());
+
+        // 3) Insert in batches
         let inserted = 0;
         let updated = 0;
         const BATCH_SIZE = 200;
@@ -139,20 +147,18 @@ const VoicesAutoImport = () => {
         if (existingErr) throw existingErr;
         const existing = new Set<string>((existingRows || []).map((r: any) => r.source_participant_id));
 
-        for (let i = 0; i < payload.length; i += BATCH_SIZE) {
-          const batch = payload.slice(i, i + BATCH_SIZE);
-          const newCount = batch.filter(b => !existing.has(b.source_participant_id)).length;
-          const updCount = batch.length - newCount;
-
-          const { error: upsertErr } = await supabase
+        for (let i = 0; i < uniquePayload.length; i += BATCH_SIZE) {
+          const batch = uniquePayload.slice(i, i + BATCH_SIZE);
+          const { data: insertedRows, error: insertErr } = await supabase
             .from("thoughts_submissions")
-            .upsert(batch, { onConflict: "source,source_participant_id" });
-          if (upsertErr) throw upsertErr;
+            .insert(batch)
+            .select("source_participant_id");
+          if (insertErr) throw insertErr;
 
-          inserted += newCount;
-          updated += updCount;
+          const newlyInserted = (insertedRows?.length ?? 0);
+          inserted += newlyInserted;
           batch.forEach(b => existing.add(b.source_participant_id));
-          console.info(`[VoicesAutoImport] Progress: ${Math.min(i + BATCH_SIZE, payload.length)}/${payload.length}`);
+          console.info(`[VoicesAutoImport] Progress: ${Math.min(i + BATCH_SIZE, uniquePayload.length)}/${uniquePayload.length} — inserted +${newlyInserted} (total ${inserted})`);
         }
 
         console.info(`[VoicesAutoImport] Done. Inserted: ${inserted}, Updated: ${updated}`);

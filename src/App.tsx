@@ -50,7 +50,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <VoicesAutoImport key="run-2" />
+          <VoicesAutoImport key="run-4" />
           <BrowserRouter>
           <ScrollToTop />
           <Routes>
