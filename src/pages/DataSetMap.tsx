@@ -63,6 +63,9 @@ const REGION_CENTROIDS: Record<string, [number, number]> = {
   "Port Moody": [-122.852, 49.284],
 };
 
+// Canada bounding box (approximate)
+const CANADA_BOUNDS: [[number, number], [number, number]] = [[-141.1, 41.5], [-52.6, 83.2]];
+
 // Heuristic helpers
 const normalize = (s: unknown) => (typeof s === "string" ? s.trim() : "");
 
@@ -367,8 +370,12 @@ const DataSetMap: React.FC = () => {
       center: [-96.8, 56.1],
       zoom: 3.2,
       pitch: 35,
+      maxBounds: CANADA_BOUNDS,
     });
     mapRef.current = map;
+
+    // Focus strictly on Canada view
+    map.fitBounds(CANADA_BOUNDS, { padding: 40, duration: 0 });
 
     map.on("style.load", () => {
 
