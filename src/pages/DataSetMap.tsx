@@ -209,6 +209,25 @@ const DataSetMap: React.FC = () => {
     return { type: "FeatureCollection", features } as GeoJSON.FeatureCollection<GeoJSON.Point, Thought>;
   }, [geoData, filters]);
 
+  // Group data by sentiment so clusters are separated per color at all zoom levels
+  const groupedData = useMemo(() => {
+    const empty = { type: "FeatureCollection", features: [] as GeoFeature[] } as GeoJSON.FeatureCollection<GeoJSON.Point, Thought>;
+    if (!filteredData) {
+      return { positive: empty, neutral: empty, negative: empty, unknown: empty } as Record<Thought["sentiment"], GeoJSON.FeatureCollection<GeoJSON.Point, Thought>>;
+    }
+    const groups: Record<Thought["sentiment"], GeoJSON.FeatureCollection<GeoJSON.Point, Thought>> = {
+      positive: { type: "FeatureCollection", features: [] },
+      neutral: { type: "FeatureCollection", features: [] },
+      negative: { type: "FeatureCollection", features: [] },
+      unknown: { type: "FeatureCollection", features: [] },
+    } as any;
+    filteredData.features.forEach((f) => {
+      const s = (f.properties.sentiment as Thought["sentiment"]) || "unknown";
+      (groups[s] ?? groups.unknown).features.push(f);
+    });
+    return groups;
+  }, [filteredData]);
+
   useEffect(() => {
     // SEO basics
     document.title = "DataSet Map – BC Sentiment Visualization";
@@ -269,129 +288,126 @@ const DataSetMap: React.FC = () => {
 
     map.on("style.load", () => {
 
-      // Add data source
-      map.addSource("thoughts", {
-        type: "geojson",
-        data: filteredData,
-        cluster: true,
-        clusterRadius: 50,
-        clusterProperties: {
-          sumPositive: ["+", ["case", ["==", ["get", "sentiment"], "positive"], 1, 0]],
-          sumNeutral: ["+", ["case", ["==", ["get", "sentiment"], "neutral"], 1, 0]],
-          sumNegative: ["+", ["case", ["==", ["get", "sentiment"], "negative"], 1, 0]],
-        },
-      } as any);
+      const sentiments: Thought["sentiment"][] = ["positive", "neutral", "negative", "unknown"];
+      const colors: Record<Thought["sentiment"], string> = {
+        positive: "hsl(150, 60%, 45%)",
+        neutral: "hsl(40, 85%, 55%)",
+        negative: "hsl(0, 70%, 55%)",
+        unknown: "hsl(220, 10%, 60%)",
+      };
 
-      // Cluster circles
-      map.addLayer({
-        id: "clusters",
-        type: "circle",
-        source: "thoughts",
-        filter: ["has", "point_count"],
-        paint: {
-          // Soft edges
-          "circle-blur": 0.6,
-          // Radius is animated later
-          "circle-radius": ["interpolate", ["linear"], ["get", "point_count"], 2, 14, 50, 22, 200, 28],
-          // Color by majority sentiment
-          "circle-color": [
-            "case",
-            [">=", ["get", "sumPositive"], ["max", ["get", "sumNeutral"], ["get", "sumNegative"]]], "hsl(150, 60%, 45%)",
-            [">=", ["get", "sumNegative"], ["max", ["get", "sumNeutral"], ["get", "sumPositive"]]], "hsl(0, 70%, 55%)",
-            "hsl(40, 85%, 55%)"
-          ],
-          "circle-opacity": 0.8,
-          "circle-stroke-color": "hsl(0, 0%, 100%)",
-          "circle-stroke-width": 1,
-          "circle-stroke-opacity": 0.3,
-        },
+      // Add one clustered source per sentiment and corresponding layers
+      sentiments.forEach((s) => {
+        map.addSource(`thoughts-${s}`, {
+          type: "geojson",
+          data: groupedData[s],
+          cluster: true,
+          clusterRadius: 50,
+        } as any);
+
+        // Cluster circles per sentiment
+        map.addLayer({
+          id: `clusters-${s}`,
+          type: "circle",
+          source: `thoughts-${s}`,
+          filter: ["has", "point_count"],
+          paint: {
+            "circle-blur": 0.6,
+            "circle-radius": ["interpolate", ["linear"], ["get", "point_count"], 2, 14, 50, 22, 200, 28],
+            "circle-color": colors[s],
+            "circle-opacity": 0.85,
+            "circle-stroke-color": "hsl(0, 0%, 100%)",
+            "circle-stroke-width": 1,
+            "circle-stroke-opacity": 0.3,
+          },
+        });
+
+        // Cluster count labels
+        map.addLayer({
+          id: `cluster-count-${s}`,
+          type: "symbol",
+          source: `thoughts-${s}`,
+          filter: ["has", "point_count"],
+          layout: {
+            "text-field": ["get", "point_count_abbreviated"],
+            "text-size": 12,
+            "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+          },
+          paint: {
+            "text-color": "hsl(0, 0%, 10%)",
+            "text-halo-color": "hsl(0, 0%, 100%)",
+            "text-halo-width": 1.2,
+          }
+        });
+
+        // Individual points per sentiment
+        map.addLayer({
+          id: `unclustered-point-${s}`,
+          type: "circle",
+          source: `thoughts-${s}`,
+          filter: ["!has", "point_count"],
+          paint: {
+            "circle-radius": 6,
+            "circle-color": colors[s],
+            "circle-opacity": 0.95,
+            "circle-blur": 0.35,
+            "circle-stroke-color": "hsl(0, 0%, 100%)",
+            "circle-stroke-width": 1,
+            "circle-stroke-opacity": 0.5,
+          },
+        });
       });
 
-      // Cluster count labels
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "thoughts",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": ["get", "point_count_abbreviated"],
-          "text-size": 12,
-          "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
-        },
-        paint: {
-          "text-color": "hsl(0, 0%, 10%)",
-          "text-halo-color": "hsl(0, 0%, 100%)",
-          "text-halo-width": 1.2,
-        }
-      });
-
-      // Individual points
-      map.addLayer({
-        id: "unclustered-point",
-        type: "circle",
-        source: "thoughts",
-        filter: ["!has", "point_count"],
-        paint: {
-          "circle-radius": 6,
-          "circle-color": [
-            "match",
-            ["get", "sentiment"],
-            "positive", "hsl(150, 60%, 45%)",
-            "negative", "hsl(0, 70%, 55%)",
-            "neutral", "hsl(40, 85%, 55%)",
-            /* other */ "hsl(220, 10%, 60%)"
-          ],
-          "circle-opacity": 0.9,
-          "circle-blur": 0.4,
-          "circle-stroke-color": "hsl(0, 0%, 100%)",
-          "circle-stroke-width": 1,
-          "circle-stroke-opacity": 0.5,
-        },
-      });
-
-      // Hover tooltip
+      // Hover tooltip for unclustered layers
       popupRef.current = new maplibregl.Popup({ closeButton: false, closeOnClick: false });
-      map.on("mousemove", "unclustered-point", (e: MapLayerMouseEvent) => {
-        const f = e.features?.[0] as unknown as GeoFeature | undefined;
-        if (!f) return;
-        const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
-        const { text, location, sentiment } = f.properties;
-        const safe = String(text).replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        const content = `<div style="max-width:280px"><strong>${location}</strong><br/><em>${sentiment}</em><br/><div style="margin-top:4px">${safe}</div></div>`;
-        popupRef.current!.setLngLat(coords).setHTML(content).addTo(map);
-      });
-      map.on("mouseleave", "unclustered-point", () => {
-        popupRef.current?.remove();
+      sentiments.forEach((s) => {
+        const layer = `unclustered-point-${s}`;
+        map.on("mousemove", layer, (e: MapLayerMouseEvent) => {
+          const f = e.features?.[0] as unknown as GeoFeature | undefined;
+          if (!f) return;
+          const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
+          const { text, location, sentiment } = f.properties;
+          const safe = String(text).replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          const content = `<div style="max-width:280px"><strong>${location}</strong><br/><em>${sentiment}</em><br/><div style="margin-top:4px">${safe}</div></div>`;
+          popupRef.current!.setLngLat(coords).setHTML(content).addTo(map);
+        });
+        map.on("mouseleave", layer, () => {
+          popupRef.current?.remove();
+        });
       });
 
-      // Click cluster to open modal
-      map.on("click", "clusters", async (e: MapLayerMouseEvent) => {
-        const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
-        const clusterId = features[0]?.properties?.cluster_id;
-        const src = map.getSource("thoughts") as any;
-        if (!src || clusterId == null) return;
-        src.getClusterLeaves(clusterId, 100, 0, (err: any, leaves: GeoFeature[]) => {
-          if (err) return;
-          setModalData(leaves.map(l => l.properties));
-          setModalOpen(true);
-          // Fancy fly-to
-          const coords = (features[0].geometry as any).coordinates as [number, number];
-          map.easeTo({ center: coords, duration: 600, zoom: Math.min(map.getZoom() + 1.2, 9) });
+      // Click cluster to open modal (per sentiment layer)
+      sentiments.forEach((s) => {
+        const clusterLayerId = `clusters-${s}`;
+        map.on("click", clusterLayerId, async (e: MapLayerMouseEvent) => {
+          const features = map.queryRenderedFeatures(e.point, { layers: [clusterLayerId] });
+          const clusterId = (features[0] as any)?.properties?.cluster_id;
+          const src = map.getSource(`thoughts-${s}`) as any;
+          if (!src || clusterId == null) return;
+          src.getClusterLeaves(clusterId, 100, 0, (err: any, leaves: GeoFeature[]) => {
+            if (err) return;
+            setModalData(leaves.map(l => l.properties));
+            setModalOpen(true);
+            const coords = (features[0].geometry as any).coordinates as [number, number];
+            map.easeTo({ center: coords, duration: 600, zoom: Math.min(map.getZoom() + 1.2, 9) });
+          });
         });
       });
 
       // Pulse animation for clusters (gentle radius breathing)
       let grow = true;
       pulseRef.current = window.setInterval(() => {
-        const layerId = "clusters";
-        const cur = map.getPaintProperty(layerId, "circle-radius") as any;
-        if (!cur) return;
-        const factor = grow ? 1.02 : 0.98;
-        const next = ["*", cur, factor];
-        try {
-          map.setPaintProperty(layerId, "circle-radius", next as any);
-          grow = !grow;
-        } catch { }
+        sentiments.forEach((s) => {
+          const layerId = `clusters-${s}`;
+          const cur = map.getPaintProperty(layerId, "circle-radius") as any;
+          if (!cur) return;
+          const factor = grow ? 1.02 : 0.98;
+          const next = ["*", cur, factor];
+          try {
+            map.setPaintProperty(layerId, "circle-radius", next as any);
+          } catch { }
+        });
+        grow = !grow;
       }, 1200);
     });
 
@@ -406,9 +422,12 @@ const DataSetMap: React.FC = () => {
   // Update source data when filters change
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded() || !map.getSource("thoughts")) return;
-    (map.getSource("thoughts") as any).setData(filteredData);
-  }, [filteredData]);
+    if (!map || !map.isStyleLoaded()) return;
+    (['positive','neutral','negative','unknown'] as Thought["sentiment"][]).forEach((s) => {
+      const src = map.getSource(`thoughts-${s}`) as any;
+      if (src) src.setData(groupedData[s]);
+    });
+  }, [groupedData]);
 
   // UI state for modal
   const [modalOpen, setModalOpen] = useState(false);
