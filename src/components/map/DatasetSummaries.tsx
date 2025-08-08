@@ -96,15 +96,24 @@ const DatasetSummaries: React.FC<DatasetSummariesProps> = ({ rows }) => {
                     <h4 className="font-medium truncate" title={region}>{region}</h4>
                     <span className="text-xs text-muted-foreground">{g.count}</span>
                   </div>
-                  <div className="h-2 w-full bg-muted rounded">
-                    <div className="h-2 bg-[hsl(150,60%,45%)] rounded-l" style={{ width: `${pct(g.pos, g.count)}%` }} />
-                    <div className="h-2 bg-[hsl(40,85%,55%)]" style={{ width: `${pct(g.neu, g.count)}%` }} />
-                    <div className="h-2 bg-[hsl(0,70%,55%)] rounded-r" style={{ width: `${pct(g.neg, g.count)}%` }} />
+                  <div className="h-3 w-full bg-muted rounded overflow-hidden flex" aria-label="Sentiment distribution" role="img">
+                    <div className="h-3 bg-positive rounded-l" style={{ width: `${pct(g.pos, g.count)}%` }} aria-label={`Positive ${pct(g.pos, g.count)}%`} />
+                    <div className="h-3 bg-neutral" style={{ width: `${pct(g.neu, g.count)}%` }} aria-label={`Neutral ${pct(g.neu, g.count)}%`} />
+                    <div className="h-3 bg-negative rounded-r" style={{ width: `${pct(g.neg, g.count)}%` }} aria-label={`Negative ${pct(g.neg, g.count)}%`} />
                   </div>
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    <span>+{pct(g.pos, g.count)}% • </span>
-                    <span>{pct(g.neu, g.count)}% • </span>
-                    <span>-{pct(g.neg, g.count)}%</span>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-positive/15 px-2 py-0.5">
+                      <span className="h-2 w-2 rounded-full bg-positive" />
+                      {pct(g.pos, g.count)}% positive
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-neutral/15 px-2 py-0.5">
+                      <span className="h-2 w-2 rounded-full bg-neutral" />
+                      {pct(g.neu, g.count)}% neutral
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-negative/15 px-2 py-0.5">
+                      <span className="h-2 w-2 rounded-full bg-negative" />
+                      {pct(g.neg, g.count)}% negative
+                    </span>
                   </div>
                 </div>
               ))}
