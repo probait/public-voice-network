@@ -1,19 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Papa from "papaparse";
 import { supabase } from "@/integrations/supabase/client";
-import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/ui/card";
 
 // One-time hidden importer that runs automatically on app load
 // It will import public/data/voices.csv into thoughts_submissions
 // Only runs if no previous bc_ai_survey_2025 rows exist
 const VoicesAutoImport = () => {
   const startedRef = useRef(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [status, setStatus] = useState<string>("");
-  const [total, setTotal] = useState<number>(0);
-  const [processed, setProcessed] = useState<number>(0);
-  const [insertedCount, setInsertedCount] = useState<number>(0);
 
   useEffect(() => {
     if (startedRef.current) return;
@@ -21,8 +14,6 @@ const VoicesAutoImport = () => {
 
     const run = async () => {
       try {
-        setIsOpen(true);
-        setStatus("Checking existing data...");
 
         // 0) Check if entries already imported
         const { count, error: countErr } = await supabase
@@ -33,9 +24,7 @@ const VoicesAutoImport = () => {
         if (countErr) throw countErr;
         if ((count ?? 0) > 0) {
           console.info(`[VoicesAutoImport] Skipping — already found ${count} imported rows.`);
-          setStatus(`Already imported ${count} rows`);
           sessionStorage.setItem("voices_import_done", "1");
-          setTimeout(() => setIsOpen(false), 3500);
           return;
         }
 
@@ -50,16 +39,10 @@ const VoicesAutoImport = () => {
         const total = rows.length;
         if (total === 0) {
           console.warn("[VoicesAutoImport] voices.csv contained 0 rows");
-          setStatus("voices.csv contained 0 rows");
           sessionStorage.setItem("voices_import_done", "1");
-          setTimeout(() => setIsOpen(false), 3500);
           return;
         }
 
-        setStatus(`Starting import of ${total} rows…`);
-        setTotal(total);
-        setProcessed(0);
-        setInsertedCount(0);
 
         const get = (row: Record<string, any>, keys: string[], fallback = ""): string => {
           for (const k of keys) {
@@ -175,22 +158,14 @@ const VoicesAutoImport = () => {
           batch.forEach(b => existing.add(b.source_participant_id));
 
           const processedNow = Math.min(i + BATCH_SIZE, uniquePayload.length);
-          setProcessed(processedNow);
-          setInsertedCount(inserted);
-          setStatus(`Importing… ${processedNow}/${uniquePayload.length}`);
 
           console.info(`[VoicesAutoImport] Progress: ${processedNow}/${uniquePayload.length} — inserted +${newlyInserted} (total ${inserted})`);
         }
 
         console.info(`[VoicesAutoImport] Done. Inserted: ${inserted}, Updated: ${updated}`);
-        setStatus(`Done. Inserted: ${inserted}`);
-        setInsertedCount(inserted);
-        setProcessed(total);
         sessionStorage.setItem("voices_import_done", "1");
-        setTimeout(() => setIsOpen(false), 4000);
       } catch (e) {
         console.error("[VoicesAutoImport] Error:", e);
-        setStatus("Import error — see console for details");
         // Do not block the UI
         sessionStorage.setItem("voices_import_done", "1");
       }
@@ -199,25 +174,7 @@ const VoicesAutoImport = () => {
     run();
   }, []);
 
-  const percent = total > 0 ? Math.round((processed / total) * 100) : 0;
-
-  return isOpen ? (
-    <div className="fixed bottom-4 right-4 z-50 w-[min(92vw,360px)]">
-      <Card className="p-4 shadow-lg">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Importing Voices</span>
-            <span className="text-xs text-muted-foreground">{percent ? `${percent}%` : null}</span>
-          </div>
-          <Progress value={percent} />
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span className="truncate max-w-[70%]" aria-live="polite">{status}</span>
-            <span>{insertedCount} inserted</span>
-          </div>
-        </div>
-      </Card>
-    </div>
-  ) : null;
+  return null;
 };
 
 export default VoicesAutoImport;
