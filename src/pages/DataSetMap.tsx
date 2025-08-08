@@ -376,6 +376,14 @@ const DataSetMap: React.FC = () => {
         unknown: "hsl(220, 10%, 60%)",
       };
 
+      // Screen-space offsets to visually separate overlapping clusters per sentiment
+      const offsets: Record<Thought["sentiment"], [number, number]> = {
+        positive: [-18, -18],   // NW
+        neutral: [18, -18],     // NE
+        negative: [18, 18],     // SE
+        unknown: [-18, 18],     // SW
+      };
+
       // Add one clustered source per sentiment and corresponding layers
       sentiments.forEach((s) => {
         map.addSource(`thoughts-${s}`, {
@@ -396,6 +404,7 @@ const DataSetMap: React.FC = () => {
             "circle-radius": ["interpolate", ["linear"], ["get", "point_count"], 2, 14, 50, 22, 200, 28],
             "circle-color": colors[s],
             "circle-opacity": 0.85,
+            "circle-translate": offsets[s],
             "circle-stroke-color": "hsl(0, 0%, 100%)",
             "circle-stroke-width": 1,
             "circle-stroke-opacity": 0.3,
@@ -417,6 +426,7 @@ const DataSetMap: React.FC = () => {
             "text-color": "hsl(0, 0%, 10%)",
             "text-halo-color": "hsl(0, 0%, 100%)",
             "text-halo-width": 1.2,
+            "text-translate": offsets[s],
           }
         });
 
@@ -431,6 +441,7 @@ const DataSetMap: React.FC = () => {
             "circle-color": colors[s],
             "circle-opacity": 0.95,
             "circle-blur": 0.35,
+            "circle-translate": offsets[s],
             "circle-stroke-color": "hsl(0, 0%, 100%)",
             "circle-stroke-width": 1,
             "circle-stroke-opacity": 0.5,
@@ -445,11 +456,10 @@ const DataSetMap: React.FC = () => {
         map.on("mousemove", layer, (e: MapLayerMouseEvent) => {
           const f = e.features?.[0] as unknown as GeoFeature | undefined;
           if (!f) return;
-          const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
           const { text, location, sentiment } = f.properties;
           const safe = String(text).replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
           const content = `<div style="max-width:280px"><strong>${location}</strong><br/><em>${sentiment}</em><br/><div style="margin-top:4px">${safe}</div></div>`;
-          popupRef.current!.setLngLat(coords).setHTML(content).addTo(map);
+          popupRef.current!.setLngLat(e.lngLat).setHTML(content).addTo(map);
         });
         map.on("mouseleave", layer, () => {
           popupRef.current?.remove();
