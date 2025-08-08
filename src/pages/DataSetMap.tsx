@@ -59,16 +59,53 @@ const REGION_CENTROIDS: Record<string, [number, number]> = {
 const normalize = (s: unknown) => (typeof s === "string" ? s.trim() : "");
 
 const detectSentiment = (row: Record<string, any>): Thought["sentiment"] => {
-  // Try common patterns
+  // 1) Direct sentiment fields if present
   for (const key of Object.keys(row)) {
     const lk = key.toLowerCase();
     if (lk.includes("sentiment")) {
       const v = String(row[key]).toLowerCase();
-      if (["pos", "positive", "1", "true"].includes(v)) return "positive";
-      if (["neg", "negative", "-1"].includes(v)) return "negative";
-      if (["neutral", "0"].includes(v)) return "neutral";
+      if (["pos", "positive", "1", "+1", "true", "yes"].includes(v)) return "positive";
+      if (["neg", "negative", "-1", "false", "no"].includes(v)) return "negative";
+      if (["neutral", "0", "mixed"].includes(v)) return "neutral";
     }
   }
+
+  // 2) Likert-style numeric scales (common in surveys)
+  const numCandidateKeys = Object.keys(row).filter(k => /experience|satisfaction|support|agreement|trust|concern|risk|benefit|impact|confidence/i.test(k));
+  for (const k of numCandidateKeys) {
+    const raw = row[k];
+    const n = typeof raw === "number" ? raw : parseFloat(raw);
+    if (Number.isFinite(n)) {
+      // Map 1-5 scales
+      if (n >= 1 && n <= 5) {
+        if (n >= 4) return "positive";
+        if (n <= 2) return "negative";
+        return "neutral"; // ~3
+      }
+      // Map 0-10 scales
+      if (n >= 0 && n <= 10) {
+        if (n >= 7) return "positive";
+        if (n <= 3) return "negative";
+        return "neutral";
+      }
+    }
+  }
+
+  // 3) Simple keyword heuristic on open-ended text fields
+  const textKeys = Object.keys(row).filter(k => /_OE$|open|comment|text|advice/i.test(k));
+  for (const k of textKeys) {
+    const t = String(row[k] ?? "").toLowerCase();
+    if (!t) continue;
+    const positives = ["good", "great", "benefit", "help", "positive", "improve", "support", "opportunity"];
+    const negatives = ["bad", "worse", "harm", "risk", "negative", "concern", "problem", "danger"];
+    let score = 0;
+    positives.forEach(w => { if (t.includes(w)) score += 1; });
+    negatives.forEach(w => { if (t.includes(w)) score -= 1; });
+    if (score >= 2) return "positive";
+    if (score <= -2) return "negative";
+    if (score !== 0) return score > 0 ? "positive" : "negative";
+  }
+
   return "unknown";
 };
 
