@@ -28,7 +28,6 @@ type GeoFeature = GeoJSON.Feature<GeoJSON.Point, Thought>;
 
 type FiltersState = {
   sentiments: Set<Thought["sentiment"]>;
-  categories: Set<string>;
 };
 
 // Approximate centroids for BC regions and major cities
@@ -279,19 +278,15 @@ const DataSetMap: React.FC = () => {
 
   const [rawRows, setRawRows] = useState<Record<string, any>[]>([]);
   const [geoData, setGeoData] = useState<GeoJSON.FeatureCollection<GeoJSON.Point, Thought> | null>(null);
-  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [filters, setFilters] = useState<FiltersState>({
     sentiments: new Set(["positive", "neutral", "negative", "unknown"]),
-    categories: new Set(),
   });
   const [loading, setLoading] = useState(true);
 
   const filteredData = useMemo(() => {
     if (!geoData) return geoData;
     const features = geoData.features.filter(f => {
-      const sOk = filters.sentiments.has(f.properties.sentiment);
-      const cOk = filters.categories.size === 0 || (f.properties.category && filters.categories.has(f.properties.category));
-      return sOk && cOk;
+      return filters.sentiments.has(f.properties.sentiment);
     });
     return { type: "FeatureCollection", features } as GeoJSON.FeatureCollection<GeoJSON.Point, Thought>;
   }, [geoData, filters]);
@@ -317,8 +312,8 @@ const DataSetMap: React.FC = () => {
 
   useEffect(() => {
     // SEO basics
-    document.title = "DataSet Map – BC Sentiment Visualization";
-    const desc = "Interactive BC sentiment map with clustering, filters, and storytelling.";
+    document.title = "Voices Across Canada – Sentiment Map";
+    const desc = "Interactive sentiment map: explore perspectives from across Canada with clustering, filters, and summaries.";
     let meta = document.querySelector('meta[name="description"]');
     if (!meta) {
       meta = document.createElement("meta");
@@ -348,9 +343,6 @@ const DataSetMap: React.FC = () => {
         setRawRows(rows);
         const gj = toGeoJSON(rows);
         setGeoData(gj);
-        // Derive categories
-        const cats = Array.from(new Set(gj.features.map(f => f.properties.category).filter(Boolean) as string[])).sort();
-        setAvailableCategories(cats);
         setLoading(false);
       },
       error: (err) => {
@@ -374,8 +366,8 @@ const DataSetMap: React.FC = () => {
     });
     mapRef.current = map;
 
-    // Focus strictly on Canada view
-    map.fitBounds(CANADA_BOUNDS, { padding: 40, duration: 0 });
+    // Focus on southern Canada on load
+    map.jumpTo({ center: [-95, 45.5], zoom: 3.8, pitch: 35 });
 
     map.on("style.load", () => {
 
@@ -576,13 +568,6 @@ const DataSetMap: React.FC = () => {
     });
   };
 
-  const toggleCategory = (c: string) => {
-    setFilters(prev => {
-      const next = new Set(prev.categories);
-      if (next.has(c)) next.delete(c); else next.add(c);
-      return { ...prev, categories: next };
-    });
-  };
 
   if (loading) {
     return (
@@ -605,8 +590,8 @@ const DataSetMap: React.FC = () => {
       <main className="min-h-screen">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
           <header className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">BC Sentiment Map</h1>
-            <p className="text-muted-foreground">Explore public sentiment across British Columbia through interactive data visualization.</p>
+            <h1 className="text-3xl font-bold tracking-tight">Voices Across Canada</h1>
+            <p className="text-muted-foreground">Explore public sentiment across Canada through interactive data visualization.</p>
           </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -618,9 +603,6 @@ const DataSetMap: React.FC = () => {
                   sentiments={sentimentsAll}
                   selectedSentiments={filters.sentiments}
                   onToggleSentiment={toggleSentiment}
-                  categories={availableCategories}
-                  selectedCategories={filters.categories}
-                  onToggleCategory={toggleCategory}
                 />
               </Card>
               

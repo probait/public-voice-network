@@ -1,7 +1,5 @@
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 
 export type Sentiment = "positive" | "neutral" | "negative" | "unknown";
 
@@ -9,9 +7,6 @@ interface Props {
   sentiments: Sentiment[];
   selectedSentiments: Set<Sentiment>;
   onToggleSentiment: (s: Sentiment) => void;
-  categories: string[];
-  selectedCategories: Set<string>;
-  onToggleCategory: (c: string) => void;
 }
 
 const sentimentLabels: Record<Sentiment, string> = {
@@ -25,9 +20,6 @@ const DataFilters: React.FC<Props> = ({
   sentiments,
   selectedSentiments,
   onToggleSentiment,
-  categories,
-  selectedCategories,
-  onToggleCategory,
 }) => {
   return (
     <div className="space-y-6">
@@ -43,22 +35,6 @@ const DataFilters: React.FC<Props> = ({
         </div>
       </div>
 
-      {categories.length > 0 && (
-        <>
-          <Separator />
-          <div>
-            <h3 className="text-sm font-medium mb-2">Categories</h3>
-            <div className="space-y-2 max-h-64 overflow-auto pr-2">
-              {categories.map((c) => (
-                <label key={c} className="flex items-center gap-2">
-                  <Checkbox checked={selectedCategories.has(c)} onCheckedChange={() => onToggleCategory(c)} />
-                  <span className="text-sm">{c}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 };
