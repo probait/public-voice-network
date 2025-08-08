@@ -1,0 +1,137 @@
+import React, { useMemo } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+interface DatasetSummariesProps {
+  rows: Record<string, any>[];
+}
+
+const normalize = (v: any) => (typeof v === "string" ? v.trim() : v);
+
+type Sent = "positive" | "neutral" | "negative" | "unknown";
+
+const inferSentiment = (row: Record<string, any>): Sent => {
+  const fields = [
+    "Q8_AI_helping_BC_community_text_OE_sentiment",
+    "Q13_AI_impact_worries_text_OE_sentiment",
+    "Q16_Indigenous_communities_involvement_AI_text_OE_sentiment",
+    "Q17_Advice_BC_Leaders_text_OE_sentiment",
+  ];
+  const vals = fields.map(f => String(row[f] ?? "").toUpperCase());
+  if (vals.some(v => v.includes("NEG"))) return "negative";
+  if (vals.some(v => v.includes("POS"))) return "positive";
+  if (vals.some(v => v.includes("NEU"))) return "neutral";
+  return "unknown";
+};
+
+const tally = (list: string[]) => {
+  const m = new Map<string, number>();
+  list.forEach(v => {
+    const key = (v && v !== "undefined" ? v : "Unknown").toString();
+    m.set(key, (m.get(key) ?? 0) + 1);
+  });
+  return Array.from(m.entries()).sort((a, b) => b[1] - a[1]);
+};
+
+const pct = (n: number, d: number) => (d ? Math.round((n / d) * 100) : 0);
+
+const List: React.FC<{ items: Array<[string, number]>, total: number, max?: number }> = ({ items, total, max = 6 }) => (
+  <ul className="space-y-2 text-sm">
+    {items.slice(0, max).map(([k, n]) => (
+      <li key={k} className="flex items-center justify-between">
+        <span className="truncate mr-2" title={k}>{k}</span>
+        <span className="text-muted-foreground">{n} • {pct(n, total)}%</span>
+      </li>
+    ))}
+  </ul>
+);
+
+const DatasetSummaries: React.FC<DatasetSummariesProps> = ({ rows }) => {
+  const total = rows.length;
+
+  const regionStats = useMemo(() => {
+    const groups = new Map<string, { count: number; pos: number; neu: number; neg: number; unk: number }>();
+    rows.forEach(r => {
+      const region = String(normalize(r["Q1_Location_in_BC"]) || "Unknown");
+      const g = groups.get(region) ?? { count: 0, pos: 0, neu: 0, neg: 0, unk: 0 };
+      g.count += 1;
+      const s = inferSentiment(r);
+      if (s === "positive") g.pos += 1; else if (s === "neutral") g.neu += 1; else if (s === "negative") g.neg += 1; else g.unk += 1;
+      groups.set(region, g);
+    });
+    const ordered = Array.from(groups.entries()).sort((a, b) => b[1].count - a[1].count);
+    return { ordered };
+  }, [rows]);
+
+  const demographics = useMemo(() => {
+    const fields = [
+      ["AgeRollup_Broad", "Age groups"],
+      ["Gender", "Gender"],
+      ["Education", "Education"],
+      ["HH_Income_Fine_23", "Household income"],
+      ["Urban/ Rural", "Urban/Rural"],
+      ["Ethnicity_Roll_23", "Ethnicity"],
+    ] as const;
+    const data = fields.map(([key, label]) => {
+      const items = tally(rows.map(r => String(normalize(r[key]) || "Unknown")));
+      return { key, label, items };
+    });
+    return { data };
+  }, [rows]);
+
+  return (
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Regional summary {total ? `(${total} responses)` : ""}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {regionStats.ordered.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No regional data available.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {regionStats.ordered.slice(0, 6).map(([region, g]) => (
+                <div key={region} className="rounded-md border p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="font-medium truncate" title={region}>{region}</h4>
+                    <span className="text-xs text-muted-foreground">{g.count}</span>
+                  </div>
+                  <div className="h-2 w-full bg-muted rounded">
+                    <div className="h-2 bg-[hsl(150,60%,45%)] rounded-l" style={{ width: `${pct(g.pos, g.count)}%` }} />
+                    <div className="h-2 bg-[hsl(40,85%,55%)]" style={{ width: `${pct(g.neu, g.count)}%` }} />
+                    <div className="h-2 bg-[hsl(0,70%,55%)] rounded-r" style={{ width: `${pct(g.neg, g.count)}%` }} />
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    <span>+{pct(g.pos, g.count)}% • </span>
+                    <span>{pct(g.neu, g.count)}% • </span>
+                    <span>-{pct(g.neg, g.count)}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Demographic breakdown</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {demographics.data.map(({ label, items }) => (
+              <div key={label} className="rounded-md border p-3">
+                <h4 className="font-medium mb-2">{label}</h4>
+                <List items={items} total={total} />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <p className="text-xs text-muted-foreground">Summaries reflect the currently visible dataset (filters applied).</p>
+    </section>
+  );
+};
+
+export default DatasetSummaries;

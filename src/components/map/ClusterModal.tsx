@@ -16,6 +16,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   thoughts: Thought[];
+  onSelect?: (t: Thought) => void;
 }
 
 const Explosion: React.FC = () => {
@@ -47,7 +48,7 @@ const Explosion: React.FC = () => {
   );
 };
 
-const ClusterModal: React.FC<Props> = ({ open, onOpenChange, thoughts }) => {
+const ClusterModal: React.FC<Props> = ({ open, onOpenChange, thoughts, onSelect }) => {
   const [phase, setPhase] = useState<"explode" | "list">("explode");
 
   useEffect(() => {
@@ -77,6 +78,20 @@ const ClusterModal: React.FC<Props> = ({ open, onOpenChange, thoughts }) => {
                       {t.location} • <span className="capitalize">{t.sentiment}</span>{t.category ? ` • ${t.category}` : ""}
                     </div>
                     <div className="text-sm leading-relaxed">{t.text}</div>
+                    {typeof onOpenChange === 'function' && (
+                      <div className="mt-2 flex justify-end">
+                        <button
+                          type="button"
+                          className="text-xs font-medium underline underline-offset-2 text-primary hover:opacity-90"
+                          onClick={() => {
+                            onOpenChange(false);
+                            onSelect?.(t);
+                          }}
+                        >
+                          View full response
+                        </button>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>

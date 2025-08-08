@@ -7,6 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import DataFilters from "@/components/map/DataFilters";
 import ClusterModal from "@/components/map/ClusterModal";
+import EntryDrawer from "@/components/map/EntryDrawer";
+import DatasetSummaries from "@/components/map/DatasetSummaries";
 
 // NOTE: Vite will bundle the CSV when referenced via new URL
 const datasetUrl = new URL("../../vanai-hackathon-003-main/Hackathon round 3 with demos[48].csv", import.meta.url).toString();
@@ -471,6 +473,16 @@ const DataSetMap: React.FC = () => {
         });
       });
 
+      // Click unclustered point to open full response
+      sentiments.forEach((s) => {
+        const layer = `unclustered-point-${s}`;
+        map.on("click", layer, (e: MapLayerMouseEvent) => {
+          const f = e.features?.[0] as unknown as GeoFeature | undefined;
+          if (!f) return;
+          openFromThought(f.properties);
+        });
+      });
+
       // Click cluster to open modal (per sentiment layer)
       sentiments.forEach((s) => {
         const clusterLayerId = `clusters-${s}`;
@@ -524,9 +536,26 @@ const DataSetMap: React.FC = () => {
     });
   }, [groupedData]);
 
-  // UI state for modal
+  // UI state for modal + inspector
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState<Thought[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<Record<string, any> | null>(null);
+
+  const openFromThought = (t: Thought) => {
+    const idx = parseInt(t.id, 10);
+    const row = rawRows[idx];
+    if (row) {
+      setSelectedRow(row);
+      setDrawerOpen(true);
+    }
+  };
+
+  const visibleRows = useMemo(() => {
+    if (!filteredData) return [] as Record<string, any>[];
+    const ids = new Set(filteredData.features.map(f => parseInt(f.properties.id, 10)));
+    return rawRows.filter((_, idx) => ids.has(idx));
+  }, [filteredData, rawRows]);
 
   const sentimentsAll: Thought["sentiment"][] = ["positive", "neutral", "negative", "unknown"];
 
@@ -615,7 +644,10 @@ const DataSetMap: React.FC = () => {
         </div>
       </section>
 
-      <ClusterModal open={modalOpen} onOpenChange={setModalOpen} thoughts={modalData} />
+      <DatasetSummaries rows={visibleRows} />
+
+      <ClusterModal open={modalOpen} onOpenChange={setModalOpen} thoughts={modalData} onSelect={openFromThought} />
+      <EntryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} row={selectedRow} />
     </main>
   );
 };
