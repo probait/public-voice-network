@@ -25,7 +25,7 @@ import {
 
 import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2, Filter } from 'lucide-react';
 import BulkActions from '@/components/admin/BulkActions';
-import Papa from 'papaparse';
+
 
 interface ThoughtsSubmission {
   id: string;
@@ -55,13 +55,6 @@ const AdminThoughtsManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
-
-  // Importer state
-  const [isImporting, setIsImporting] = useState(false);
-  const [importTotal, setImportTotal] = useState(0);
-  const [importProcessed, setImportProcessed] = useState(0);
-  const [importInserted, setImportInserted] = useState(0);
-  const [importUpdated, setImportUpdated] = useState(0);
 
   const fetchSubmissions = async () => {
     try {
@@ -340,154 +333,6 @@ const AdminThoughtsManagement = () => {
     }
   };
 
-  // UTIL: find first non-empty value for a set of possible header names
-  const findField = (row: Record<string, any>, keys: string[], fallback = ''): string => {
-    for (const k of keys) {
-      const v = row[k];
-      if (typeof v === 'string' && v.trim().length > 0) return v.trim();
-      if (typeof v === 'number') return String(v);
-    }
-    return fallback;
-  };
-
-  // Importer
-  const handleImportVoices = async () => {
-    if (isImporting) return;
-
-    try {
-      setIsImporting(true);
-      setImportTotal(0);
-      setImportProcessed(0);
-      setImportInserted(0);
-      setImportUpdated(0);
-
-      // 1) Load CSV
-      const res = await fetch('/data/voices.csv');
-      if (!res.ok) throw new Error('Failed to load voices.csv');
-      const csvText = await res.text();
-
-      const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-      const rows = (parsed.data as any[]).filter(Boolean);
-      const total = rows.length;
-      setImportTotal(total);
-
-      if (total === 0) {
-        toast({ title: 'No data', description: 'voices.csv contains no rows.', variant: 'destructive' });
-        setIsImporting(false);
-        return;
-      }
-
-      // Confirm with the user
-      if (!window.confirm(`Found ${total} rows in voices.csv. Proceed with import?`)) {
-        setIsImporting(false);
-        return;
-      }
-
-      // 2) Build set of existing participant ids for this source for insert/update counts
-      const SOURCE = 'bc_ai_survey_2025';
-      const { data: existingRows, error: existingErr } = await supabase
-        .from('thoughts_submissions')
-        .select('source_participant_id')
-        .eq('source', SOURCE)
-        .not('source_participant_id', 'is', null);
-
-      if (existingErr) throw existingErr;
-      const existingSet = new Set<string>((existingRows || []).map((r: any) => r.source_participant_id));
-
-      // 3) Map CSV rows to payload
-      const payload = rows.map((row, idx) => {
-        // Try a few common variations for these fields
-        const participantId =
-          findField(row, ['participant_id', 'ParticipantID', 'Participant Id', 'Participant ID'], `row-${idx + 1}`);
-
-        const region =
-          findField(row, ['region', 'Region', 'Location in BC', 'Location', 'BC Region'], '');
-
-        const name = region ? `Resident, ${region}` : 'BC Resident';
-
-        // Attempt to pick a category from possible columns; default to 'general'
-        const category = findField(
-          row,
-          ['category', 'Category', 'Main Sector', 'Top Sector'],
-          'general'
-        ).toLowerCase();
-
-        const subject = `Citizen Voice: ${region || 'BC'}`;
-
-        // Prefer any obvious open-ended text fields; otherwise create a minimal message
-        const textCandidatesKeys = [
-          'comments', 'Comments', 'feedback', 'Feedback',
-          'Q8', 'Q13', 'Q14', 'Q16', 'Q17',
-          'Main Concern', 'Advice', 'Story'
-        ];
-        const textCandidates = textCandidatesKeys
-          .map(k => (row as any)[k])
-          .filter(v => typeof v === 'string' && v.trim().length > 0) as string[];
-
-        const combined = textCandidates.length > 0
-          ? textCandidates.join('\n\n')
-          : `Voice imported from the BC AI Survey. Region: ${region || 'N/A'}.`;
-
-        return {
-          // Required fields
-          name,
-          email: '', // empty emails where none
-          province: 'BC',
-          category: category || 'general',
-          subject,
-          message: combined,
-          // Tracking/dedupe fields
-          source: SOURCE,
-          source_participant_id: participantId || `row-${idx + 1}`,
-          region: region || null,
-          // DO NOT send featured so it won't overwrite existing featured=true rows on upsert
-        };
-      });
-
-      // 4) Upsert in batches
-      const BATCH_SIZE = 200;
-      for (let i = 0; i < payload.length; i += BATCH_SIZE) {
-        const batch = payload.slice(i, i + BATCH_SIZE);
-
-        // Count inserts/updates for this batch based on existingSet snapshot
-        const batchNewCount = batch.filter(item => !existingSet.has(item.source_participant_id || '')).length;
-        const batchUpdateCount = batch.length - batchNewCount;
-
-        const { error: upsertErr } = await supabase
-          .from('thoughts_submissions')
-          .upsert(batch, {
-            onConflict: 'source,source_participant_id',
-          });
-
-        if (upsertErr) throw upsertErr;
-
-        // After successful upsert, update counters and existingSet
-        setImportInserted(prev => prev + batchNewCount);
-        setImportUpdated(prev => prev + batchUpdateCount);
-        batch.forEach(item => {
-          if (item.source_participant_id) existingSet.add(item.source_participant_id);
-        });
-
-        setImportProcessed(prev => prev + batch.length);
-      }
-
-      // 5) Refresh list and notify
-      await fetchSubmissions();
-      toast({
-        title: 'Import complete',
-        description: `Processed ${total} rows. Inserted ${importInserted + (total - importProcessed)} new and updated ${importUpdated} existing.`,
-      });
-    } catch (err: any) {
-      console.error('Error importing voices:', err);
-      toast({
-        title: 'Import failed',
-        description: err?.message || 'There was an error importing voices.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsImporting(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -510,24 +355,11 @@ const AdminThoughtsManagement = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Thoughts Management</h1>
             <p className="text-gray-600 mt-2">Manage citizen submissions and feature them on the homepage</p>
-            {isImporting && (
-              <p className="text-sm text-gray-500 mt-2">
-                Importing voices... {importProcessed}/{importTotal} processed
-                {importTotal > 0 && ` (${Math.round((importProcessed / importTotal) * 100)}%)`}
-              </p>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <Button onClick={exportToCSV} className="flex items-center gap-2">
               <Download className="h-4 w-4" />
               Export CSV
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleImportVoices}
-              disabled={isImporting}
-            >
-              {isImporting ? 'Importing…' : 'Import Voices'}
             </Button>
           </div>
         </div>

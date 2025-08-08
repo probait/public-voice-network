@@ -32,6 +32,7 @@ import AdminNewsletter from "./pages/admin/AdminNewsletter";
 import NotFound from "./pages/NotFound";
 import MaintenanceMode from "./components/MaintenanceMode";
 import DataSetMap from "./pages/DataSetMap";
+import VoicesAutoImport from "./components/admin/VoicesAutoImport";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <VoicesAutoImport />
           <BrowserRouter>
           <ScrollToTop />
           <Routes>
