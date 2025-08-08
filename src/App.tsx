@@ -31,6 +31,7 @@ import AdminNewsletter from "./pages/admin/AdminNewsletter";
 
 import NotFound from "./pages/NotFound";
 import MaintenanceMode from "./components/MaintenanceMode";
+import DataSetMap from "./pages/DataSetMap";
 
 const queryClient = new QueryClient();
 
@@ -78,8 +79,9 @@ const App = () => {
             <Route path="/admin/newsletter" element={<AdminNewsletter />} />
             <Route path="/admin/partnerships" element={<AdminPartnerships />} />
             <Route path="/admin/thoughts" element={<AdminThoughtsManagement />} />
-            
-            
+
+            {/* New: DataSet Map route */}
+            <Route path="/dataset-map" element={<DataSetMap />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

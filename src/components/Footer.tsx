@@ -51,6 +51,9 @@ const Footer = () => {
               <Link to="/privacy" className="block text-muted-foreground hover:text-primary transition-colors">
                 Terms of Use
               </Link>
+              <Link to="/dataset-map" className="block text-muted-foreground hover:text-primary transition-colors">
+                DataSet Map
+              </Link>
               <a href="mailto:contact@aicanadavoice.org" className="block text-muted-foreground hover:text-primary transition-colors">
                 Contact Us
               </a>
