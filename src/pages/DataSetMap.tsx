@@ -3,11 +3,8 @@ import mapboxgl, { Map, MapLayerMouseEvent, Popup } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Papa from "papaparse";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import DataFilters from "@/components/map/DataFilters";
 import ClusterModal from "@/components/map/ClusterModal";
 
@@ -148,6 +145,7 @@ const toGeoJSON = (rows: Record<string, any>[]): GeoJSON.FeatureCollection<GeoJS
 };
 
 const CANONICAL_URL = "/dataset-map";
+const MAPBOX_TOKEN = "pk.eyJ1IjoiY2hhc2V3aWxzb24iLCJhIjoiY2s4Y3VqZ2xxMDBmaDNzbXdvdXk2ZHE5YyJ9.YmWh-rTZ9JD_oH2tG7GHyw"; // Public token for demo
 
 const DataSetMap: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
@@ -162,8 +160,7 @@ const DataSetMap: React.FC = () => {
     sentiments: new Set(["positive", "neutral", "negative", "unknown"]),
     categories: new Set(),
   });
-  const [token, setToken] = useState<string>(() => localStorage.getItem("mapbox_token") || "");
-  const [overlayUrl, setOverlayUrl] = useState<string>(() => localStorage.getItem("bc_overlay_url") || "");
+  const [loading, setLoading] = useState(true);
 
   const filteredData = useMemo(() => {
     if (!geoData) return geoData;
@@ -211,24 +208,26 @@ const DataSetMap: React.FC = () => {
         // Derive categories
         const cats = Array.from(new Set(gj.features.map(f => f.properties.category).filter(Boolean) as string[])).sort();
         setAvailableCategories(cats);
+        setLoading(false);
       },
       error: (err) => {
         console.error("CSV parse error", err);
+        setLoading(false);
       }
     });
   }, []);
 
   useEffect(() => {
-    if (!mapContainer.current || mapRef.current || !token) return;
-    mapboxgl.accessToken = token;
+    if (!mapContainer.current || mapRef.current || loading || !geoData) return;
+    mapboxgl.accessToken = MAPBOX_TOKEN;
 
     const map = new Map({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/light-v11",
-      center: [-123.5, 49.8],
-      zoom: 4.6,
+      center: [-123.5, 54.0],
+      zoom: 5.5,
       projection: "globe",
-      pitch: 45,
+      pitch: 35,
     });
     mapRef.current = map;
 
@@ -240,157 +239,130 @@ const DataSetMap: React.FC = () => {
         "horizon-blend": 0.2,
       });
 
-      // Optional overlay image if provided
-      if (overlayUrl) {
-        try {
-          map.addSource("bc-overlay", {
-            type: "image",
-            url: overlayUrl,
-            coordinates: [
-              [-139.06, 60.0], // top-left
-              [-114.02, 60.0], // top-right
-              [-114.02, 48.3], // bottom-right
-              [-139.06, 48.3], // bottom-left
-            ],
-          } as any);
-          map.addLayer({
-            id: "bc-overlay-layer",
-            type: "raster",
-            source: "bc-overlay",
-            paint: { "raster-opacity": 0.7 },
-          }, "waterway-label");
-        } catch (e) {
-          console.warn("Overlay add failed", e);
+      // Add data source
+      map.addSource("thoughts", {
+        type: "geojson",
+        data: filteredData,
+        cluster: true,
+        clusterRadius: 50,
+        clusterProperties: {
+          sumPositive: ["+", ["case", ["==", ["get", "sentiment"], "positive"], 1, 0]],
+          sumNeutral: ["+", ["case", ["==", ["get", "sentiment"], "neutral"], 1, 0]],
+          sumNegative: ["+", ["case", ["==", ["get", "sentiment"], "negative"], 1, 0]],
+        },
+      } as any);
+
+      // Cluster circles
+      map.addLayer({
+        id: "clusters",
+        type: "circle",
+        source: "thoughts",
+        filter: ["has", "point_count"],
+        paint: {
+          // Soft edges
+          "circle-blur": 0.6,
+          // Radius is animated later
+          "circle-radius": ["interpolate", ["linear"], ["get", "point_count"], 2, 14, 50, 22, 200, 28],
+          // Color by majority sentiment
+          "circle-color": [
+            "case",
+            [">=", ["get", "sumPositive"], ["max", ["get", "sumNeutral"], ["get", "sumNegative"]]], "hsl(150, 60%, 45%)",
+            [">=", ["get", "sumNegative"], ["max", ["get", "sumNeutral"], ["get", "sumPositive"]]], "hsl(0, 70%, 55%)",
+            "hsl(40, 85%, 55%)"
+          ],
+          "circle-opacity": 0.8,
+          "circle-stroke-color": "hsl(0, 0%, 100%)",
+          "circle-stroke-width": 1,
+          "circle-stroke-opacity": 0.3,
+        },
+      });
+
+      // Cluster count labels
+      map.addLayer({
+        id: "cluster-count",
+        type: "symbol",
+        source: "thoughts",
+        filter: ["has", "point_count"],
+        layout: {
+          "text-field": ["get", "point_count_abbreviated"],
+          "text-size": 12,
+          "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+        },
+        paint: {
+          "text-color": "hsl(0, 0%, 10%)",
+          "text-halo-color": "hsl(0, 0%, 100%)",
+          "text-halo-width": 1.2,
         }
-      }
+      });
 
-      // Add data source when available
-      if (filteredData) {
-        map.addSource("thoughts", {
-          type: "geojson",
-          data: filteredData,
-          cluster: true,
-          clusterRadius: 50,
-          clusterProperties: {
-            sumPositive: ["+", ["case", ["==", ["get", "sentiment"], "positive"], 1, 0]],
-            sumNeutral: ["+", ["case", ["==", ["get", "sentiment"], "neutral"], 1, 0]],
-            sumNegative: ["+", ["case", ["==", ["get", "sentiment"], "negative"], 1, 0]],
-          },
-        } as any);
+      // Individual points
+      map.addLayer({
+        id: "unclustered-point",
+        type: "circle",
+        source: "thoughts",
+        filter: ["!has", "point_count"],
+        paint: {
+          "circle-radius": 6,
+          "circle-color": [
+            "match",
+            ["get", "sentiment"],
+            "positive", "hsl(150, 60%, 45%)",
+            "negative", "hsl(0, 70%, 55%)",
+            "neutral", "hsl(40, 85%, 55%)",
+            /* other */ "hsl(220, 10%, 60%)"
+          ],
+          "circle-opacity": 0.9,
+          "circle-blur": 0.4,
+          "circle-stroke-color": "hsl(0, 0%, 100%)",
+          "circle-stroke-width": 1,
+          "circle-stroke-opacity": 0.5,
+        },
+      });
 
-        // Cluster circles
-        map.addLayer({
-          id: "clusters",
-          type: "circle",
-          source: "thoughts",
-          filter: ["has", "point_count"],
-          paint: {
-            // Soft edges
-            "circle-blur": 0.6,
-            // Radius is animated later
-            "circle-radius": ["interpolate", ["linear"], ["get", "point_count"], 2, 14, 50, 22, 200, 28],
-            // Color by majority sentiment
-            "circle-color": [
-              "case",
-              [">=", ["get", "sumPositive"], ["max", ["get", "sumNeutral"], ["get", "sumNegative"]]], "hsl(150, 60%, 45%)",
-              [">=", ["get", "sumNegative"], ["max", ["get", "sumNeutral"], ["get", "sumPositive"]]], "hsl(0, 70%, 55%)",
-              "hsl(40, 85%, 55%)"
-            ],
-            "circle-opacity": 0.8,
-            "circle-stroke-color": "hsl(0, 0%, 100%)",
-            "circle-stroke-width": 1,
-            "circle-stroke-opacity": 0.3,
-          },
+      // Hover tooltip
+      popupRef.current = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+      map.on("mousemove", "unclustered-point", (e: MapLayerMouseEvent) => {
+        const f = e.features?.[0] as unknown as GeoFeature | undefined;
+        if (!f) return;
+        const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
+        const { text, location, sentiment } = f.properties;
+        const safe = String(text).replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const content = `<div style="max-width:280px"><strong>${location}</strong><br/><em>${sentiment}</em><br/><div style="margin-top:4px">${safe}</div></div>`;
+        popupRef.current!.setLngLat(coords).setHTML(content).addTo(map);
+      });
+      map.on("mouseleave", "unclustered-point", () => {
+        popupRef.current?.remove();
+      });
+
+      // Click cluster to open modal
+      map.on("click", "clusters", async (e: MapLayerMouseEvent) => {
+        const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
+        const clusterId = features[0]?.properties?.cluster_id;
+        const src = map.getSource("thoughts") as any;
+        if (!src || clusterId == null) return;
+        src.getClusterLeaves(clusterId, 100, 0, (err: any, leaves: GeoFeature[]) => {
+          if (err) return;
+          setModalData(leaves.map(l => l.properties));
+          setModalOpen(true);
+          // Fancy fly-to
+          const coords = (features[0].geometry as any).coordinates as [number, number];
+          map.easeTo({ center: coords, duration: 600, zoom: Math.min(map.getZoom() + 1.2, 9) });
         });
+      });
 
-        // Cluster count labels
-        map.addLayer({
-          id: "cluster-count",
-          type: "symbol",
-          source: "thoughts",
-          filter: ["has", "point_count"],
-          layout: {
-            "text-field": ["get", "point_count_abbreviated"],
-            "text-size": 12,
-            "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
-          },
-          paint: {
-            "text-color": "hsl(0, 0%, 10%)",
-            "text-halo-color": "hsl(0, 0%, 100%)",
-            "text-halo-width": 1.2,
-          }
-        });
-
-        // Individual points
-        map.addLayer({
-          id: "unclustered-point",
-          type: "circle",
-          source: "thoughts",
-          filter: ["!has", "point_count"],
-          paint: {
-            "circle-radius": 6,
-            "circle-color": [
-              "match",
-              ["get", "sentiment"],
-              "positive", "hsl(150, 60%, 45%)",
-              "negative", "hsl(0, 70%, 55%)",
-              "neutral", "hsl(40, 85%, 55%)",
-              /* other */ "hsl(220, 10%, 60%)"
-            ],
-            "circle-opacity": 0.9,
-            "circle-blur": 0.4,
-            "circle-stroke-color": "hsl(0, 0%, 100%)",
-            "circle-stroke-width": 1,
-            "circle-stroke-opacity": 0.5,
-          },
-        });
-
-        // Hover tooltip
-        popupRef.current = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
-        map.on("mousemove", "unclustered-point", (e: MapLayerMouseEvent) => {
-          const f = e.features?.[0] as unknown as GeoFeature | undefined;
-          if (!f) return;
-          const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
-          const { text, location, sentiment } = f.properties;
-          const safe = String(text).replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-          const content = `<div style="max-width:280px"><strong>${location}</strong><br/><em>${sentiment}</em><br/><div style="margin-top:4px">${safe}</div></div>`;
-          popupRef.current!.setLngLat(coords).setHTML(content).addTo(map);
-        });
-        map.on("mouseleave", "unclustered-point", () => {
-          popupRef.current?.remove();
-        });
-
-        // Click cluster to open modal
-        map.on("click", "clusters", async (e: MapLayerMouseEvent) => {
-          const features = map.queryRenderedFeatures(e.point, { layers: ["clusters"] });
-          const clusterId = features[0]?.properties?.cluster_id;
-          const src = map.getSource("thoughts") as any;
-          if (!src || clusterId == null) return;
-          src.getClusterLeaves(clusterId, 100, 0, (err: any, leaves: GeoFeature[]) => {
-            if (err) return;
-            setModalData(leaves.map(l => l.properties));
-            setModalOpen(true);
-            // Fancy fly-to
-            const coords = (features[0].geometry as any).coordinates as [number, number];
-            map.easeTo({ center: coords, duration: 600, zoom: Math.min(map.getZoom() + 1.2, 9) });
-          });
-        });
-
-        // Pulse animation for clusters (gentle radius breathing)
-        let grow = true;
-        pulseRef.current = window.setInterval(() => {
-          const layerId = "clusters";
-          const cur = map.getPaintProperty(layerId, "circle-radius") as any;
-          if (!cur) return;
-          const delta = 0.6;
-          const factor = grow ? 1 + 0.04 : 1 - 0.04;
-          const next = ["*", cur, factor];
-          try {
-            map.setPaintProperty(layerId, "circle-radius", next as any);
-            grow = !grow && Math.random() > 0.5 ? false : !grow ? true : false; // keep it subtle
-          } catch { }
-        }, 900);
-      }
+      // Pulse animation for clusters (gentle radius breathing)
+      let grow = true;
+      pulseRef.current = window.setInterval(() => {
+        const layerId = "clusters";
+        const cur = map.getPaintProperty(layerId, "circle-radius") as any;
+        if (!cur) return;
+        const factor = grow ? 1.02 : 0.98;
+        const next = ["*", cur, factor];
+        try {
+          map.setPaintProperty(layerId, "circle-radius", next as any);
+          grow = !grow;
+        } catch { }
+      }, 1200);
     });
 
     return () => {
@@ -399,7 +371,7 @@ const DataSetMap: React.FC = () => {
       map.remove();
       mapRef.current = null;
     };
-  }, [token, overlayUrl, filteredData]);
+  }, [loading, geoData, filteredData]);
 
   // Update source data when filters change
   useEffect(() => {
@@ -430,51 +402,24 @@ const DataSetMap: React.FC = () => {
     });
   };
 
-  const handleSaveToken = () => {
-    localStorage.setItem("mapbox_token", token);
-    // Re-initialize map if needed
-    if (mapRef.current) {
-      mapRef.current.remove();
-      mapRef.current = null;
-    }
-    // Trigger effect by setting state (already updated)
-  };
-
-  const handleSaveOverlay = () => {
-    localStorage.setItem("bc_overlay_url", overlayUrl);
-    if (mapRef.current) {
-      mapRef.current.remove();
-      mapRef.current = null;
-    }
-  };
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading BC sentiment data...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         <header className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">DataSet Map – BC Sentiment</h1>
-          <p className="text-muted-foreground">Explore public sentiment across British Columbia with interactive clustering, filters, and storytelling overlays.</p>
+          <h1 className="text-3xl font-bold tracking-tight">BC Sentiment Map</h1>
+          <p className="text-muted-foreground">Explore public sentiment across British Columbia through interactive data visualization.</p>
         </header>
-
-        {/* Config inputs (token and overlay) */}
-        <Card className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="token">Mapbox Public Token</Label>
-            <div className="flex gap-2 mt-1">
-              <Input id="token" placeholder="pk.eyJ..." value={token} onChange={(e) => setToken(e.target.value)} />
-              <Button onClick={handleSaveToken}>Save</Button>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Store your Mapbox public token locally. You can find it in your Mapbox dashboard.</p>
-          </div>
-          <div>
-            <Label htmlFor="overlay">BC Overlay PNG (optional)</Label>
-            <div className="flex gap-2 mt-1">
-              <Input id="overlay" placeholder="/lovable-uploads/your-bc-map.png" value={overlayUrl} onChange={(e) => setOverlayUrl(e.target.value)} />
-              <Button onClick={handleSaveOverlay}>Save</Button>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Provide a transparent PNG URL to overlay on the basemap.</p>
-          </div>
-        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <aside className="lg:col-span-1 space-y-4">
@@ -490,19 +435,38 @@ const DataSetMap: React.FC = () => {
                 onToggleCategory={toggleCategory}
               />
             </Card>
+            
+            <Card className="p-4">
+              <h3 className="text-sm font-semibold mb-2">Legend</h3>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                  <span>Positive sentiment</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <span>Neutral sentiment</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span>Negative sentiment</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                  <span>Unknown sentiment</span>
+                </div>
+              </div>
+            </Card>
           </aside>
 
           <div className="lg:col-span-3">
-            {!token ? (
-              <Card className="p-6 text-center">
-                <p className="text-muted-foreground">Enter your Mapbox public token above to load the interactive map.</p>
-              </Card>
-            ) : (
-              <div className={cn("relative w-full h-[70vh] rounded-lg shadow", !geoData && "animate-pulse")}
-                   ref={mapContainer}
-                   aria-label="Interactive BC sentiment map"
-              />
-            )}
+            <div className={cn("relative w-full h-[75vh] rounded-lg shadow-lg overflow-hidden")}
+                 ref={mapContainer}
+                 aria-label="Interactive BC sentiment map"
+            />
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              Click clusters to explore thoughts • Hover individual dots for details
+            </p>
           </div>
         </div>
       </section>
