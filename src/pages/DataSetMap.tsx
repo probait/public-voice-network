@@ -421,12 +421,17 @@ const DataSetMap: React.FC = () => {
             "text-field": ["get", "point_count_abbreviated"],
             "text-size": 12,
             "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+            "text-allow-overlap": true,
+            "text-ignore-placement": true,
+            "text-justify": "center",
+            "text-padding": 0
           },
           paint: {
             "text-color": "hsl(0, 0%, 10%)",
             "text-halo-color": "hsl(0, 0%, 100%)",
             "text-halo-width": 1.2,
             "text-translate": offsets[s],
+            "text-translate-anchor": "viewport",
           }
         });
 
