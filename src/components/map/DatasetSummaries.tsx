@@ -36,11 +36,11 @@ const tally = (list: string[]) => {
 const pct = (n: number, d: number) => (d ? Math.round((n / d) * 100) : 0);
 
 const List: React.FC<{ items: Array<[string, number]>, total: number, max?: number }> = ({ items, total, max = 6 }) => (
-  <ul className="space-y-2 text-sm">
+  <ul className="space-y-2 text-sm" role="list">
     {items.slice(0, max).map(([k, n]) => (
-      <li key={k} className="flex items-center justify-between">
+      <li key={k} className="flex items-center justify-between" role="listitem">
         <span className="truncate mr-2" title={k}>{k}</span>
-        <span className="text-muted-foreground">{n} • {pct(n, total)}%</span>
+        <span className="text-muted-foreground" aria-label={`${n} responses, ${pct(n, total)} percent`}>{n} • {pct(n, total)}%</span>
       </li>
     ))}
   </ul>
@@ -80,10 +80,10 @@ const DatasetSummaries: React.FC<DatasetSummariesProps> = ({ rows }) => {
   }, [rows]);
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 space-y-6">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 space-y-6" aria-labelledby="regional-summary-heading">
       <Card>
         <CardHeader>
-          <CardTitle>Regional summary {total ? `(${total} responses)` : ""}</CardTitle>
+          <CardTitle id="regional-summary-heading">Regional summary {total ? `(${total} responses)` : ""}</CardTitle>
         </CardHeader>
         <CardContent>
           {regionStats.ordered.length === 0 ? (
@@ -91,10 +91,10 @@ const DatasetSummaries: React.FC<DatasetSummariesProps> = ({ rows }) => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {regionStats.ordered.slice(0, 6).map(([region, g]) => (
-                <div key={region} className="rounded-md border p-3">
-                  <div className="flex items-center justify-between mb-1">
+                <div key={region} className="rounded-md border p-3" role="group" aria-label={`Region ${region}`}>
+                  <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium truncate" title={region}>{region}</h4>
-                    <span className="text-xs text-muted-foreground">{g.count}</span>
+                    <span className="text-xs text-muted-foreground" aria-label="Responses count">{g.count}</span>
                   </div>
                   <div className="h-3 w-full bg-muted rounded overflow-hidden flex" aria-label="Sentiment distribution" role="img">
                     <div className="h-3 bg-positive rounded-l" style={{ width: `${pct(g.pos, g.count)}%` }} aria-label={`Positive ${pct(g.pos, g.count)}%`} />

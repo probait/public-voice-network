@@ -31,6 +31,10 @@ const Navigation = () => {
                   Contributors
                 </Link>
 
+                <Link to="/dataset-map" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                  DataSet
+                </Link>
+
                 <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Events
                 </Link>

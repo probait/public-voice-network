@@ -9,6 +9,8 @@ import DataFilters from "@/components/map/DataFilters";
 import ClusterModal from "@/components/map/ClusterModal";
 import EntryDrawer from "@/components/map/EntryDrawer";
 import DatasetSummaries from "@/components/map/DatasetSummaries";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 
 // NOTE: Vite will bundle the CSV when referenced via new URL
 const datasetUrl = new URL("../../vanai-hackathon-003-main/Hackathon round 3 with demos[48].csv", import.meta.url).toString();
@@ -577,78 +579,86 @@ const DataSetMap: React.FC = () => {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="text-muted-foreground">Loading BC sentiment data...</p>
-        </div>
-      </main>
+      <>
+        <Navigation />
+        <main className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Loading BC sentiment data...</p>
+          </div>
+        </main>
+        <Footer />
+      </>
     );
   }
 
   return (
-    <main className="min-h-screen">
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        <header className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">BC Sentiment Map</h1>
-          <p className="text-muted-foreground">Explore public sentiment across British Columbia through interactive data visualization.</p>
-        </header>
+    <>
+      <Navigation />
+      <main className="min-h-screen">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+          <header className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">BC Sentiment Map</h1>
+            <p className="text-muted-foreground">Explore public sentiment across British Columbia through interactive data visualization.</p>
+          </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <aside className="lg:col-span-1 space-y-4">
-            <Card className="p-4">
-              <h2 className="text-lg font-semibold mb-3">Filters</h2>
-              <Separator className="mb-3" />
-              <DataFilters
-                sentiments={sentimentsAll}
-                selectedSentiments={filters.sentiments}
-                onToggleSentiment={toggleSentiment}
-                categories={availableCategories}
-                selectedCategories={filters.categories}
-                onToggleCategory={toggleCategory}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <aside className="lg:col-span-1 space-y-4">
+              <Card className="p-4">
+                <h2 className="text-lg font-semibold mb-3">Filters</h2>
+                <Separator className="mb-3" />
+                <DataFilters
+                  sentiments={sentimentsAll}
+                  selectedSentiments={filters.sentiments}
+                  onToggleSentiment={toggleSentiment}
+                  categories={availableCategories}
+                  selectedCategories={filters.categories}
+                  onToggleCategory={toggleCategory}
+                />
+              </Card>
+              
+              <Card className="p-4">
+                <h3 className="text-sm font-semibold mb-2">Legend</h3>
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-positive"></div>
+                    <span>Positive sentiment</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-neutral"></div>
+                    <span>Neutral sentiment</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-negative"></div>
+                    <span>Negative sentiment</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-muted-foreground"></div>
+                    <span>Unknown sentiment</span>
+                  </div>
+                </div>
+              </Card>
+            </aside>
+
+            <div className="lg:col-span-3">
+              <div className={cn("relative w-full h-[75vh] rounded-lg shadow-lg overflow-hidden")}
+                   ref={mapContainer}
+                   aria-label="Interactive BC sentiment map"
               />
-            </Card>
-            
-            <Card className="p-4">
-              <h3 className="text-sm font-semibold mb-2">Legend</h3>
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <span>Positive sentiment</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <span>Neutral sentiment</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <span>Negative sentiment</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                  <span>Unknown sentiment</span>
-                </div>
-              </div>
-            </Card>
-          </aside>
-
-          <div className="lg:col-span-3">
-            <div className={cn("relative w-full h-[75vh] rounded-lg shadow-lg overflow-hidden")}
-                 ref={mapContainer}
-                 aria-label="Interactive BC sentiment map"
-            />
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              Click clusters to explore thoughts • Hover individual dots for details
-            </p>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Click clusters to explore thoughts • Hover individual dots for details
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <DatasetSummaries rows={visibleRows} />
+        <DatasetSummaries rows={visibleRows} />
 
-      <ClusterModal open={modalOpen} onOpenChange={setModalOpen} thoughts={modalData} onSelect={openFromThought} />
-      <EntryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} row={selectedRow} />
-    </main>
+        <ClusterModal open={modalOpen} onOpenChange={setModalOpen} thoughts={modalData} onSelect={openFromThought} />
+        <EntryDrawer open={drawerOpen} onOpenChange={setDrawerOpen} row={selectedRow} />
+      </main>
+      <Footer />
+    </>
   );
 };
 
