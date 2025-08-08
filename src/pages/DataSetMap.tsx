@@ -69,7 +69,19 @@ const CANADA_BOUNDS: [[number, number], [number, number]] = [[-141.1, 41.5], [-5
 const normalize = (s: unknown) => (typeof s === "string" ? s.trim() : "");
 
 const detectSentiment = (row: Record<string, any>): Thought["sentiment"] => {
-  // 1) Direct sentiment fields if present
+  // Prefer explicit sentiment labels from dataset (to match summaries)
+  const explicitFields = [
+    "Q8_AI_helping_BC_community_text_OE_sentiment",
+    "Q13_AI_impact_worries_text_OE_sentiment",
+    "Q16_Indigenous_communities_involvement_AI_text_OE_sentiment",
+    "Q17_Advice_BC_Leaders_text_OE_sentiment",
+  ];
+  const labels = explicitFields.map(f => String(row[f] ?? "").toUpperCase());
+  if (labels.some(v => v.includes("NEG"))) return "negative";
+  if (labels.some(v => v.includes("POS"))) return "positive";
+  if (labels.some(v => v.includes("NEU"))) return "neutral";
+
+  // 1) Direct generic sentiment fields if present
   for (const key of Object.keys(row)) {
     const lk = key.toLowerCase();
     if (lk.includes("sentiment")) {
