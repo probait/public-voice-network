@@ -461,6 +461,9 @@ export type Database = {
           message: string
           name: string
           province: string
+          region: string | null
+          source: string
+          source_participant_id: string | null
           status: string | null
           subject: string
           updated_at: string
@@ -474,6 +477,9 @@ export type Database = {
           message: string
           name: string
           province: string
+          region?: string | null
+          source?: string
+          source_participant_id?: string | null
           status?: string | null
           subject: string
           updated_at?: string
@@ -487,6 +493,9 @@ export type Database = {
           message?: string
           name?: string
           province?: string
+          region?: string | null
+          source?: string
+          source_participant_id?: string | null
           status?: string | null
           subject?: string
           updated_at?: string
