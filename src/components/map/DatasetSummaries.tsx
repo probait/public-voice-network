@@ -174,14 +174,17 @@ const DatasetSummaries: React.FC<DatasetSummariesProps> = ({ rows }) => {
               const percent = pct(topCount, total);
               const Icon = categoryIcon[label] || Users;
               return (
-                <div key={label} className="flex items-center gap-3 rounded-md border p-3">
-                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
-                    <Icon size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-xs text-muted-foreground">{label}</div>
-                    <div className="font-medium truncate" title={String(topLabel)}>{String(topLabel)}</div>
-                    <div className="text-xs text-muted-foreground">{percent}% of responses</div>
+                <div key={label} className="relative overflow-hidden rounded-md border p-4 hover-scale shadow-sm">
+                  <div className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full bg-primary/10" />
+                  <div className="flex items-center gap-3">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-md bg-accent text-accent-foreground shadow">
+                      <Icon size={22} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-xs text-muted-foreground">{label}</div>
+                      <div className="font-medium truncate" title={String(topLabel)}>{String(topLabel)}</div>
+                      <div className="text-xs text-muted-foreground">{percent}% of responses</div>
+                    </div>
                   </div>
                 </div>
               );
@@ -201,17 +204,43 @@ const DatasetSummaries: React.FC<DatasetSummariesProps> = ({ rows }) => {
                     <h4 className="font-medium">{label}</h4>
                     <span className="text-xs text-muted-foreground">Top {Math.min(5, items.length)} + other</span>
                   </div>
-                  <ChartContainer config={chartConfig}>
-                    <PieChart>
-                      <Pie data={data} dataKey="value" nameKey="name" innerRadius={36} outerRadius={64} stroke="hsl(var(--background))" strokeWidth={2}>
-                        {data.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <ChartLegend content={<ChartLegendContent />} />
-                    </PieChart>
-                  </ChartContainer>
+                  {(() => {
+                    const [firstName, firstCount] = items[0] || ["Unknown", 0];
+                    const percentTop = pct(firstCount, total);
+                    return (
+                      <div className="relative hover-scale">
+                        <ChartContainer config={chartConfig} className="aspect-square">
+                          <PieChart>
+                            <Pie
+                              data={data}
+                              dataKey="value"
+                              nameKey="name"
+                              innerRadius={36}
+                              outerRadius={64}
+                              stroke="hsl(var(--background))"
+                              strokeWidth={2}
+                              isAnimationActive
+                              animationBegin={150}
+                              animationDuration={700}
+                            >
+                              {data.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <ChartLegend content={<ChartLegendContent />} />
+                          </PieChart>
+                        </ChartContainer>
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <div className="text-center">
+                            <div className="text-xs text-muted-foreground">{label}</div>
+                            <div className="text-xl font-semibold">{percentTop}%</div>
+                            <div className="text-xs text-muted-foreground truncate max-w-[8rem] mx-auto">{String(firstName)}</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             })}

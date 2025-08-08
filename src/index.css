@@ -111,4 +111,10 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+
+  .hover-scale {
+    transition: transform 200ms var(--transition-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+    will-change: transform;
+  }
+  .hover-scale:hover { transform: translateZ(0) scale(1.03); }
 }
