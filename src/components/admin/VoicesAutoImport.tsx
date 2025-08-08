@@ -14,8 +14,7 @@ const VoicesAutoImport = () => {
 
     const run = async () => {
       try {
-        // Skip if we've already marked it done in this browser session
-        if (sessionStorage.getItem("voices_import_done") === "1") return;
+        // Proceed regardless of sessionStorage; rely on DB check to prevent duplicates
 
         // 0) Check if entries already imported
         const { count, error: countErr } = await supabase
