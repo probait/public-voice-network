@@ -1,5 +1,6 @@
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 
 export type Sentiment = "positive" | "neutral" | "negative" | "unknown";
 
