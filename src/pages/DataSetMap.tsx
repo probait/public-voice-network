@@ -360,14 +360,11 @@ const DataSetMap: React.FC = () => {
       container: mapContainer.current,
       style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
       center: [-96.8, 56.1],
-      zoom: 3.2,
+      zoom: 0,
       pitch: 35,
       maxBounds: CANADA_BOUNDS,
     });
     mapRef.current = map;
-
-    // Focus on southern Canada on load
-    map.jumpTo({ center: [-95, 45.5], zoom: 3.8, pitch: 35 });
 
     map.on("style.load", () => {
 
