@@ -12,8 +12,8 @@ import DatasetSummaries from "@/components/map/DatasetSummaries";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
-// NOTE: Vite will bundle the CSV when referenced via new URL
-const datasetUrl = new URL("../../vanai-hackathon-003-main/Hackathon round 3 with demos[48].csv", import.meta.url).toString();
+// NOTE: Load dataset from public folder
+const datasetUrl = "/data/voices.csv";
 
 type Thought = {
   id: string;
