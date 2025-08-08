@@ -348,11 +348,12 @@ const DataSetMap: React.FC = () => {
         // Hover tooltip
         popupRef.current = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
         map.on("mousemove", "unclustered-point", (e: MapLayerMouseEvent) => {
-          const f = e.features?.[0] as GeoFeature | undefined;
+          const f = e.features?.[0] as unknown as GeoFeature | undefined;
           if (!f) return;
           const coords = (f.geometry as GeoJSON.Point).coordinates as [number, number];
           const { text, location, sentiment } = f.properties;
-          const content = `<div style="max-width:280px"><strong>${location}</strong><br/><em>${sentiment}</em><br/><div style="margin-top:4px">${text.replaceAll("\\\"", "&quot;")}</div></div>`;
+          const safe = String(text).replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          const content = `<div style="max-width:280px"><strong>${location}</strong><br/><em>${sentiment}</em><br/><div style="margin-top:4px">${safe}</div></div>`;
           popupRef.current!.setLngLat(coords).setHTML(content).addTo(map);
         });
         map.on("mouseleave", "unclustered-point", () => {
