@@ -29,7 +29,9 @@ export const useAdminEvents = () => {
           user_id,
           homepage_featured,
           image_url,
-          is_published
+          is_published,
+          external_url,
+          external_link_text
         `)
         .order('date_time', { ascending: false });
 
@@ -77,6 +79,8 @@ export const useAdminEvents = () => {
           homepage_featured: meetup.homepage_featured,
           image_url: meetup.image_url,
           is_published: meetup.is_published,
+          external_url: meetup.external_url,
+          external_link_text: meetup.external_link_text,
           profiles: profile ? { full_name: profile.full_name } : null
         };
       });

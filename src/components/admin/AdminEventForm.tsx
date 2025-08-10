@@ -48,6 +48,8 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
       is_virtual: event?.is_virtual || false,
       meeting_link: event?.meeting_link || '',
       image_url: event?.image_url || '',
+      external_url: event?.external_url || '',
+      external_link_text: event?.external_link_text || '',
     },
   });
 
@@ -89,7 +91,9 @@ const AdminEventForm = ({ event, onClose }: AdminEventFormProps) => {
         date_time: new Date(data.date_time).toISOString(),
         category: data.category,
         is_virtual: data.is_virtual,
-        meeting_link: data.is_virtual ? data.meeting_link || null : null,
+        meeting_link: data.is_virtual ? (data.meeting_link?.trim() ? data.meeting_link.trim() : null) : null,
+        external_url: data.external_url?.trim() ? data.external_url.trim() : null,
+        external_link_text: data.external_link_text?.trim() ? data.external_link_text.trim() : null,
         image_url: imageUrl,
         image_width: imageMetadata?.width || null,
         image_height: imageMetadata?.height || null,
