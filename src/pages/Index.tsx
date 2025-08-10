@@ -115,7 +115,7 @@ const Index = () => {
           
           {/* Featured Events - show up to 3 featured events */}
           <div className="mb-8">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Featured Events</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">Events we recommend</h3>
             <EventbriteFeed showFeaturedOnly={true} referrer="home" />
           </div>
 
