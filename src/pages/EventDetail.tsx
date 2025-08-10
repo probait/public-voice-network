@@ -220,9 +220,6 @@ const EventDetail = () => {
                     <Badge variant="secondary" className="text-sm">
                       {event.category}
                     </Badge>
-                    <Badge variant="outline" className="text-sm">
-                      Free
-                    </Badge>
                   </div>
                 </div>
 

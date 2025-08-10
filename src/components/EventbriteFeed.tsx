@@ -209,9 +209,6 @@ const EventbriteFeed = ({ showFeaturedOnly = false, referrer = "events" }: Event
                   <Badge variant="secondary" className="text-xs">
                     {meetup.category}
                   </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    Free
-                  </Badge>
                 </div>
               </div>
               {meetup.profiles && (

@@ -68,9 +68,6 @@ const MeetupCard = ({ meetup, referrer = "events" }: MeetupCardProps) => {
               <Badge variant="secondary" className="text-xs">
                 {meetup.category}
               </Badge>
-              <Badge variant="outline" className="text-xs">
-                Free
-              </Badge>
             </div>
           </div>
           {meetup.profiles && (
