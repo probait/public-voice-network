@@ -217,6 +217,87 @@ export type Database = {
           },
         ]
       }
+      letter_campaigns: {
+        Row: {
+          body_md: string
+          created_at: string
+          id: string
+          is_active: boolean
+          scope: string
+          send_instructions: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body_md: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          scope?: string
+          send_instructions?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body_md?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          scope?: string
+          send_instructions?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      letter_supports: {
+        Row: {
+          campaign_id: string
+          comment: string
+          created_at: string
+          display_name: string | null
+          id: string
+          is_public: boolean
+          mp_id: string
+        }
+        Insert: {
+          campaign_id: string
+          comment: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_public?: boolean
+          mp_id: string
+        }
+        Update: {
+          campaign_id?: string
+          comment?: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_public?: boolean
+          mp_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "letter_supports_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "letter_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "letter_supports_mp_id_fkey"
+            columns: ["mp_id"]
+            isOneToOne: false
+            referencedRelation: "mps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       meetups: {
         Row: {
           category: string | null
@@ -280,6 +361,48 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      mps: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          is_current: boolean
+          parliament: string
+          population: number
+          province: string
+          riding_name: string
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_current?: boolean
+          parliament?: string
+          population: number
+          province: string
+          riding_name: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_current?: boolean
+          parliament?: string
+          population?: number
+          province?: string
+          riding_name?: string
+          source_url?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

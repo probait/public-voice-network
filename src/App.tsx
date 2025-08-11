@@ -33,6 +33,7 @@ import NotFound from "./pages/NotFound";
 import MaintenanceMode from "./components/MaintenanceMode";
 import DataSetMap from "./pages/DataSetMap";
 import VoicesAutoImport from "./components/admin/VoicesAutoImport";
+import LettersForAction from "./pages/LettersForAction";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,9 @@ const App = () => {
 
             {/* New: DataSet Map route */}
             <Route path="/dataset-map" element={<DataSetMap />} />
+
+            {/* New: Letters for Action route */}
+            <Route path="/letters-for-action" element={<LettersForAction />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
