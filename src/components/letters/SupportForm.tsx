@@ -29,7 +29,8 @@ const SupportForm: React.FC<Props> = ({ campaignId, mps, onSubmitted }) => {
   }, [mps]);
 
   const filteredMPs = useMemo(() => {
-    return provinceFilter ? mps.filter((m) => m.province === provinceFilter) : mps;
+    if (!provinceFilter || provinceFilter === "all") return mps;
+    return mps.filter((m) => m.province === provinceFilter);
   }, [mps, provinceFilter]);
 
   const canSubmit = mpId && comment.trim().length >= 10 && comment.trim().length <= 500;
@@ -86,7 +87,7 @@ const SupportForm: React.FC<Props> = ({ campaignId, mps, onSubmitted }) => {
             <SelectValue placeholder="Filter by province (optional)" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All provinces</SelectItem>
+            <SelectItem value="all">All provinces</SelectItem>
             {provinces.map((p) => (
               <SelectItem key={p} value={p}>
                 {p}
