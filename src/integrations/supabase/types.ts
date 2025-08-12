@@ -695,9 +695,24 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_public: {
+        Row: {
+          avatar_url: string | null
+          full_name: string | null
+          id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_public_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          full_name: string
+          avatar_url: string
+        }[]
+      }
       get_total_thoughts_count: {
         Args: Record<PropertyKey, never>
         Returns: number
