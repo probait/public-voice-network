@@ -705,6 +705,25 @@ export type Database = {
       }
     }
     Functions: {
+      get_featured_thoughts_category_counts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          category: string
+          count: number
+        }[]
+      }
+      get_featured_thoughts_public: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          name: string
+          province: string
+          category: string
+          subject: string
+          message: string
+          created_at: string
+        }[]
+      }
       get_public_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {
