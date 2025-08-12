@@ -35,10 +35,6 @@ const Navigation = () => {
                   DataSet
                 </Link>
 
-                <Link to="/letters-for-action" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  Letters for Action
-                </Link>
-
                 <Link to="/events" className="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
                   Events
                 </Link>
@@ -93,13 +89,6 @@ const Navigation = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 DataSet
-              </Link>
-              <Link 
-                to="/letters-for-action" 
-                className="block text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Letters for Action
               </Link>
               <Link 
                 to="/events" 
