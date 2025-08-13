@@ -18,7 +18,7 @@ Hugh Behroozy is a creative industry executive with over 15 years of experience 
 
 PolicyNow Canada is a civic engagement platform designed to capture, summarize, and map public opinion on artificial intelligence and other emerging technologies. Our mission is to provide policymakers, researchers, and the public with clear, accessible insight into the evolving sentiment landscape, enabling more informed, evidence-based decision-making.
 
-During the BC-AI Hackathon, we collected a dataset of public perspectives from across British Columbia. Each submission is distilled into a concise "voice blurb" that preserves the meaning and tone while making it easy to read and compare. These voices are visualized on our interactive "Voices Across Canada" map, where users can explore sentiment by region and topic.
+During the BC-AI Hackathon, we were given a dataset of public perspectives from across British Columbia. Each submission is distilled into a concise "voice blurb" that preserves the meaning and tone while making it easy to read and compare. These voices are visualized on our interactive "Voices Across Canada" map, where users can explore sentiment by region and topic.
 
 For visual clarity, location points are currently spread geographically to avoid overlap; however, our long-term goal is to gather more precise, riding-level location data (with consent) to deliver truly accurate constituency-based insights for policymakers. This expansion will allow for targeted analysis and direct integration into government consultation processes.
 
