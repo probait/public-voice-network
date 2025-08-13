@@ -5,6 +5,9 @@
 ## 🚀 Live Demo
 [https://policynow.ca](https://policynow.ca)
 
+## 🎥 Video Walkthrough
+[Watch our project demo on Loom](https://www.loom.com/share/fc94c8f186394242a6e75559118d97bb?sid=67620321-dd0f-41bd-81f2-131148ce53a8)
+
 ## 👥 Team Members
 
 **Hugh Behroozy** – Creative Industry Executive, Founder & Project Lead
