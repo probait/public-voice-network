@@ -30,7 +30,7 @@ The PolicyNow Canada prototype is built as a secure, modular web application wit
 
 Our mapping functionality combines CARTO with OpenStreetMap to render sentiment points and clusters, providing an intuitive geographic visualization of public opinion. The data processing pipeline anonymizes hackathon survey responses, categorizes them by sentiment (positive, neutral, negative, unknown), and applies spatial adjustments for visual clarity on the map. Current geospatial adjustments scatter points slightly to avoid overlap while maintaining regional accuracy.
 
-Security and privacy are paramount: sensitive backend logic, API keys, and raw datasets are excluded from the public repository, with only anonymized and aggregated data used for the demo version. The architecture supports modular dataset expansion through environment-driven configuration, enabling rapid adaptation for new regions and topics.
+Security and privacy are paramount: sensitive backend logic, API keys, and raw datasets are excluded from the public repository, with only anonymized and aggregated data used for the demo version. The platform architecture maintains data sovereignty and editorial control while providing transparency through this public frontend demonstration.
 
 Planned scalability features include AI-assisted summarization for processing larger datasets, advanced filtering by topic and geography, real-time analytics dashboards for policymakers, and precision riding-level mapping. Future enhancements will support bilingual (English/French) and multilingual features to serve Canada's diverse population, making PolicyNow a truly national platform for democratic engagement.
 
@@ -51,10 +51,11 @@ Planned scalability features include AI-assisted summarization for processing la
 - All personal identifiers have been removed from the dataset
 - Data is used strictly for research, policy, and public good purposes
 - Follows Canadian privacy legislation and best practices
-- Open source approach ensures transparency and accountability
+- Platform maintains editorial control and data sovereignty
+- Frontend demonstration code shared for hackathon transparency
 
-## 📜 License
-This project is open source and available under the [MIT License](LICENSE).
+## 📜 Project Status
+This project represents a hackathon demonstration of the PolicyNow Canada platform. The frontend code is shared for educational and hackathon evaluation purposes while maintaining proprietary control over data processing, backend systems, and platform operations.
 
 ---
 
