@@ -1,77 +1,48 @@
-# PolicyNow Canada
+# PolicyNow Canada – Voices Across Canada
 
-**Vancouver AI Hackathon 2025 Submission**
-
-PolicyNow Canada is a public sentiment data visualization platform designed to bridge the gap between citizens and policymakers on AI and emerging technologies. Built using the BC AI Survey dataset from the Vancouver AI Hackathon.
+**Vancouver AI Hackathon Round 3: BC's AI Story**
 
 ## 🚀 Live Demo
 [https://policynow.ca](https://policynow.ca)
 
-## 📋 Features
-- **Interactive Sentiment Map**: Visualize public opinion across British Columbia
-- **Advanced Filtering**: Filter by sentiment category (positive, neutral, negative, unknown)
-- **Real-time Analytics**: Summary statistics and demographic breakdowns
-- **Contributor Recognition**: Highlight community voices and contributors
-- **Open Data Access**: Public dataset transparency and accessibility
+## 👥 Team Members
 
-## 🗺️ About the Data
-This project uses the BC AI Survey dataset containing 1,001 responses from British Columbians about artificial intelligence. The sentiment data has been spatially adjusted for visual clarity while maintaining statistical integrity. Future iterations will incorporate exact riding-level data for precise policymaker insights.
+**Hugh Behroozy** – Creative Industry Executive, Founder & Project Lead
 
-## 🛠️ Tech Stack
-- **Frontend**: React 18 + TypeScript + Vite
-- **UI Components**: shadcn/ui + TailwindCSS
-- **Backend**: Supabase (PostgreSQL + Auth + Storage)
-- **Mapping**: CARTO + OpenStreetMap
-- **Data Processing**: Custom sentiment analysis pipeline
-- **Deployment**: Vercel
+Hugh Behroozy is a creative industry executive with over 15 years of experience spanning entertainment, technology, and emerging media. He has been directly involved in large-scale projects across gaming, VFX, hardware, and software, collaborating with world-class teams to deliver innovative, high-impact creative solutions. Today, he focuses on building platforms that bridge technology, storytelling, and public engagement.
 
-## 🎯 Hackathon Goals
-- Bridge the communication gap between citizens and policymakers
-- Make public sentiment data accessible and actionable
-- Demonstrate how AI can enhance democratic participation
-- Create a scalable model for public consultation visualization
+## 📖 Project Overview
 
-## 🏗️ Getting Started
+PolicyNow Canada is a civic engagement platform designed to capture, summarize, and map public opinion on artificial intelligence and other emerging technologies. Our mission is to provide policymakers, researchers, and the public with clear, accessible insight into the evolving sentiment landscape, enabling more informed, evidence-based decision-making.
 
-### Prerequisites
-- Node.js 18+
-- npm or yarn
+During the BC-AI Hackathon, we collected a dataset of public perspectives from across British Columbia. Each submission is distilled into a concise "voice blurb" that preserves the meaning and tone while making it easy to read and compare. These voices are visualized on our interactive "Voices Across Canada" map, where users can explore sentiment by region and topic.
 
-### Installation
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/policynow-canada.git
-cd policynow-canada
+For visual clarity, location points are currently spread geographically to avoid overlap; however, our long-term goal is to gather more precise, riding-level location data (with consent) to deliver truly accurate constituency-based insights for policymakers. This expansion will allow for targeted analysis and direct integration into government consultation processes.
 
-# Install dependencies
-npm install
+The next phase of PolicyNow will extend this approach nationwide, expand the dataset to cover other emerging tech topics, and introduce advanced analytics, filtering, and multilingual support. By combining intuitive design, robust data collection, and transparent reporting, we aim to empower both citizens and decision-makers in shaping BC's AI story and Canada's technological future.
 
-# Start development server
-npm run dev
-```
+## 🛠️ Technical Notes
 
-### Environment Setup
-```bash
-# Required environment variables (see .env.example)
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+The PolicyNow Canada prototype is built as a secure, modular web application with a React frontend using Vite and TypeScript, enhanced by ShadCN UI components and TailwindCSS for modern, responsive styling. The backend leverages Supabase for authentication and secure data storage, with sensitive configurations kept private in this public repository.
+
+Our mapping functionality combines CARTO with OpenStreetMap to render sentiment points and clusters, providing an intuitive geographic visualization of public opinion. The data processing pipeline anonymizes hackathon survey responses, categorizes them by sentiment (positive, neutral, negative, unknown), and applies spatial adjustments for visual clarity on the map. Current geospatial adjustments scatter points slightly to avoid overlap while maintaining regional accuracy.
+
+Security and privacy are paramount: sensitive backend logic, API keys, and raw datasets are excluded from the public repository, with only anonymized and aggregated data used for the demo version. The architecture supports modular dataset expansion through environment-driven configuration, enabling rapid adaptation for new regions and topics.
+
+Planned scalability features include AI-assisted summarization for processing larger datasets, advanced filtering by topic and geography, real-time analytics dashboards for policymakers, and precision riding-level mapping. Future enhancements will support bilingual (English/French) and multilingual features to serve Canada's diverse population, making PolicyNow a truly national platform for democratic engagement.
 
 ## 📊 Data Sources
-- **Primary Dataset**: BC AI Survey (1,001 responses)
+- **Primary Dataset**: BC AI Survey (1,001 responses from Vancouver AI Hackathon)
 - **Geographic Data**: Statistics Canada boundary files
 - **Sentiment Analysis**: Custom NLP processing of open-ended responses
 
 ## 🔮 Roadmap
-- [ ] Expand dataset to full Canada coverage
-- [ ] Integrate riding-level precision mapping
-- [ ] Add policy-maker targeted reports and dashboards
-- [ ] Implement real-time public consultation features
-- [ ] Enhanced accessibility and mobile optimization
-- [ ] Multi-language support (French/English)
-
-## 🤝 Contributing
-We welcome contributions! This project was built for the Vancouver AI Hackathon to demonstrate how technology can enhance democratic participation.
+- [ ] Expand dataset to all Canadian provinces and territories
+- [ ] Integrate precise riding-level geolocation with consent
+- [ ] Add AI-assisted response summarization
+- [ ] Launch policymaker dashboard with trend analysis
+- [ ] Support bilingual (English/French) and multilingual features
+- [ ] Real-time public consultation integration
 
 ## 🔒 Privacy & Ethics
 - All personal identifiers have been removed from the dataset
@@ -82,12 +53,6 @@ We welcome contributions! This project was built for the Vancouver AI Hackathon 
 ## 📜 License
 This project is open source and available under the [MIT License](LICENSE).
 
-## 🏆 Hackathon Team
-Built for Vancouver AI Hackathon 2025 - demonstrating how AI can bridge the gap between public sentiment and policy-making.
-
-## 📧 Contact
-For questions about this project or collaboration opportunities, please open an issue on GitHub.
-
 ---
 
-*PolicyNow Canada - Making democracy more responsive through data visualization*
+*PolicyNow Canada – Making democracy more responsive through data visualization*
