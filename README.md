@@ -34,9 +34,5 @@ Sentiment data has been spatially adjusted for visual clarity. In future, exact 
 ## Privacy Statement
 All personal identifiers have been removed. Data is used strictly for research, policy, and public good purposes.
 
-## What technologies are used for this project?
-
-This project is built with:
-
 
 
