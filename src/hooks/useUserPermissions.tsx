@@ -20,21 +20,37 @@ interface UserPermissions {
 }
 
 export const useUserPermissions = () => {
-  const { user } = useAuth();
-  const { role, isAdmin } = useUserRole();
+  const { user, session } = useAuth();
+  const { role, isAdmin, loading: roleLoading } = useUserRole();
   const [permissions, setPermissions] = useState<UserPermissions>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPermissions = async () => {
-      if (!user || !role) {
+      if (!user || !session || roleLoading) {
+        console.log('useUserPermissions - Waiting for auth/role:', { 
+          user: !!user, 
+          session: !!session, 
+          roleLoading,
+          role 
+        });
         setPermissions({});
         setLoading(false);
         return;
       }
 
+      if (!role) {
+        console.log('useUserPermissions - No role available');
+        setPermissions({});
+        setLoading(false);
+        return;
+      }
+
+      console.log('useUserPermissions - Fetching permissions for role:', role);
+
       // Admins have access to everything
       if (role === 'admin') {
+        console.log('useUserPermissions - Setting admin permissions');
         setPermissions({
           dashboard: true,
           articles: true,
@@ -52,6 +68,7 @@ export const useUserPermissions = () => {
 
       // Public users have no admin access
       if (role === 'public') {
+        console.log('useUserPermissions - Setting public permissions (none)');
         setPermissions({});
         setLoading(false);
         return;
@@ -60,15 +77,17 @@ export const useUserPermissions = () => {
       // Employee users - fetch their specific permissions from the database
       if (role === 'employee') {
         try {
+          console.log('useUserPermissions - Fetching employee permissions');
           const { data, error } = await supabase
             .from('user_section_permissions')
             .select('section, has_access')
             .eq('user_id', user.id);
 
           if (error) {
-            console.error('Error fetching user permissions:', error);
+            console.error('useUserPermissions - Error fetching permissions:', error);
             setPermissions({});
           } else {
+            console.log('useUserPermissions - Employee permissions fetched:', data);
             const userPermissions: UserPermissions = {};
             data?.forEach((perm) => {
               userPermissions[perm.section] = perm.has_access;
@@ -76,7 +95,7 @@ export const useUserPermissions = () => {
             setPermissions(userPermissions);
           }
         } catch (error) {
-          console.error('Error fetching user permissions:', error);
+          console.error('useUserPermissions - Unexpected error:', error);
           setPermissions({});
         }
       }
@@ -84,8 +103,14 @@ export const useUserPermissions = () => {
       setLoading(false);
     };
 
-    fetchPermissions();
-  }, [user, role]);
+    // Add small delay to ensure role is established
+    if (user && session && !roleLoading) {
+      const timeoutId = setTimeout(fetchPermissions, 100);
+      return () => clearTimeout(timeoutId);
+    } else {
+      fetchPermissions();
+    }
+  }, [user, session, role, roleLoading]);
 
   const hasPermission = (section: AdminSection) => {
     // Admins have access to everything
