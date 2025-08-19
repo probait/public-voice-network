@@ -82,6 +82,17 @@ const AdminThoughtsManagement = () => {
   }, [session, user]);
 
   const fetchSubmissions = async () => {
+    if (!user || !session) {
+      console.log('AdminThoughts - No user or session available');
+      return;
+    }
+
+    // Ensure the session is set on the Supabase client
+    await supabase.auth.setSession({
+      access_token: session.access_token,
+      refresh_token: session.refresh_token
+    });
+
     try {
       // Calculate offset for pagination
       const offset = (currentPage - 1) * pageSize;
@@ -117,34 +128,12 @@ const AdminThoughtsManagement = () => {
       const { data, error, count } = await query;
 
       if (error) {
-        console.error('JWT/RLS Debug - Query failed:', {
-          error: error.message,
-          code: error.code,
-          details: error.details,
-          hint: error.hint,
-          userIdFromAuth: user?.id,
-          sessionExists: !!session,
-          tokenPresent: !!session?.access_token
+        console.error('AdminThoughts - Database error:', error);
+        toast({
+          title: "Database Error",
+          description: "Failed to load thoughts submissions. Please try again.",
+          variant: "destructive",
         });
-        
-        // Check if this is an RLS/auth.uid() issue
-        if (error.message?.includes('permission denied') || error.code === 'PGRST301') {
-          // Test auth.uid() resolution
-          const { data: authTest, error: authTestError } = await supabase.rpc('get_user_role', { _user_id: user?.id });
-          console.log('Auth UID Test:', { authTest, authTestError });
-          
-          toast({
-            title: "Access Denied - RLS Issue",
-            description: "The database auth.uid() is returning null. Check JWT token claims.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Database Error",
-            description: `Failed to fetch thoughts: ${error.message}`,
-            variant: "destructive",
-          });
-        }
         return;
       }
 
