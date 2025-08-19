@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useAdminThoughts, ThoughtsSubmission } from '@/hooks/useAdminThoughts';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,21 @@ import {
 import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2, Filter } from 'lucide-react';
 import BulkActions from '@/components/admin/BulkActions';
 
+interface ThoughtsSubmission {
+  id: string;
+  name: string;
+  email: string;
+  province: string;
+  category: string;
+  subject: string;
+  message: string;
+  status: string;
+  featured: boolean;
+  source: string;
+  created_at: string;
+  updated_at: string;
+}
+
 
 
 const AdminThoughtsManagement = () => {
@@ -40,26 +56,252 @@ const AdminThoughtsManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const {
-    submissions,
-    totalSubmissions,
-    isLoading,
-    filterOptions,
-    toggleFeaturedMutation,
-    featureNextBatchMutation,
-    deleteMutation,
-    bulkDeleteMutation,
-    exportMutation
-  } = useAdminThoughts({
-    page: currentPage,
-    pageSize,
-    searchTerm,
-    featuredFilter,
-    categoryFilter,
-    provinceFilter,
-    orderBy,
-    orderDirection
+  // Fetch submissions with direct query
+  const { data: submissionsData, isLoading } = useQuery({
+    queryKey: ['admin-thoughts', currentPage, pageSize, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection],
+    queryFn: async () => {
+      let query = supabase
+        .from('thoughts_submissions')
+        .select('*', { count: 'exact' });
+
+      // Apply filters
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,subject.ilike.%${searchTerm}%,message.ilike.%${searchTerm}%`);
+      }
+      if (featuredFilter === 'featured') {
+        query = query.eq('featured', true);
+      } else if (featuredFilter === 'not-featured') {
+        query = query.eq('featured', false);
+      }
+      if (categoryFilter !== 'all') {
+        query = query.eq('category', categoryFilter);
+      }
+      if (provinceFilter !== 'all') {
+        query = query.eq('province', provinceFilter);
+      }
+
+      // Apply sorting and pagination
+      query = query
+        .order(orderBy, { ascending: orderDirection === 'asc' })
+        .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
+
+      const { data, error, count } = await query;
+      if (error) throw error;
+      
+      return { submissions: data || [], totalSubmissions: count || 0 };
+    },
+  });
+
+  // Fetch filter options
+  const { data: filterOptions } = useQuery({
+    queryKey: ['admin-thoughts-filters'],
+    queryFn: async () => {
+      const [categoriesRes, provincesRes] = await Promise.all([
+        supabase.from('thoughts_submissions').select('category').not('category', 'is', null),
+        supabase.from('thoughts_submissions').select('province').not('province', 'is', null)
+      ]);
+
+      const categories = [...new Set(categoriesRes.data?.map(item => item.category) || [])];
+      const provinces = [...new Set(provincesRes.data?.map(item => item.province) || [])];
+
+      return { categories, provinces };
+    },
+  });
+
+  const submissions = submissionsData?.submissions || [];
+  const totalSubmissions = submissionsData?.totalSubmissions || 0;
+
+  // Toggle featured mutation
+  const toggleFeaturedMutation = useMutation({
+    mutationFn: async ({ id, featured }: { id: string; featured: boolean }) => {
+      const { error } = await supabase
+        .from('thoughts_submissions')
+        .update({ featured })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-thoughts'] });
+      toast({
+        title: 'Success',
+        description: 'Featured status updated successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to update featured status',
+        variant: 'destructive',
+      });
+      console.error('Error updating featured status:', error);
+    },
+  });
+
+  // Feature next batch mutation
+  const featureNextBatchMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase
+        .from('thoughts_submissions')
+        .select('id')
+        .eq('source', 'voices_csv')
+        .eq('featured', false)
+        .gte('message.length()', 100)
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        const ids = data.map(item => item.id);
+        const { error: updateError } = await supabase
+          .from('thoughts_submissions')
+          .update({ featured: true })
+          .in('id', ids);
+        
+        if (updateError) throw updateError;
+        return ids.length;
+      }
+      return 0;
+    },
+    onSuccess: (count) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-thoughts'] });
+      toast({
+        title: 'Success',
+        description: `Featured ${count} submissions`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to feature submissions',
+        variant: 'destructive',
+      });
+      console.error('Error featuring submissions:', error);
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('thoughts_submissions')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-thoughts'] });
+      toast({
+        title: 'Success',
+        description: 'Submission deleted successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete submission',
+        variant: 'destructive',
+      });
+      console.error('Error deleting submission:', error);
+    },
+  });
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      const { error } = await supabase
+        .from('thoughts_submissions')
+        .delete()
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-thoughts'] });
+      toast({
+        title: 'Success',
+        description: 'Submissions deleted successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete submissions',
+        variant: 'destructive',
+      });
+      console.error('Error deleting submissions:', error);
+    },
+  });
+
+  // Export mutation
+  const exportMutation = useMutation({
+    mutationFn: async (filters: any) => {
+      let query = supabase.from('thoughts_submissions').select('*');
+
+      // Apply same filters as main query
+      if (filters.searchTerm) {
+        query = query.or(`name.ilike.%${filters.searchTerm}%,email.ilike.%${filters.searchTerm}%,subject.ilike.%${filters.searchTerm}%,message.ilike.%${filters.searchTerm}%`);
+      }
+      if (filters.featuredFilter === 'featured') {
+        query = query.eq('featured', true);
+      } else if (filters.featuredFilter === 'not-featured') {
+        query = query.eq('featured', false);
+      }
+      if (filters.categoryFilter !== 'all') {
+        query = query.eq('category', filters.categoryFilter);
+      }
+      if (filters.provinceFilter !== 'all') {
+        query = query.eq('province', filters.provinceFilter);
+      }
+
+      query = query.order(filters.orderBy, { ascending: filters.orderDirection === 'asc' });
+
+      const { data, error } = await query;
+      if (error) throw error;
+
+      // Create CSV content
+      const headers = ['Name', 'Email', 'Province', 'Category', 'Subject', 'Message', 'Featured', 'Source', 'Created At'];
+      const csvContent = [
+        headers.join(','),
+        ...(data || []).map(row => [
+          `"${row.name.replace(/"/g, '""')}"`,
+          `"${row.email.replace(/"/g, '""')}"`,
+          `"${row.province.replace(/"/g, '""')}"`,
+          `"${row.category.replace(/"/g, '""')}"`,
+          `"${row.subject.replace(/"/g, '""')}"`,
+          `"${row.message.replace(/"/g, '""')}"`,
+          row.featured ? 'Yes' : 'No',
+          `"${row.source.replace(/"/g, '""')}"`,
+          new Date(row.created_at).toISOString()
+        ].join(','))
+      ].join('\n');
+
+      // Download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `thoughts_submissions_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Success',
+        description: 'Export completed successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: 'Failed to export data',
+        variant: 'destructive',
+      });
+      console.error('Error exporting data:', error);
+    },
   });
 
   const toggleFeatured = (id: string, currentFeatured: boolean) => {
@@ -201,7 +443,7 @@ const AdminThoughtsManagement = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    {filterOptions.categories.map((category) => (
+                    {filterOptions?.categories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
@@ -215,7 +457,7 @@ const AdminThoughtsManagement = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Provinces</SelectItem>
-                    {filterOptions.provinces.map((province) => (
+                    {filterOptions?.provinces.map((province) => (
                       <SelectItem key={province} value={province}>
                         {province}
                       </SelectItem>
