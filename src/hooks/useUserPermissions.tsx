@@ -20,20 +20,14 @@ interface UserPermissions {
 }
 
 export const useUserPermissions = () => {
-  const { user, session } = useAuth();
-  const { role, isAdmin, loading: roleLoading } = useUserRole();
+  const { user } = useAuth();
+  const { role, isAdmin } = useUserRole();
   const [permissions, setPermissions] = useState<UserPermissions>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPermissions = async () => {
-      if (!user || !session || roleLoading) {
-        setPermissions({});
-        setLoading(false);
-        return;
-      }
-
-      if (!role) {
+      if (!user || !role) {
         setPermissions({});
         setLoading(false);
         return;
@@ -72,7 +66,7 @@ export const useUserPermissions = () => {
             .eq('user_id', user.id);
 
           if (error) {
-            console.error('useUserPermissions - Error fetching permissions:', error);
+            console.error('Error fetching user permissions:', error);
             setPermissions({});
           } else {
             const userPermissions: UserPermissions = {};
@@ -82,7 +76,7 @@ export const useUserPermissions = () => {
             setPermissions(userPermissions);
           }
         } catch (error) {
-          console.error('useUserPermissions - Unexpected error:', error);
+          console.error('Error fetching user permissions:', error);
           setPermissions({});
         }
       }
@@ -91,7 +85,7 @@ export const useUserPermissions = () => {
     };
 
     fetchPermissions();
-  }, [user, session, role, roleLoading]);
+  }, [user, role]);
 
   const hasPermission = (section: AdminSection) => {
     // Admins have access to everything

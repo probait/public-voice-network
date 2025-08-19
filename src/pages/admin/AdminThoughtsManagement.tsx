@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -57,42 +56,8 @@ const AdminThoughtsManagement = () => {
   const pageSize = 10;
   const { toast } = useToast();
   const [batching, setBatching] = useState(false);
-  const { user, session } = useAuth();
-
-  // JWT Token Debugging
-  useEffect(() => {
-    if (session?.access_token) {
-      try {
-        // Decode JWT token to inspect claims
-        const [header, payload, signature] = session.access_token.split('.');
-        const decodedPayload = JSON.parse(atob(payload));
-        
-        console.log('JWT Token Debug:', {
-          userIdInToken: decodedPayload.sub,
-          currentUserId: user?.id,
-          tokenExpiry: new Date(decodedPayload.exp * 1000).toISOString(),
-          currentTime: new Date().toISOString(),
-          tokenValid: decodedPayload.exp * 1000 > Date.now(),
-          claims: decodedPayload
-        });
-      } catch (error) {
-        console.error('Failed to decode JWT token:', error);
-      }
-    }
-  }, [session, user]);
 
   const fetchSubmissions = async () => {
-    if (!user || !session) {
-      console.log('AdminThoughts - No user or session available');
-      return;
-    }
-
-    // Ensure the session is set on the Supabase client
-    await supabase.auth.setSession({
-      access_token: session.access_token,
-      refresh_token: session.refresh_token
-    });
-
     try {
       // Calculate offset for pagination
       const offset = (currentPage - 1) * pageSize;
@@ -127,23 +92,14 @@ const AdminThoughtsManagement = () => {
 
       const { data, error, count } = await query;
 
-      if (error) {
-        console.error('AdminThoughts - Database error:', error);
-        toast({
-          title: "Database Error",
-          description: "Failed to load thoughts submissions. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
+      if (error) throw error;
       setSubmissions(data || []);
       setTotalSubmissions(count || 0);
     } catch (error) {
-      console.error('AdminThoughts - Unexpected error:', error);
+      console.error('Error fetching submissions:', error);
       toast({
-        title: "Unexpected Error",
-        description: "An unexpected error occurred. Please try refreshing the page.",
+        title: "Error",
+        description: "Failed to fetch thoughts submissions",
         variant: "destructive",
       });
     } finally {
@@ -304,10 +260,8 @@ const AdminThoughtsManagement = () => {
   };
 
   useEffect(() => {
-    if (session && user) {
-      fetchSubmissions();
-    }
-  }, [currentPage, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection, session, user]);
+    fetchSubmissions();
+  }, [currentPage, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection]);
 
   useEffect(() => {
     if (searchTerm || featuredFilter !== 'all' || categoryFilter !== 'all' || provinceFilter !== 'all') {
