@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,11 +57,13 @@ const AdminThoughtsManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
 
   // Fetch submissions with direct query
   const { data: submissionsData, isLoading } = useQuery({
-    queryKey: ['admin-thoughts', currentPage, pageSize, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection],
+    queryKey: ['admin-thoughts', user?.id, currentPage, pageSize, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection],
+    enabled: !!user,
     queryFn: async () => {
       let query = supabase
         .from('thoughts_submissions')
@@ -96,7 +99,8 @@ const AdminThoughtsManagement = () => {
 
   // Fetch filter options
   const { data: filterOptions } = useQuery({
-    queryKey: ['admin-thoughts-filters'],
+    queryKey: ['admin-thoughts-filters', user?.id],
+    enabled: !!user,
     queryFn: async () => {
       const [categoriesRes, provincesRes] = await Promise.all([
         supabase.from('thoughts_submissions').select('category').not('category', 'is', null),
@@ -115,6 +119,7 @@ const AdminThoughtsManagement = () => {
 
   // Toggle featured mutation
   const toggleFeaturedMutation = useMutation({
+    mutationKey: ['toggle-featured', user?.id],
     mutationFn: async ({ id, featured }: { id: string; featured: boolean }) => {
       const { error } = await supabase
         .from('thoughts_submissions')
@@ -141,6 +146,7 @@ const AdminThoughtsManagement = () => {
 
   // Feature next batch mutation
   const featureNextBatchMutation = useMutation({
+    mutationKey: ['feature-next-batch', user?.id],
     mutationFn: async () => {
       const { data, error } = await supabase
         .from('thoughts_submissions')
@@ -184,6 +190,7 @@ const AdminThoughtsManagement = () => {
 
   // Delete mutation
   const deleteMutation = useMutation({
+    mutationKey: ['delete-submission', user?.id],
     mutationFn: async (id: string) => {
       const { error } = await supabase
         .from('thoughts_submissions')
@@ -210,6 +217,7 @@ const AdminThoughtsManagement = () => {
 
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
+    mutationKey: ['bulk-delete', user?.id],
     mutationFn: async (ids: string[]) => {
       const { error } = await supabase
         .from('thoughts_submissions')
