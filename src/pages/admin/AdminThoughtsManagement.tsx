@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,9 +57,39 @@ const AdminThoughtsManagement = () => {
   const pageSize = 10;
   const { toast } = useToast();
   const [batching, setBatching] = useState(false);
+  const { user, session } = useAuth();
+
+  // Enhanced authentication debugging
+  useEffect(() => {
+    console.log('AdminThoughtsManagement - Auth State:', {
+      user: user?.id,
+      userEmail: user?.email,
+      sessionExists: !!session,
+      sessionExpiry: session?.expires_at,
+      sessionAccessToken: session?.access_token ? 'Present' : 'Missing'
+    });
+  }, [user, session]);
 
   const fetchSubmissions = async () => {
     try {
+      // Enhanced session validation before making queries
+      const { data: currentSession } = await supabase.auth.getSession();
+      
+      if (!currentSession?.session) {
+        console.error('AdminThoughts - No valid session found');
+        toast({
+          title: "Authentication Required",
+          description: "Please log in again to access admin features",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('AdminThoughts - Making query with session:', {
+        userId: currentSession.session.user?.id,
+        sessionValid: !!currentSession.session.access_token
+      });
+
       // Calculate offset for pagination
       const offset = (currentPage - 1) * pageSize;
       
@@ -92,14 +123,43 @@ const AdminThoughtsManagement = () => {
 
       const { data, error, count } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error('AdminThoughts - Database query error:', {
+          error: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        });
+        
+        // Enhanced error handling
+        if (error.message?.includes('permission denied') || error.code === 'PGRST301') {
+          toast({
+            title: "Access Denied",
+            description: "Admin permissions required. Please verify your role and try refreshing the page.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Database Error",
+            description: `Failed to fetch thoughts: ${error.message}`,
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+
+      console.log('AdminThoughts - Query successful:', {
+        resultsCount: data?.length || 0,
+        totalCount: count
+      });
+
       setSubmissions(data || []);
       setTotalSubmissions(count || 0);
     } catch (error) {
-      console.error('Error fetching submissions:', error);
+      console.error('AdminThoughts - Unexpected error:', error);
       toast({
-        title: "Error",
-        description: "Failed to fetch thoughts submissions",
+        title: "Unexpected Error",
+        description: "An unexpected error occurred. Please try refreshing the page.",
         variant: "destructive",
       });
     } finally {
@@ -259,9 +319,17 @@ const AdminThoughtsManagement = () => {
     }
   };
 
+  // Enhanced effect with session dependency and delayed execution
   useEffect(() => {
-    fetchSubmissions();
-  }, [currentPage, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection]);
+    if (session && user) {
+      // Small delay to ensure session context is fully established
+      const timeoutId = setTimeout(() => {
+        fetchSubmissions();
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [currentPage, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection, session, user]);
 
   useEffect(() => {
     if (searchTerm || featuredFilter !== 'all' || categoryFilter !== 'all' || provinceFilter !== 'all') {
