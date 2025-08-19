@@ -695,6 +695,36 @@ export type Database = {
       }
     }
     Views: {
+      featured_thoughts_safe: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          id: string | null
+          message: string | null
+          name: string | null
+          province: string | null
+          subject: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          id?: string | null
+          message?: string | null
+          name?: string | null
+          province?: string | null
+          subject?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          id?: string | null
+          message?: string | null
+          name?: string | null
+          province?: string | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
       profiles_public: {
         Row: {
           avatar_url: string | null
@@ -712,8 +742,8 @@ export type Database = {
           count: number
         }[]
       }
-      get_featured_thoughts_public: {
-        Args: Record<PropertyKey, never>
+      get_featured_thoughts_safe: {
+        Args: { p_limit?: number; p_offset?: number }
         Returns: {
           category: string
           created_at: string

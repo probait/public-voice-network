@@ -15,10 +15,10 @@ export const useFeaturedThoughts = () => {
   return useQuery({
     queryKey: ["featuredThoughts"],
     queryFn: async (): Promise<FeaturedThought[]> => {
+      // Use the new secure view instead of direct table access
       const { data, error } = await supabase
-        .from("thoughts_submissions")
-        .select("id, name, province, category, subject, message, created_at")
-        .eq("featured", true)
+        .from("featured_thoughts_safe")
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) {
