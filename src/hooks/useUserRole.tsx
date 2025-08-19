@@ -13,13 +13,10 @@ export const useUserRole = () => {
   useEffect(() => {
     const fetchUserRole = async () => {
       if (!user || !session) {
-        console.log('useUserRole - No user or session:', { user: !!user, session: !!session });
         setRole(null);
         setLoading(false);
         return;
       }
-
-      console.log('useUserRole - Fetching role for user:', user.id);
 
       try {
         // First try the RPC function
@@ -28,10 +25,7 @@ export const useUserRole = () => {
         });
 
         if (rpcError) {
-          console.warn('useUserRole - RPC function failed:', rpcError);
-          
           // Fallback: Query profiles table directly
-          console.log('useUserRole - Trying fallback profile query...');
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('user_role')
@@ -39,14 +33,11 @@ export const useUserRole = () => {
             .single();
 
           if (profileError) {
-            console.error('useUserRole - Profile query also failed:', profileError);
             setRole('public'); // Default fallback
           } else {
-            console.log('useUserRole - Profile query successful:', profileData);
             setRole(profileData.user_role as UserRole || 'public');
           }
         } else {
-          console.log('useUserRole - RPC query successful:', rpcData);
           setRole(rpcData as UserRole);
         }
       } catch (error) {
@@ -57,13 +48,7 @@ export const useUserRole = () => {
       }
     };
 
-    // Add small delay to ensure session is fully established
-    if (user && session) {
-      const timeoutId = setTimeout(fetchUserRole, 100);
-      return () => clearTimeout(timeoutId);
-    } else {
-      fetchUserRole();
-    }
+    fetchUserRole();
   }, [user, session]);
 
   const hasRole = (requiredRole: UserRole) => {

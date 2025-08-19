@@ -28,29 +28,19 @@ export const useUserPermissions = () => {
   useEffect(() => {
     const fetchPermissions = async () => {
       if (!user || !session || roleLoading) {
-        console.log('useUserPermissions - Waiting for auth/role:', { 
-          user: !!user, 
-          session: !!session, 
-          roleLoading,
-          role 
-        });
         setPermissions({});
         setLoading(false);
         return;
       }
 
       if (!role) {
-        console.log('useUserPermissions - No role available');
         setPermissions({});
         setLoading(false);
         return;
       }
 
-      console.log('useUserPermissions - Fetching permissions for role:', role);
-
       // Admins have access to everything
       if (role === 'admin') {
-        console.log('useUserPermissions - Setting admin permissions');
         setPermissions({
           dashboard: true,
           articles: true,
@@ -68,7 +58,6 @@ export const useUserPermissions = () => {
 
       // Public users have no admin access
       if (role === 'public') {
-        console.log('useUserPermissions - Setting public permissions (none)');
         setPermissions({});
         setLoading(false);
         return;
@@ -77,7 +66,6 @@ export const useUserPermissions = () => {
       // Employee users - fetch their specific permissions from the database
       if (role === 'employee') {
         try {
-          console.log('useUserPermissions - Fetching employee permissions');
           const { data, error } = await supabase
             .from('user_section_permissions')
             .select('section, has_access')
@@ -87,7 +75,6 @@ export const useUserPermissions = () => {
             console.error('useUserPermissions - Error fetching permissions:', error);
             setPermissions({});
           } else {
-            console.log('useUserPermissions - Employee permissions fetched:', data);
             const userPermissions: UserPermissions = {};
             data?.forEach((perm) => {
               userPermissions[perm.section] = perm.has_access;
@@ -103,13 +90,7 @@ export const useUserPermissions = () => {
       setLoading(false);
     };
 
-    // Add small delay to ensure role is established
-    if (user && session && !roleLoading) {
-      const timeoutId = setTimeout(fetchPermissions, 100);
-      return () => clearTimeout(timeoutId);
-    } else {
-      fetchPermissions();
-    }
+    fetchPermissions();
   }, [user, session, role, roleLoading]);
 
   const hasPermission = (section: AdminSection) => {

@@ -59,37 +59,30 @@ const AdminThoughtsManagement = () => {
   const [batching, setBatching] = useState(false);
   const { user, session } = useAuth();
 
-  // Enhanced authentication debugging
+  // JWT Token Debugging
   useEffect(() => {
-    console.log('AdminThoughtsManagement - Auth State:', {
-      user: user?.id,
-      userEmail: user?.email,
-      sessionExists: !!session,
-      sessionExpiry: session?.expires_at,
-      sessionAccessToken: session?.access_token ? 'Present' : 'Missing'
-    });
-  }, [user, session]);
+    if (session?.access_token) {
+      try {
+        // Decode JWT token to inspect claims
+        const [header, payload, signature] = session.access_token.split('.');
+        const decodedPayload = JSON.parse(atob(payload));
+        
+        console.log('JWT Token Debug:', {
+          userIdInToken: decodedPayload.sub,
+          currentUserId: user?.id,
+          tokenExpiry: new Date(decodedPayload.exp * 1000).toISOString(),
+          currentTime: new Date().toISOString(),
+          tokenValid: decodedPayload.exp * 1000 > Date.now(),
+          claims: decodedPayload
+        });
+      } catch (error) {
+        console.error('Failed to decode JWT token:', error);
+      }
+    }
+  }, [session, user]);
 
   const fetchSubmissions = async () => {
     try {
-      // Enhanced session validation before making queries
-      const { data: currentSession } = await supabase.auth.getSession();
-      
-      if (!currentSession?.session) {
-        console.error('AdminThoughts - No valid session found');
-        toast({
-          title: "Authentication Required",
-          description: "Please log in again to access admin features",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      console.log('AdminThoughts - Making query with session:', {
-        userId: currentSession.session.user?.id,
-        sessionValid: !!currentSession.session.access_token
-      });
-
       // Calculate offset for pagination
       const offset = (currentPage - 1) * pageSize;
       
@@ -124,18 +117,25 @@ const AdminThoughtsManagement = () => {
       const { data, error, count } = await query;
 
       if (error) {
-        console.error('AdminThoughts - Database query error:', {
+        console.error('JWT/RLS Debug - Query failed:', {
           error: error.message,
           code: error.code,
           details: error.details,
-          hint: error.hint
+          hint: error.hint,
+          userIdFromAuth: user?.id,
+          sessionExists: !!session,
+          tokenPresent: !!session?.access_token
         });
         
-        // Enhanced error handling
+        // Check if this is an RLS/auth.uid() issue
         if (error.message?.includes('permission denied') || error.code === 'PGRST301') {
+          // Test auth.uid() resolution
+          const { data: authTest, error: authTestError } = await supabase.rpc('get_user_role', { _user_id: user?.id });
+          console.log('Auth UID Test:', { authTest, authTestError });
+          
           toast({
-            title: "Access Denied",
-            description: "Admin permissions required. Please verify your role and try refreshing the page.",
+            title: "Access Denied - RLS Issue",
+            description: "The database auth.uid() is returning null. Check JWT token claims.",
             variant: "destructive",
           });
         } else {
@@ -147,11 +147,6 @@ const AdminThoughtsManagement = () => {
         }
         return;
       }
-
-      console.log('AdminThoughts - Query successful:', {
-        resultsCount: data?.length || 0,
-        totalCount: count
-      });
 
       setSubmissions(data || []);
       setTotalSubmissions(count || 0);
@@ -319,15 +314,9 @@ const AdminThoughtsManagement = () => {
     }
   };
 
-  // Enhanced effect with session dependency and delayed execution
   useEffect(() => {
     if (session && user) {
-      // Small delay to ensure session context is fully established
-      const timeoutId = setTimeout(() => {
-        fetchSubmissions();
-      }, 100);
-      
-      return () => clearTimeout(timeoutId);
+      fetchSubmissions();
     }
   }, [currentPage, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection, session, user]);
 

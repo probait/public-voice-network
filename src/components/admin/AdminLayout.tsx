@@ -19,7 +19,7 @@ const AdminLayout = ({ children, requiredRole = 'employee' }: AdminLayoutProps) 
   const { canAccessAdminPortal, hasAnyPermission, loading: permissionsLoading } = useUserPermissions();
 
   // Wait for all authentication states to load before making access decisions
-  if (authLoading || roleLoading || permissionsLoading || !role) {
+  if (authLoading || roleLoading || permissionsLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="h-16 bg-white border-b">
