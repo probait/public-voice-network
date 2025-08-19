@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminThoughts, ThoughtsSubmission } from '@/hooks/useAdminThoughts';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,23 +27,8 @@ import { Download, Star, StarOff, Search, MessageSquare, Users, Edit2, Trash2, F
 import BulkActions from '@/components/admin/BulkActions';
 
 
-interface ThoughtsSubmission {
-  id: string;
-  name: string;
-  email: string;
-  province: string;
-  category: string;
-  subject: string;
-  message: string;
-  featured: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 const AdminThoughtsManagement = () => {
-  const [submissions, setSubmissions] = useState<ThoughtsSubmission[]>([]);
-  const [totalSubmissions, setTotalSubmissions] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [featuredFilter, setFeaturedFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -55,249 +40,52 @@ const AdminThoughtsManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const { toast } = useToast();
-  const [batching, setBatching] = useState(false);
 
-  const fetchSubmissions = async () => {
-    try {
-      // Calculate offset for pagination
-      const offset = (currentPage - 1) * pageSize;
-      
-      let query = supabase
-        .from('thoughts_submissions')
-        .select('*', { count: 'exact' })
-        .range(offset, offset + pageSize - 1);
+  const {
+    submissions,
+    totalSubmissions,
+    isLoading,
+    filterOptions,
+    toggleFeaturedMutation,
+    featureNextBatchMutation,
+    deleteMutation,
+    bulkDeleteMutation,
+    exportMutation
+  } = useAdminThoughts({
+    page: currentPage,
+    pageSize,
+    searchTerm,
+    featuredFilter,
+    categoryFilter,
+    provinceFilter,
+    orderBy,
+    orderDirection
+  });
 
-      // Apply search filter if there's a search term
-      if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,subject.ilike.%${searchTerm}%,message.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,province.ilike.%${searchTerm}%`);
-      }
-
-      // Apply featured filter
-      if (featuredFilter !== 'all') {
-        query = query.eq('featured', featuredFilter === 'featured');
-      }
-
-      // Apply category filter
-      if (categoryFilter !== 'all') {
-        query = query.eq('category', categoryFilter);
-      }
-
-      // Apply province filter
-      if (provinceFilter !== 'all') {
-        query = query.eq('province', provinceFilter);
-      }
-
-      // Apply ordering
-      query = query.order(orderBy, { ascending: orderDirection === 'asc' });
-
-      const { data, error, count } = await query;
-
-      if (error) throw error;
-      setSubmissions(data || []);
-      setTotalSubmissions(count || 0);
-    } catch (error) {
-      console.error('Error fetching submissions:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch thoughts submissions",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const toggleFeatured = (id: string, currentFeatured: boolean) => {
+    toggleFeaturedMutation.mutate({ id, featured: !currentFeatured });
   };
 
-  const toggleFeatured = async (id: string, currentFeatured: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('thoughts_submissions')
-        .update({ featured: !currentFeatured })
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setSubmissions(prev => 
-        prev.map(sub => 
-          sub.id === id ? { ...sub, featured: !currentFeatured } : sub
-        )
-      );
-
-      toast({
-        title: currentFeatured ? "Unfeatured" : "Featured",
-        description: `Thought ${currentFeatured ? 'removed from' : 'added to'} homepage`,
-      });
-    } catch (error) {
-      console.error('Error updating featured status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update featured status",
-        variant: "destructive",
-      });
-    }
+  const featureNextBatch = () => {
+    featureNextBatchMutation.mutate();
   };
 
-  const featureNextBatch = async () => {
-    try {
-      setBatching(true);
-      // Fetch a larger pool to filter, then take first 100 eligible
-      const { data, error } = await supabase
-        .from('thoughts_submissions')
-        .select('id, message, created_at')
-        .eq('source', 'bc_ai_survey_2025')
-        .eq('featured', false)
-        .order('created_at', { ascending: true })
-        .limit(500);
-      if (error) throw error;
-
-      const pool = (data || []).filter(r => {
-        const m = (r.message || '').trim();
-        if (!m) return false;
-        if (m.startsWith('Voice imported from the BC AI Survey')) return false;
-        return m.length >= 60; // basic quality gate
-      });
-
-      if (pool.length === 0) {
-        toast({ title: 'No eligible voices', description: 'No more dataset entries meet curation criteria.' });
-        return;
-      }
-
-      const ids = pool.slice(0, 100).map(r => r.id);
-      const { error: updErr } = await supabase
-        .from('thoughts_submissions')
-        .update({ featured: true })
-        .in('id', ids);
-      if (updErr) throw updErr;
-
-      toast({ title: 'Curated 100 voices', description: `Featured ${ids.length} new voices from the dataset.` });
-      await fetchSubmissions();
-    } catch (err) {
-      console.error('Error featuring next 100:', err);
-      toast({ title: 'Curation failed', description: 'Could not feature the next batch.', variant: 'destructive' });
-    } finally {
-      setBatching(false);
-    }
+  const exportToCSV = () => {
+    exportMutation.mutate({
+      searchTerm,
+      featuredFilter,
+      categoryFilter,
+      provinceFilter,
+      orderBy,
+      orderDirection
+    });
   };
-  const exportToCSV = async () => {
-    try {
-      // Fetch ALL submissions for export (not just current page)
-      let query = supabase
-        .from('thoughts_submissions')
-        .select('*');
-
-      // Apply the same filters that are currently active
-      if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,subject.ilike.%${searchTerm}%,message.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,province.ilike.%${searchTerm}%`);
-      }
-
-      if (featuredFilter !== 'all') {
-        query = query.eq('featured', featuredFilter === 'featured');
-      }
-
-      if (categoryFilter !== 'all') {
-        query = query.eq('category', categoryFilter);
-      }
-
-      if (provinceFilter !== 'all') {
-        query = query.eq('province', provinceFilter);
-      }
-
-      // Apply ordering
-      query = query.order(orderBy, { ascending: orderDirection === 'asc' });
-
-      const { data: allSubmissions, error } = await query;
-
-      if (error) throw error;
-
-      const headers = [
-        'Name',
-        'Email', 
-        'Province',
-        'Category',
-        'Subject',
-        'Message',
-        'Featured',
-        'Submitted Date'
-      ];
-
-      const csvData = (allSubmissions || []).map(submission => [
-        submission.name,
-        submission.email,
-        submission.province,
-        submission.category,
-        submission.subject,
-        submission.message.replace(/"/g, '""'), // Escape quotes
-        submission.featured ? 'Yes' : 'No',
-        new Date(submission.created_at).toLocaleDateString()
-      ]);
-
-      const csvContent = [
-        headers.join(','),
-        ...csvData.map(row => row.map(field => `"${field}"`).join(','))
-      ].join('\n');
-
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `thoughts-submissions-${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      toast({
-        title: "Export complete",
-        description: `CSV file with ${csvData.length} thoughts has been downloaded`,
-      });
-    } catch (error) {
-      console.error('Error exporting CSV:', error);
-      toast({
-        title: "Export failed",
-        description: "There was an error exporting the CSV file",
-        variant: "destructive",
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetchSubmissions();
-  }, [currentPage, searchTerm, featuredFilter, categoryFilter, provinceFilter, orderBy, orderDirection]);
 
   useEffect(() => {
     if (searchTerm || featuredFilter !== 'all' || categoryFilter !== 'all' || provinceFilter !== 'all') {
       setCurrentPage(1);
     }
   }, [searchTerm, featuredFilter, categoryFilter, provinceFilter]);
-
-  const [allCategories, setAllCategories] = useState<string[]>([]);
-  const [allProvinces, setAllProvinces] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchFilterOptions = async () => {
-      try {
-        const { data: categories } = await supabase
-          .from('thoughts_submissions')
-          .select('category')
-          .order('category');
-        
-        const { data: provinces } = await supabase
-          .from('thoughts_submissions')
-          .select('province')
-          .order('province');
-
-        if (categories) {
-          setAllCategories([...new Set(categories.map(c => c.category))]);
-        }
-        if (provinces) {
-          setAllProvinces([...new Set(provinces.map(p => p.province))]);
-        }
-      } catch (error) {
-        console.error('Error fetching filter options:', error);
-      }
-    };
-
-    fetchFilterOptions();
-  }, []);
 
   const filteredSubmissions = submissions;
   const totalPages = Math.ceil(totalSubmissions / pageSize);
@@ -322,61 +110,21 @@ const AdminThoughtsManagement = () => {
     setViewingSubmission(submission);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this submission?')) {
-      try {
-        const { error } = await supabase
-          .from('thoughts_submissions')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
-
-        await fetchSubmissions();
-        toast({
-          title: 'Success',
-          description: 'Submission deleted successfully',
-        });
-      } catch (error) {
-        console.error('Error deleting submission:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to delete submission',
-          variant: 'destructive',
-        });
-      }
+      deleteMutation.mutate(id);
     }
   };
 
-  const handleBulkDelete = async () => {
+  const handleBulkDelete = () => {
     if (window.confirm(`Are you sure you want to delete ${selectedSubmissions.length} submissions?`)) {
-      try {
-        const { error } = await supabase
-          .from('thoughts_submissions')
-          .delete()
-          .in('id', selectedSubmissions);
-
-        if (error) throw error;
-
-        await fetchSubmissions();
-        setSelectedSubmissions([]);
-        toast({
-          title: 'Success',
-          description: `${selectedSubmissions.length} submissions deleted successfully`,
-        });
-      } catch (error) {
-        console.error('Error deleting submissions:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to delete submissions',
-          variant: 'destructive',
-        });
-      }
+      bulkDeleteMutation.mutate(selectedSubmissions);
+      setSelectedSubmissions([]);
     }
   };
 
 
-  if (loading) {
+  if (isLoading) {
     return (
       <AdminLayout requiredRole="admin">
         <div className="space-y-6">
@@ -399,9 +147,9 @@ const AdminThoughtsManagement = () => {
             <p className="text-gray-600 mt-2">Manage citizen submissions and feature them on the homepage</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button onClick={featureNextBatch} disabled={batching} className="flex items-center gap-2">
+            <Button onClick={featureNextBatch} disabled={featureNextBatchMutation.isPending} className="flex items-center gap-2">
               <Star className="h-4 w-4" />
-              {batching ? 'Featuring…' : 'Feature next 100'}
+              {featureNextBatchMutation.isPending ? 'Featuring…' : 'Feature next 100'}
             </Button>
             <Button onClick={exportToCSV} className="flex items-center gap-2">
               <Download className="h-4 w-4" />
@@ -453,7 +201,7 @@ const AdminThoughtsManagement = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    {allCategories.map((category) => (
+                    {filterOptions.categories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
@@ -467,7 +215,7 @@ const AdminThoughtsManagement = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Provinces</SelectItem>
-                    {allProvinces.map((province) => (
+                    {filterOptions.provinces.map((province) => (
                       <SelectItem key={province} value={province}>
                         {province}
                       </SelectItem>
