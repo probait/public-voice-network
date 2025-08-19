@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -715,21 +715,21 @@ export type Database = {
       get_featured_thoughts_public: {
         Args: Record<PropertyKey, never>
         Returns: {
+          category: string
+          created_at: string
           id: string
+          message: string
           name: string
           province: string
-          category: string
           subject: string
-          message: string
-          created_at: string
         }[]
       }
       get_public_profiles: {
         Args: Record<PropertyKey, never>
         Returns: {
-          id: string
-          full_name: string
           avatar_url: string
+          full_name: string
+          id: string
         }[]
       }
       get_total_thoughts_count: {
@@ -739,8 +739,8 @@ export type Database = {
       get_user_permissions: {
         Args: { user_id_param: string }
         Returns: {
-          section: string
           has_access: boolean
+          section: string
         }[]
       }
       get_user_role: {
@@ -749,17 +749,17 @@ export type Database = {
       }
       has_role: {
         Args: {
-          _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: boolean
       }
       has_section_permission: {
-        Args: { _user_id: string; _section: string }
+        Args: { _section: string; _user_id: string }
         Returns: boolean
       }
       is_admin_or_has_section: {
-        Args: { _user_id: string; _section: string }
+        Args: { _section: string; _user_id: string }
         Returns: boolean
       }
     }
